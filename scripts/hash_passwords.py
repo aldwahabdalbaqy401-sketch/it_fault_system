@@ -1,0 +1,31 @@
+import bcrypt
+import mysql.connector
+
+from config import Config
+
+
+NEW_PASSWORD = "0120270"
+ADMIN_USERNAME = "admin"
+
+
+conn = mysql.connector.connect(
+    host=Config.MYSQL_HOST,
+    user=Config.MYSQL_USER,
+    password=Config.MYSQL_PASSWORD,
+    database=Config.MYSQL_DB,
+)
+cursor = conn.cursor()
+
+try:
+    hashed_password = bcrypt.hashpw(
+        NEW_PASSWORD.encode('utf-8'), bcrypt.gensalt()
+    ).decode('utf-8')
+    cursor.execute(
+        "UPDATE users SET password = %s WHERE username = %s",
+        (hashed_password, ADMIN_USERNAME),
+    )
+    conn.commit()
+    print(f"Updated password for {ADMIN_USERNAME}: {cursor.rowcount} row(s)")
+finally:
+    cursor.close()
+    conn.close()

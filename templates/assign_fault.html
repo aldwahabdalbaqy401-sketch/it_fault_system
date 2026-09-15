@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}إسناد البلاغ{% endblock %}
+
+{% block content %}
+<div class="form-wrapper">
+    <div class="form-header">
+        <h2>🔧 إسناد البلاغ</h2>
+        <p>قم بإسناد البلاغ إلى أحد الفنيين</p>
+    </div>
+
+    <div class="form-container">
+        <!-- ===== معلومات البلاغ ===== -->
+        <div style="margin-bottom: 25px; padding: 20px; background: #f8fafc; border-radius: 12px; border-right: 4px solid #4a6cf7;">
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <p><strong>📌 البلاغ:</strong> {{ fault.title }}</p>
+                    <p><strong>📝 الوصف:</strong> {{ fault.description or 'لا يوجد وصف' }}</p>
+                </div>
+                <div style="text-align: left;">
+                    <p><strong>⚡ الأولوية:</strong> <span class="priority-{{ fault.priority }}">{{ fault.priority }}</span></p>
+                    <p><strong>📊 الحالة:</strong> <span class="status-{{ fault.status }}">{{ fault.status }}</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== نموذج الإسناد ===== -->
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="form-group">
+                <label for="assigned_to">👨‍🔧 اختر الفني</label>
+                <select id="assigned_to" name="assigned_to" required>
+                    <option value="">-- اختر فني --</option>
+                    {% for tech in technicians %}
+                    <option value="{{ tech.id }}">{{ tech.full_name }} ({{ tech.username }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">✅ إسناد</button>
+                <a href="{{ url_for('view_faults') }}" class="btn btn-secondary">⬅️ رجوع</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

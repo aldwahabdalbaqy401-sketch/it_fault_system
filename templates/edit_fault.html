@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}تعديل العطل{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 800px;">
+    
+    <!-- Header Section -->
+    <div class="mb-4 text-center">
+        <h2 class="fw-bold"><i class="bi bi-pencil-square text-primary me-2"></i> تعديل العطل</h2>
+        <p class="text-muted">قم بتحديث بيانات العطل التقني <span class="badge bg-secondary">#{{ fault.id }}</span></p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 p-md-5">
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="row g-4">
+                    <!-- Title -->
+                    <div class="col-12">
+                        <label for="title" class="form-label fw-bold"><i class="bi bi-type me-1"></i> عنوان العطل <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control bg-light" id="title" name="title" value="{{ fault.title }}" required>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="col-12">
+                        <label for="description" class="form-label fw-bold"><i class="bi bi-card-text me-1"></i> وصف العطل <span class="text-danger">*</span></label>
+                        <textarea class="form-control bg-light" id="description" name="description" rows="4">{{ fault.description }}</textarea>
+                    </div>
+
+                    <!-- Fault Type & Location -->
+                    <div class="col-md-6">
+                        <label for="fault_type" class="form-label fw-bold"><i class="bi bi-tags me-1"></i> نوع العطل <span class="text-danger">*</span></label>
+                        <select class="form-select bg-light" id="fault_type" name="fault_type">
+                            <option value="hardware" {% if fault.fault_type == 'hardware' %}selected{% endif %}>💻 أجهزة</option>
+                            <option value="software" {% if fault.fault_type == 'software' %}selected{% endif %}>💽 برمجيات</option>
+                            <option value="network" {% if fault.fault_type == 'network' %}selected{% endif %}>🌐 شبكات</option>
+                            <option value="database" {% if fault.fault_type == 'database' %}selected{% endif %}>🗄️ قواعد بيانات</option>
+                            <option value="internet" {% if fault.fault_type == 'internet' %}selected{% endif %}>🌍 إنترنت واتصال</option>
+                            <option value="security" {% if fault.fault_type == 'security' %}selected{% endif %}>🔒 أمني</option>
+                            <option value="other" {% if fault.fault_type == 'other' %}selected{% endif %}>⚙️ أخرى</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="location" class="form-label fw-bold"><i class="bi bi-geo-alt me-1"></i> مكان العطل</label>
+                        <input type="text" class="form-control bg-light" id="location" name="location" value="{{ fault.location or '' }}" placeholder="مثال: مبنى الهندسة، معمل 3">
+                    </div>
+
+                    <!-- Priority & Status -->
+                    <div class="col-md-6">
+                        <label for="priority" class="form-label fw-bold"><i class="bi bi-exclamation-triangle me-1"></i> الأولوية</label>
+                        <select class="form-select bg-light" id="priority" name="priority">
+                            <option value="low" {% if fault.priority == 'low' %}selected{% endif %}>🟢 منخفضة</option>
+                            <option value="medium" {% if fault.priority == 'medium' %}selected{% endif %}>🟡 متوسطة</option>
+                            <option value="high" {% if fault.priority == 'high' %}selected{% endif %}>🟠 عالية</option>
+                            <option value="critical" {% if fault.priority == 'critical' %}selected{% endif %}>🔴 حرجة</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="status" class="form-label fw-bold"><i class="bi bi-info-circle me-1"></i> الحالة</label>
+                        <select class="form-select bg-light" id="status" name="status">
+                            <option value="new" {% if fault.status == 'new' %}selected{% endif %}>🆕 جديد</option>
+                            <option value="in_progress" {% if fault.status == 'in_progress' %}selected{% endif %}>🔄 قيد المعالجة</option>
+                            <option value="resolved" {% if fault.status == 'resolved' %}selected{% endif %}>✅ تم الحل</option>
+                            <option value="closed" {% if fault.status == 'closed' %}selected{% endif %}>🔒 مغلق</option>
+                        </select>
+                    </div>
+
+                    <!-- Scheduled Date -->
+                    <div class="col-12">
+                        <label for="scheduled_date" class="form-label fw-bold"><i class="bi bi-calendar-event me-1"></i> موعد الصيانة (اختياري)</label>
+                        <input type="datetime-local" class="form-control bg-light" id="scheduled_date" name="scheduled_date" value="{{ fault.scheduled_date.strftime('%Y-%m-%dT%H:%M') if fault.scheduled_date else '' }}">
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Actions -->
+                <div class="d-flex gap-2 justify-content-end">
+                    <a href="{{ url_for('view_faults') }}" class="btn btn-light rounded-pill px-4 fw-bold">
+                        <i class="bi bi-x-circle me-1"></i> رجوع
+                    </a>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">
+                        <i class="bi bi-save me-1"></i> تحديث العطل
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control:focus, .form-select:focus {
+    background-color: #fff !important;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ 'Technician Support' if is_english else 'دعم الفنيين' }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- ===== الهيدر ===== -->
+    <div class="dashboard-header technician-header">
+        <div class="header-left">
+            <span class="technician-eyebrow"><i class="bi bi-wrench-adjustable-circle"></i> {{ 'Operations Center' if is_english else 'مركز العمليات' }}</span>
+            <h1>{{ 'Technician Support Dashboard' if is_english else 'لوحة دعم الفنيين' }}</h1>
+            <p>{{ 'Welcome' if is_english else 'مرحباً' }} {{ session.full_name }}, {{ 'these are the reports that need your attention.' if is_english else 'هذه البلاغات التي تحتاج إلى متابعتك.' }}</p>
+        </div>
+        <div class="header-right">
+            <span class="badge active-badge"><i class="bi bi-circle-fill"></i> {{ 'Online' if is_english else 'متصل' }}</span>
+            <span class="user-role"><i class="bi bi-person-gear"></i> {{ session.user_role }}</span>
+            <a href="{{ url_for('logout') }}" class="btn-logout"><i class="bi bi-box-arrow-left"></i> {{ 'Sign out' if is_english else 'تسجيل خروج' }}</a>
+        </div>
+    </div>
+
+    <!-- ===== إحصائيات الفني ===== -->
+    <div class="stats-grid technician-stats">
+        <div class="stat-card-dash">
+            <div class="stat-icon"><i class="bi bi-clipboard2-data"></i></div>
+            <div class="stat-info">
+                <span class="stat-number">{{ total_assigned }}</span>
+                <span class="stat-label">{{ 'Total assigned reports' if is_english else 'إجمالي البلاغات المسندة' }}</span>
+            </div>
+        </div>
+        <div class="stat-card-dash pending-stat">
+            <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-info">
+                <span class="stat-number">{{ pending_assigned }}</span>
+                <span class="stat-label">{{ 'In progress' if is_english else 'قيد المعالجة' }}</span>
+            </div>
+        </div>
+        <div class="stat-card-dash resolved-stat">
+            <div class="stat-icon"><i class="bi bi-check2-circle"></i></div>
+            <div class="stat-info">
+                <span class="stat-number">{{ resolved_assigned }}</span>
+                <span class="stat-label">{{ 'Resolved' if is_english else 'تم حلها' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== البلاغات المسندة ===== -->
+    <div class="table-box">
+        <div class="table-heading">
+            <div><span class="technician-eyebrow">{{ 'Work List' if is_english else 'قائمة العمل' }}</span><h2>{{ 'Reports assigned to you' if is_english else 'البلاغات المسندة إليك' }}</h2></div>
+            <span class="assignment-count">{{ assigned_faults|length }} {{ 'report(s)' if is_english else 'بلاغ' }}</span>
+        </div>
+        
+        {% if assigned_faults %}
+        <div class="technician-support-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>{{ 'Title' if is_english else 'العنوان' }}</th>
+                    <th>{{ 'Type' if is_english else 'النوع' }}</th>
+                    <th>{{ 'Location' if is_english else 'المكان' }}</th>
+                    <th>{{ 'Priority' if is_english else 'الأولوية' }}</th>
+                    <th>{{ 'Status' if is_english else 'الحالة' }}</th>
+                    <th>{{ 'Date' if is_english else 'التاريخ' }}</th>
+                    <th>{{ 'Actions' if is_english else 'الإجراءات' }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fault in assigned_faults %}
+                <tr>
+                    <td>{{ fault.id }}</td>
+                    <td>{{ localize_data(fault.title) }}</td>
+                    <td>{{ localize_data(fault.fault_type) or ('Not specified' if is_english else 'غير محدد') }}</td>
+                    <td>{{ localize_data(fault.location) or ('Not specified' if is_english else 'غير محدد') }}</td>
+                    <td>
+                        <span class="priority-{{ fault.priority }}">
+                            {% if fault.priority == 'critical' %}{{ 'Critical' if is_english else 'حرجة' }}{% elif fault.priority == 'high' %}{{ 'High' if is_english else 'عالية' }}{% elif fault.priority == 'medium' %}{{ 'Medium' if is_english else 'متوسطة' }}{% else %}{{ 'Low' if is_english else 'منخفضة' }}{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-{{ fault.status }}">
+                            {% if fault.status == 'new' %}{{ 'New' if is_english else 'جديد' }}{% elif fault.status == 'in_progress' %}{{ 'In progress' if is_english else 'قيد المعالجة' }}{% elif fault.status == 'resolved' %}{{ 'Resolved' if is_english else 'تم الحل' }}{% else %}{{ 'Closed' if is_english else 'مغلق' }}{% endif %}
+                        </span>
+                    </td>
+                    <td>{{ fault.created_at.strftime('%Y-%m-%d') if fault.created_at else '' }}</td>
+                    <td>
+                        <!-- ===== أزرار دورة حياة البلاغ (أيقونات فقط) ===== -->
+                        {% if fault.status == 'new' %}
+                            <form method="POST" action="{{ url_for('receive_fault', id=fault.id) }}" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-primary btn-icon" title="{{ 'Receive' if is_english else 'استلام' }}">📥</button>
+                            </form>
+                        {% elif fault.status == 'in_progress' %}
+                            <a href="{{ url_for('resolve_fault', id=fault.id) }}" class="btn btn-success btn-icon" title="{{ 'Resolve' if is_english else 'حل المشكلة' }}">
+                                ✅
+                            </a>
+                        {% elif fault.status == 'resolved' %}
+                            <span class="badge" style="background: #10b981; color: white; padding: 6px 14px; border-radius: 20px; font-size: 13px;">
+                                ✅ {{ 'Resolved' if is_english else 'تم الحل' }}
+                            </span>
+                        {% elif fault.status == 'closed' %}
+                            <span class="badge" style="background: #6b7280; color: white; padding: 6px 14px; border-radius: 20px; font-size: 13px;">
+                                🔒 {{ 'Closed' if is_english else 'مغلق' }}
+                            </span>
+                        {% else %}
+                            <a href="{{ url_for('edit_fault', id=fault.id) }}" class="btn btn-warning btn-icon" title="{{ 'Edit' if is_english else 'تعديل' }}">
+                                ✏️
+                            </a>
+                        {% endif %}
+                        
+                        <!-- ===== زر التفاصيل (أيقونة) ===== -->
+                        <a href="{{ url_for('fault_details', id=fault.id) }}" class="btn btn-primary btn-icon" title="{{ 'Details' if is_english else 'تفاصيل' }}">
+                            📄
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">{{ 'No reports are currently assigned to you.' if is_english else 'لا توجد بلاغات مسندة إليك حالياً' }}</div>
+        {% endif %}
+        
+        <div class="table-actions">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary"><i class="bi bi-arrow-return-right"></i> {{ 'Dashboard' if is_english else 'لوحة التحكم' }}</a>
+            {% if session.get('user_role') != 'technician' %}<a href="{{ url_for('view_faults') }}" class="btn btn-primary"><i class="bi bi-card-list"></i> {{ 'All reports' if is_english else 'جميع البلاغات' }}</a>{% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .dashboard-wrapper { max-width: 1400px; margin: 0 auto; }
+    .technician-header { background: linear-gradient(135deg, #0f3d46, #176b67); color: #fff; }
+    .technician-header h1, .technician-header p { color: #fff; }
+    .technician-header p { opacity: .78; }
+    .technician-eyebrow { display: block; color: #99f6e4; font-size: 12px; font-weight: 800; margin-bottom: 6px; }
+    .active-badge { background: rgba(153, 246, 228, .18); color: #ccfbf1; }
+    .active-badge i { color: #5eead4; font-size: 8px; vertical-align: middle; }
+    .technician-stats .stat-card-dash { border-right-color: #0f766e; }
+    .technician-stats .pending-stat { border-right-color: #d97706; }
+    .technician-stats .resolved-stat { border-right-color: #059669; }
+    .technician-stats .stat-icon { color: #0f766e; }
+    .technician-stats .pending-stat .stat-icon { color: #d97706; }
+    .technician-stats .resolved-stat .stat-icon { color: #059669; }
+    .table-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    .table-heading h2 { margin: 3px 0 0; }
+    .assignment-count { color: #64748b; font-size: 12px; font-weight: 700; }
+    .priority-critical, .priority-high, .priority-medium, .priority-low, .status-new, .status-in_progress, .status-resolved, .status-closed { display: inline-block; padding: 4px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+    .priority-critical { color: #b91c1c; background: #fee2e2; }
+    .priority-high { color: #b45309; background: #fef3c7; }
+    .priority-medium { color: #1d4ed8; background: #dbeafe; }
+    .priority-low { color: #047857; background: #d1fae5; }
+    .status-new { color: #0369a1; background: #e0f2fe; }
+    .status-in_progress { color: #b45309; background: #fef3c7; }
+    .status-resolved { color: #047857; background: #d1fae5; }
+    .status-closed { color: #475569; background: #e2e8f0; }
+    .badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .btn-icon {
+        padding: 6px 10px;
+        font-size: 18px;
+        line-height: 1;
+        min-width: 36px;
+        text-align: center;
+    }
+    .technician-header .btn-logout { border: 1px solid rgba(255,255,255,.25); }
+    .technician-stats .stat-card-dash { min-height: 106px; }
+    .technician-support-table { overflow-x: auto; }
+    .technician-support-table table { min-width: 980px; }
+    .technician-support-table th { white-space: nowrap; }
+    .technician-support-table td:first-child { color: #1d4ed8; font-weight: 800; direction: ltr; }
+    .technician-support-table .btn-icon { margin: 2px; }
+    @media (max-width: 767.98px) {
+        .dashboard-wrapper { padding: 0 4px; }
+        .technician-header,
+        .table-heading { align-items: flex-start; flex-direction: column; }
+        .technician-header .header-right { width: 100%; }
+        .technician-header .btn-logout { width: 100%; text-align: center; }
+        .technician-stats { grid-template-columns: 1fr; }
+        .table-box { padding: 18px 14px; }
+        .technician-support-table { margin: 0 -14px; padding: 0 14px 4px; }
+        .table-actions { width: 100%; }
+        .table-actions .btn { flex: 1 1 100%; }
+    }
+</style>
+{% endblock %}

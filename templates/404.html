@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="{{ page_lang }}" dir="{{ page_direction }}" class="{% if is_english %}lang-en{% else %}lang-ar{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - {{ 'Page not found' if is_english else 'الصفحة غير موجودة' }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
+            font-family: var(--font-ui, var(--font-arabic));
+            margin: 0;
+        }
+        .error-container {
+            text-align: center;
+            padding: 60px 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            max-width: 500px;
+            width: 90%;
+        }
+        .error-code {
+            font-size: 120px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+        .error-title {
+            color: #fff;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .error-desc {
+            color: rgba(255,255,255,0.6);
+            font-size: 16px;
+            margin-bottom: 35px;
+            line-height: 1.6;
+        }
+        .btn-home {
+            display: inline-block;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+        }
+        .icon { font-size: 60px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="icon">🔍</div>
+        <div class="error-code">404</div>
+        <div class="error-title">{{ 'Page not found' if is_english else 'الصفحة غير موجودة' }}</div>
+        <div class="error-desc">
+            {{ 'Sorry! The page you are looking for does not exist, was moved, or was deleted.' if is_english else 'عذراً! الصفحة التي تبحث عنها غير موجودة أو تم نقلها أو حذفها.' }}
+        </div>
+        <a href="{{ url_for('login') }}" class="btn-home">🏠 {{ 'Back to home' if is_english else 'العودة للرئيسية' }}</a>
+    </div>
+</body>
+</html>

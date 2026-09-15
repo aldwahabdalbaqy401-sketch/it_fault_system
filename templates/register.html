@@ -1,0 +1,358 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ 'Create new account - Admin only' if is_english else 'إنشاء حساب جديد - للأدمن فقط' }}{% endblock %}
+
+{% block content %}
+<div class="login-wrapper">
+    <div class="login-container">
+        <div class="login-left">
+            <div class="login-brand">
+                <div class="brand-icon"> </div>
+                <h1>{{ 'Add New<br>User Panel' if is_english else 'لوحة إضافة مستخدم<br>جديد' }}</h1>
+                <p style="color: #818cf8; font-weight: 600;">{{ 'White Nile University' if is_english else 'جامعة النيل الأبيض' }}</p>
+                <p>{{ 'This page is for admins only<br>to add new users to the system quickly and easily.' if is_english else 'هذه الصفحة مخصصة للأدمن فقط<br>لإضافة مستخدمين جدد إلى النظام بسرعة وسهولة' }}</p>
+                <div class="brand-features">
+                    <span>{{ 'Custom permissions' if is_english else 'صلاحيات مخصصة' }}</span>
+                    <span>{{ 'Full management' if is_english else 'إدارة كاملة' }}</span>
+                    <span>{{ 'Quick add' if is_english else 'إضافة سريعة' }}</span>
+                </div>
+                <div style="margin-top: 20px; padding: 12px; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                    <span style="font-size: 14px;">{{ 'You are currently managing the system as: ' if is_english else 'أنت تدير النظام حالياً كـ: ' }}<strong>{{ session.full_name }}</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="login-right">
+            <div class="login-form-box">
+                <h2>{{ 'Add New User' if is_english else 'إضافة مستخدم جديد' }}</h2>
+                <p class="subtitle">{{ 'Enter the new user details' if is_english else 'أدخل بيانات المستخدم الجديد' }}</p>
+                
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="form-group">
+                        <label for="full_name">{{ 'Full name' if is_english else 'الاسم الكامل' }}</label>
+                        <input type="text" id="full_name" name="full_name" placeholder="{{ 'Enter full name' if is_english else 'أدخل اسم المستخدم الكامل' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="username">{{ 'Username' if is_english else 'اسم المستخدم' }}</label>
+                        <input type="text" id="username" name="username" placeholder="{{ 'Choose a username' if is_english else 'اختر اسم مستخدم' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">{{ 'Email' if is_english else 'البريد الإلكتروني' }}</label>
+                        <input type="email" id="email" name="email" placeholder="example@email.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">{{ 'Mobile number' if is_english else 'رقم الجوال' }}</label>
+                        <input type="tel" id="phone" name="phone" placeholder="{{ '05xxxxxxxx' if not is_english else '+9665xxxxxxx' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="department">{{ 'College / Department' if is_english else 'الكلية / القسم' }}</label>
+                        <select id="department" name="department" required>
+                            <option value="">{{ '-- Select college --' if is_english else '-- اختر الكلية --' }}</option>
+                            <option value="كلية الطب">{{ 'Medicine' if is_english else 'كلية الطب' }}</option>
+                            <option value="كلية الهندسة">{{ 'Engineering' if is_english else 'كلية الهندسة' }}</option>
+                            <option value="كلية العلوم">{{ 'Science' if is_english else 'كلية العلوم' }}</option>
+                            <option value="كلية الآداب">{{ 'Arts' if is_english else 'كلية الآداب' }}</option>
+                            <option value="كلية الاقتصاد">{{ 'Economics' if is_english else 'كلية الاقتصاد' }}</option>
+                            <option value="كلية الحقوق">{{ 'Law' if is_english else 'كلية الحقوق' }}</option>
+                            <option value="كلية التربية">{{ 'Education' if is_english else 'كلية التربية' }}</option>
+                            <option value="كلية الزراعة">{{ 'Agriculture' if is_english else 'كلية الزراعة' }}</option>
+                            <option value="كلية الطب البيطري">{{ 'Veterinary Medicine' if is_english else 'كلية الطب البيطري' }}</option>
+                            <option value="كلية الصيدلة">{{ 'Pharmacy' if is_english else 'كلية الصيدلة' }}</option>
+                            <option value="كلية التمريض">{{ 'Nursing' if is_english else 'كلية التمريض' }}</option>
+                            <option value="كلية علوم الحاسوب">{{ 'Computer Science' if is_english else 'كلية علوم الحاسوب' }}</option>
+                            <option value="كلية الإعلام">{{ 'Media' if is_english else 'كلية الإعلام' }}</option>
+                            <option value="كلية الفنون">{{ 'Arts and Design' if is_english else 'كلية الفنون' }}</option>
+                            <option value="كلية التعليم الصناعي">{{ 'Industrial Education' if is_english else 'كلية التعليم الصناعي' }}</option>
+                            <option value="كلية الدراسات العليا">{{ 'Graduate Studies' if is_english else 'كلية الدراسات العليا' }}</option>
+                            <option value="عمادة القبول والتسجيل">{{ 'Admissions and Registration' if is_english else 'عمادة القبول والتسجيل' }}</option>
+                            <option value="عمادة شؤون الطلاب">{{ 'Student Affairs' if is_english else 'عمادة شؤون الطلاب' }}</option>
+                            <option value="الإدارة العامة">{{ 'General Administration' if is_english else 'الإدارة العامة' }}</option>
+                            <option value="أخرى">{{ 'Other' if is_english else 'أخرى' }}</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="user_type">{{ 'User type' if is_english else 'نوع المستخدم' }}</label>
+                        <select id="user_type" name="user_type" required>
+                            <option value="student">{{ 'Student' if is_english else 'طالب' }}</option>
+                            <option value="employee" selected>{{ 'Employee' if is_english else 'موظف' }}</option>
+                            <option value="faculty">{{ 'Faculty member' if is_english else 'عضو هيئة تدريس' }}</option>
+                            <option value="admin">{{ 'Administrative' if is_english else 'إداري' }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role">{{ 'Role' if is_english else 'الصلاحية' }}</label>
+                        <select id="role" name="role" required>
+                            <option value="user">{{ 'Regular user' if is_english else 'مستخدم عادي' }}</option>
+                            <option value="technician">{{ 'Technician' if is_english else 'فني' }}</option>
+                            <option value="supervisor">{{ 'Supervisor' if is_english else 'مشرف' }}</option>
+                            <option value="admin">{{ 'Admin' if is_english else 'أدمن' }}</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">{{ 'Password' if is_english else 'كلمة المرور' }}</label>
+                        <input type="password" id="password" name="password" placeholder="{{ 'Enter password' if is_english else 'أدخل كلمة المرور' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm_password">{{ 'Confirm password' if is_english else 'تأكيد كلمة المرور' }}</label>
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="{{ 'Re-enter password' if is_english else 'أعد كتابة كلمة المرور' }}" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-login">{{ 'Add user' if is_english else 'إضافة المستخدم' }}</button>
+                </form>
+                
+                <div class="login-footer-text">
+                    <p><a href="{{ url_for('admin_users') }}">{{ 'Back to user management' if is_english else 'رجوع إلى إدارة المستخدمين' }}</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+body {
+    font-family: var(--font-ui, var(--font-arabic)) !important;
+}
+
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top left, rgba(64, 201, 255, 0.35), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(34, 97, 224, 0.28), transparent 25%),
+        linear-gradient(135deg, #061a3d 0%, #0b2d6b 35%, #0d7ad8 100%);
+    padding: 20px;
+}
+
+.login-container {
+    display: flex;
+    max-width: 1040px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 24px 70px rgba(4, 20, 52, 0.38);
+    backdrop-filter: blur(6px);
+}
+
+.login-left {
+    flex: 1;
+    position: relative;
+    background: linear-gradient(155deg, #061a3d 0%, #123c91 35%, #1a9df5 100%);
+    color: white;
+    padding: 40px 35px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.login-left::before {
+    content: "";
+    position: absolute;
+    inset: auto -30px -50px -35px;
+    height: 170px;
+    background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.35), transparent 35%),
+                radial-gradient(circle at 70% 30%, rgba(255,255,255,0.2), transparent 30%),
+                linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+    border-radius: 60% 40% 0 0 / 100% 100% 0 0;
+}
+
+.login-left > * {
+    position: relative;
+    z-index: 1;
+}
+
+.login-left .brand-icon {
+    font-size: 60px;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 8px 16px rgba(18, 74, 180, 0.45));
+}
+
+.login-left h1 {
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1.4;
+    margin-bottom: 10px;
+    color: #f4fbff;
+    letter-spacing: 0.02em;
+}
+
+.login-left p {
+    opacity: 0.95;
+    font-size: 15px;
+    line-height: 1.8;
+    font-weight: 600;
+}
+
+.brand-features {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+    flex-wrap: wrap;
+}
+
+.brand-features span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+    background: linear-gradient(135deg, rgba(87, 190, 255, 0.35), rgba(35, 120, 255, 0.85));
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 0 8px 18px rgba(19, 95, 215, 0.22);
+    backdrop-filter: blur(4px);
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.1);
+}
+
+.brand-features span:nth-child(2) {
+    background: linear-gradient(135deg, rgba(73, 222, 202, 0.35), rgba(11, 145, 148, 0.82));
+}
+
+.brand-features span:nth-child(3) {
+    background: linear-gradient(135deg, rgba(130, 184, 255, 0.35), rgba(48, 92, 255, 0.8));
+}
+
+.login-right {
+    flex: 1.2;
+    padding: 42px 36px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(236,245,255,0.96));
+}
+
+.login-form-box h2 {
+    font-size: 27px;
+    color: #123c91;
+    margin-bottom: 4px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+.login-form-box .subtitle {
+    color: #4a5f8a;
+    font-size: 14px;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+.login-form-box .form-group {
+    margin-bottom: 16px;
+}
+
+.login-form-box .form-group label {
+    display: block;
+    font-weight: 700;
+    font-size: 14px;
+    color: #163d7d;
+    margin-bottom: 7px;
+    letter-spacing: 0.01em;
+}
+
+.login-form-box .form-group input,
+.login-form-box .form-group select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #d6e6ff;
+    border-radius: 12px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: #f5faff;
+    color: #123c91;
+    font-family: var(--font-ui, var(--font-arabic));
+    font-weight: 600;
+    box-shadow: inset 0 1px 2px rgba(17, 72, 152, 0.04);
+}
+
+.login-form-box .form-group input:focus,
+.login-form-box .form-group select:focus {
+    border-color: #38a4ff;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(56, 164, 255, 0.12);
+    background: white;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #1d72ff 0%, #2bb3ff 50%, #53d5ff 100%);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 6px;
+    box-shadow: 0 12px 24px rgba(30, 115, 255, 0.25);
+    font-family: var(--font-ui, var(--font-arabic));
+    letter-spacing: 0.02em;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 26px rgba(30, 115, 255, 0.32);
+}
+
+.login-footer-text {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 14px;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.login-footer-text a {
+    color: #4a6cf7;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.login-footer-text a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .login-container {
+        flex-direction: column;
+    }
+    .login-left {
+        padding: 30px 25px;
+    }
+    .login-right {
+        padding: 30px 25px;
+    }
+    .login-left h1 {
+        font-size: 22px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-left h1 {
+        font-size: 18px;
+    }
+    .brand-features {
+        gap: 8px;
+    }
+    .brand-features span {
+        font-size: 11px;
+        padding: 4px 12px;
+    }
+}
+</style>
+{% endblock %}

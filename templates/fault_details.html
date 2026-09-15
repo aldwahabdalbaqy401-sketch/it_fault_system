@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+
+{% block title %}تفاصيل البلاغ{% endblock %}
+
+{% block content %}
+<div class="container py-4 fault-details-page">
+    
+    <!-- Header -->
+    <div class="fault-details-hero mb-4">
+        <div class="fault-details-heading">
+            <span class="fault-details-eyebrow"><i class="bi bi-ticket-detailed"></i> مركز البلاغات</span>
+            <h2><i class="bi bi-file-earmark-text"></i> تفاصيل البلاغ</h2>
+            <span class="fault-number">#{{ fault.id }}</span>
+            <h1>{{ fault.title }}</h1>
+        </div>
+        <div class="fault-details-back">
+            <a href="{{ url_for('my_faults' if session.get('user_role') == 'user' else 'view_faults') }}" class="btn btn-outline-secondary rounded-pill px-4 fw-bold">
+                <i class="bi bi-arrow-right me-1"></i> رجوع
+            </a>
+        </div>
+    </div>
+
+    <!-- Details Card -->
+    <div class="card fault-details-card border-0 mb-4">
+        <div class="card-body p-4 p-md-5">
+            <div class="row g-4">
+                
+                <div class="col-md-6">
+                    <div class="detail-tile h-100">
+                        <small class="text-muted fw-bold d-block mb-1"><i class="bi bi-tag me-1"></i> النوع</small>
+                        <div class="fs-6">{{ fault.fault_type or 'غير محدد' }}</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="detail-tile h-100">
+                        <small class="text-muted fw-bold d-block mb-1"><i class="bi bi-geo-alt me-1"></i> المكان</small>
+                        <div class="fs-6">{{ fault.location or 'غير محدد' }}</div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="detail-tile description-tile">
+                        <small class="text-muted fw-bold d-block mb-2"><i class="bi bi-card-text me-1"></i> الوصف</small>
+                        <p class="mb-0">{{ fault.description or 'لا يوجد وصف' }}</p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="detail-tile status-tile h-100 text-center">
+                        <small class="text-muted fw-bold d-block mb-2"><i class="bi bi-exclamation-triangle me-1"></i> الأولوية</small>
+                        {% if fault.priority == 'critical' %}<span class="badge bg-danger rounded-pill px-3 py-2">حرجة</span>
+                        {% elif fault.priority == 'high' %}<span class="badge bg-warning text-dark rounded-pill px-3 py-2">عالية</span>
+                        {% elif fault.priority == 'medium' %}<span class="badge bg-primary rounded-pill px-3 py-2">متوسطة</span>
+                        {% else %}<span class="badge bg-success rounded-pill px-3 py-2">منخفضة</span>{% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="detail-tile status-tile h-100 text-center">
+                        <small class="text-muted fw-bold d-block mb-2"><i class="bi bi-info-circle me-1"></i> الحالة</small>
+                        {% if fault.status == 'new' %}<span class="badge bg-info text-dark rounded-pill px-3 py-2">جديد</span>
+                        {% elif fault.status == 'in_progress' %}<span class="badge bg-warning text-dark rounded-pill px-3 py-2">قيد المعالجة</span>
+                        {% elif fault.status == 'resolved' %}<span class="badge bg-success rounded-pill px-3 py-2">تم الحل</span>
+                        {% else %}<span class="badge bg-secondary rounded-pill px-3 py-2">مغلق</span>{% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="detail-tile status-tile h-100 text-center">
+                        <small class="text-muted fw-bold d-block mb-2"><i class="bi bi-calendar-event me-1"></i> موعد الصيانة</small>
+                        {% if fault.scheduled_date %}
+                            <span class="badge bg-primary rounded-pill px-3 py-2" dir="ltr">{{ fault.scheduled_date.strftime('%Y-%m-%d %H:%M') }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary bg-opacity-25 text-dark rounded-pill px-3 py-2">غير محدد</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="detail-tile date-tile h-100">
+                        <small class="text-muted fw-bold d-block mb-1"><i class="bi bi-clock-history me-1"></i> تاريخ الإضافة</small>
+                        <div class="small" dir="ltr">{{ fault.created_at }}</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="detail-tile date-tile h-100">
+                        <small class="text-muted fw-bold d-block mb-1"><i class="bi bi-arrow-clockwise me-1"></i> آخر تحديث</small>
+                        <div class="small" dir="ltr">{{ fault.updated_at }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-footer fault-actions p-4">
+            <div class="d-flex flex-wrap gap-2 justify-content-center">
+                {% if session.get('user_role') != 'user' %}
+                <a href="{{ url_for('edit_fault', id=fault.id) }}" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm">
+                    <i class="bi bi-pencil me-1"></i> تعديل
+                </a>
+                {% endif %}
+                <a href="{{ url_for('chat', fault_id=fault.id) }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+                    <i class="bi bi-chat-dots me-1"></i> محادثة
+                </a>
+                {% if session.get('user_role') != 'user' %}
+                <form method="POST" action="{{ url_for('delete_fault', id=fault.id) }}" class="d-inline" onsubmit="return confirm('هل أنت متأكد من الحذف؟')">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm"><i class="bi bi-trash me-1"></i> حذف</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Rating Section -->
+    {% if fault.status == 'closed' and (not fault.user_rating or fault.user_rating == 0) %}
+    <div class="card rating-card border-0 text-center p-4 border-start border-4 border-warning">
+        <h4 class="fw-bold mb-3"><i class="bi bi-star-half text-warning me-2"></i> قيم مستوى الخدمة</h4>
+        <form method="POST" action="{{ url_for('rate_fault', id=fault.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="d-flex justify-content-center gap-2 mb-3">
+                <button type="submit" name="rating" value="1" class="btn btn-outline-warning rounded-circle" style="width:50px; height:50px;"><i class="bi bi-star-fill fs-4"></i></button>
+                <button type="submit" name="rating" value="2" class="btn btn-outline-warning rounded-circle" style="width:50px; height:50px;"><i class="bi bi-star-fill fs-4"></i></button>
+                <button type="submit" name="rating" value="3" class="btn btn-outline-warning rounded-circle" style="width:50px; height:50px;"><i class="bi bi-star-fill fs-4"></i></button>
+                <button type="submit" name="rating" value="4" class="btn btn-outline-warning rounded-circle" style="width:50px; height:50px;"><i class="bi bi-star-fill fs-4"></i></button>
+                <button type="submit" name="rating" value="5" class="btn btn-outline-warning rounded-circle" style="width:50px; height:50px;"><i class="bi bi-star-fill fs-4"></i></button>
+            </div>
+            <p class="text-muted small mb-0">اضغط على عدد النجوم المناسب لتقييم أداء فريق الصيانة</p>
+        </form>
+    </div>
+    {% elif fault.status == 'closed' and fault.user_rating and fault.user_rating > 0 %}
+    <div class="card rating-card border-0 text-center p-4 border-start border-4 border-success">
+        <h4 class="fw-bold text-success mb-3"><i class="bi bi-check-circle-fill me-2"></i> تم التقييم</h4>
+        <div class="fs-3 text-warning mb-2">
+            {% for i in range(fault.user_rating) %}<i class="bi bi-star-fill"></i>{% endfor %}
+        </div>
+        <p class="text-muted fw-bold mb-0">شكراً لتقييمك مستوى الخدمة ({{ fault.user_rating }} من 5)</p>
+    </div>
+    {% endif %}
+
+</div>
+<style>
+.fault-details-page {
+    max-width: 960px;
+}
+.fault-details-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 26px 30px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #12343b, #176b67);
+    border-radius: 20px;
+    box-shadow: 0 14px 30px rgba(18, 52, 59, .18);
+}
+.fault-details-heading {
+    min-width: 0;
+}
+.fault-details-eyebrow {
+    display: block;
+    color: #99f6e4;
+    font-size: .78rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+.fault-details-heading h2 {
+    display: inline;
+    margin: 0;
+    color: #ffffff;
+    font-size: 1.45rem;
+}
+.fault-details-heading h1 {
+    margin: 12px 0 0;
+    color: #ffffff;
+    font-size: 1.25rem;
+    overflow-wrap: anywhere;
+}
+.fault-number {
+    display: inline-flex;
+    margin-right: 8px;
+    padding: 5px 10px;
+    color: #ccfbf1;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 999px;
+    direction: ltr;
+    font-size: .85rem;
+    font-weight: 800;
+}
+.fault-details-back .btn {
+    color: #ffffff;
+    border-color: rgba(255,255,255,.55);
+    white-space: nowrap;
+}
+.fault-details-back .btn:hover {
+    color: #12343b;
+    background: #ffffff;
+}
+.fault-details-card {
+    overflow: hidden;
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(15,23,42,.08);
+}
+.detail-tile {
+    padding: 16px;
+    color: #334155;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+.detail-tile small {
+    color: #64748b !important;
+}
+.description-tile {
+    min-height: 100px;
+    line-height: 1.85;
+}
+.status-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.date-tile {
+    background: #ffffff;
+}
+.fault-actions {
+    background: #ffffff;
+    border-top: 1px solid #eef2f7;
+}
+.rating-card {
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 10px 26px rgba(15,23,42,.07);
+}
+.rating-card button {
+    width: 48px;
+    height: 48px;
+    transition: transform .2s ease, background .2s ease;
+}
+.rating-card button:hover {
+    transform: translateY(-3px) scale(1.04);
+}
+@media (max-width: 767.98px) {
+    .fault-details-page {
+        padding-top: 1rem !important;
+    }
+    .fault-details-hero {
+        flex-direction: column;
+        padding: 20px;
+    }
+    .fault-details-back,
+    .fault-details-back .btn {
+        width: 100%;
+    }
+    .fault-details-heading h2 {
+        font-size: 1.2rem;
+    }
+    .fault-details-heading h1 {
+        font-size: 1.05rem;
+    }
+    .fault-details-card .card-body,
+    .fault-actions {
+        padding: 18px !important;
+    }
+    .fault-actions .btn {
+        flex: 1 1 100%;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ 'Home - Fault Management System' if is_english else 'الرئيسية - نظام إدارة الأعطال' }}{% endblock %}
+
+{% block content %}
+<!-- ===== القسم الأول: الترحيب ===== -->
+<section class="hero-section">
+    <div class="hero-content">
+        <div class="hero-text">
+            <span class="hero-badge">{{ '🚀 Smart System' if is_english else '🚀 النظام الذكي' }}</span>
+            <h1>{{ 'Fault Management and Tracking <br><span class="highlight">System</span>' if is_english else 'نظام إدارة وتتبع <br><span class="highlight">الأعطال التقنية</span>' }}</h1>
+            <p>{{ 'A complete platform for managing technical faults in institutions, allowing you to track issues, analyze data, and generate reports with ease and professionalism.' if is_english else 'منصة متكاملة لإدارة الأعطال التقنية في المؤسسات، تتيح لك تتبع الأعطال، تحليل البيانات، وإصدار التقارير بكل سهولة واحترافية.' }}</p>
+            <div class="hero-buttons">
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">{{ '🚀 Get Started' if is_english else '🚀 ابدأ الآن' }}</a>
+                <a href="{{ url_for('login') }}" class="btn btn-outline">{{ '🔐 Sign In' if is_english else '🔐 تسجيل الدخول' }}</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div class="hero-illustration">
+                <span class="illustration-icon">{{ '🔧' if not is_english else '🛠️' }}</span>
+                <div class="floating-icons">
+                    <span class="float-icon">{{ '📊' if not is_english else '📈' }}</span>
+                    <span class="float-icon">{{ '🛠️' if not is_english else '🔧' }}</span>
+                    <span class="float-icon">{{ '📋' if not is_english else '✅' }}</span>
+                    <span class="float-icon">{{ '⚡' if not is_english else '⚙️' }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== القسم الثاني: إحصائيات سريعة ===== -->
+<section class="stats-section">
+    <div class="stats-container">
+        <div class="stat-item">
+            <span class="stat-number">100+</span>
+            <span class="stat-desc">{{ 'faults resolved' if is_english else 'عطل تم حله' }}</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">50+</span>
+            <span class="stat-desc">{{ 'active users' if is_english else 'مستخدم نشط' }}</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">99%</span>
+            <span class="stat-desc">{{ 'user satisfaction' if is_english else 'رضا المستخدمين' }}</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">24/7</span>
+            <span class="stat-desc">{{ 'technical support' if is_english else 'دعم فني' }}</span>
+        </div>
+    </div>
+</section>
+
+<!-- ===== القسم الثالث: الميزات ===== -->
+<section class="features-section">
+    <div class="section-header">
+        <h2>{{ '✨ System Features' if is_english else '✨ مميزات النظام' }}</h2>
+        <p>{{ 'All the tools you need to manage faults efficiently' if is_english else 'جميع الأدوات التي تحتاجها لإدارة الأعطال بكفاءة' }}</p>
+    </div>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🔐</div>
+            <h3>{{ 'Password Encryption' if is_english else 'تشفير كلمة المرور' }}</h3>
+            <p>{{ 'Secure system using bcrypt to protect user data.' if is_english else 'نظام آمن باستخدام bcrypt لحماية بيانات المستخدمين.' }}</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">👥</div>
+            <h3>{{ 'User Roles' if is_english else 'صلاحيات المستخدمين' }}</h3>
+            <p>{{ 'Three levels: admin, supervisor, technician, each with its own permissions.' if is_english else 'ثلاث مستويات: أدمن، مشرف، فني لكل منهم صلاحياته.' }}</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🕒</div>
+            <h3>{{ 'Activity Log' if is_english else 'سجل النشاطات' }}</h3>
+            <p>{{ 'Track every action in the system with IP and time.' if is_english else 'تتبع كل حركة في النظام مع IP والوقت.' }}</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📎</div>
+            <h3>{{ 'File Uploads' if is_english else 'رفع الملفات' }}</h3>
+            <p>{{ 'Attach images and documents to each fault report.' if is_english else 'إرفاق صور ومستندات مع كل بلاغ عطل.' }}</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3>{{ 'Search & Filter' if is_english else 'بحث وتصفية' }}</h3>
+            <p>{{ 'Search for any fault quickly and easily.' if is_english else 'ابحث عن أي عطل بسهولة وسرعة.' }}</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>{{ 'PDF Reports' if is_english else 'تقارير PDF' }}</h3>
+            <p>{{ 'Export professional reports in PDF format.' if is_english else 'تصدير تقارير احترافية بصيغة PDF.' }}</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📧</div>
+            <h3>{{ 'Email Notifications' if is_english else 'إشعارات البريد' }}</h3>
+            <p>{{ 'Instant notifications when a new fault is added.' if is_english else 'إشعارات فورية عند إضافة عطل جديد.' }}</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3>{{ 'Responsive Design' if is_english else 'تصميم متجاوب' }}</h3>
+            <p>{{ 'Works on all devices (mobile, tablet, desktop).' if is_english else 'يعمل على جميع الأجهزة (جوال، تابلت، كمبيوتر).' }}</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📈</div>
+            <h3>{{ 'Advanced Statistics' if is_english else 'إحصائيات متقدمة' }}</h3>
+            <p>{{ 'Charts and comprehensive analytics for all faults.' if is_english else 'رسوم بيانية وتحليلات شاملة للأعطال.' }}</p>
+        </div>
+    </div>
+</section>
+
+<!-- ===== القسم الرابع: كيفية العمل ===== -->
+<section class="how-it-works">
+    <div class="section-header">
+        <h2>{{ '📋 How It Works' if is_english else '📋 كيفية العمل' }}</h2>
+        <p>{{ 'Three simple steps to manage faults' if is_english else 'ثلاث خطوات بسيطة لإدارة الأعطال' }}</p>
+    </div>
+
+    <div class="steps-container">
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-icon">📝</div>
+            <h3>{{ 'Create an Account' if is_english else 'إنشاء حساب' }}</h3>
+            <p>{{ 'Register a new account in the system.' if is_english else 'سجل حساب جديد في النظام.' }}</p>
+        </div>
+        <div class="step-arrow">➜</div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-icon">➕</div>
+            <h3>{{ 'Add a Fault' if is_english else 'إضافة عطل' }}</h3>
+            <p>{{ 'Log the fault with details and priority.' if is_english else 'سجل العطل مع التفاصيل والأولوية.' }}</p>
+        </div>
+        <div class="step-arrow">➜</div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-icon">📊</div>
+            <h3>{{ 'Track & Analyze' if is_english else 'متابعة وتحليل' }}</h3>
+            <p>{{ 'Track and analyze faults via reports.' if is_english else 'تابع الأعطال وحللها عبر التقارير.' }}</p>
+        </div>
+    </div>
+</section>
+
+<!-- ===== القسم الخامس: دعوة للانضمام ===== -->
+<section class="cta-section">
+    <div class="cta-content">
+        <h2>{{ '🚀 Ready to manage your faults?' if is_english else '🚀 جاهز لبدء إدارة أعطالك؟' }}</h2>
+        <p>{{ 'Join now and enjoy all available features' if is_english else 'انضم الآن واستفد من جميع الميزات المتاحة' }}</p>
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">{{ '🌟 Start Now' if is_english else '🌟 ابدأ الآن مجاناً' }}</a>
+    </div>
+</section>
+
+<!-- ===== التذييل ===== -->
+<footer class="main-footer">
+    <div class="footer-content">
+        <div class="footer-brand">
+            <h3>{{ '🔧 Fault Management System' if is_english else '🔧 نظام إدارة الأعطال' }}</h3>
+            <p>{{ 'An integrated platform for managing technical faults in institutions.' if is_english else 'منصة متكاملة لإدارة الأعطال التقنية في المؤسسات.' }}</p>
+        </div>
+        <div class="footer-links">
+            <a href="{{ url_for('register') }}">{{ 'Create account' if is_english else 'إنشاء حساب' }}</a>
+            <a href="{{ url_for('login') }}">{{ 'Sign in' if is_english else 'تسجيل الدخول' }}</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>{{ '© 2026 Technical Fault Management and Tracking System - All rights reserved' if is_english else '© 2026 نظام إدارة وتتبع الأعطال التقنية - جميع الحقوق محفوظة' }}</p>
+    </div>
+</footer>
+{% endblock %}
