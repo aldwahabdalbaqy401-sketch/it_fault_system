@@ -1,0 +1,632 @@
+{% extends 'base.html' %}
+
+{% block title %}لوحة التحكم الرئيسية{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 dashboard-page">
+    
+    <!-- Header Section -->
+    <div class="row mb-4 align-items-center dashboard-header">
+        <div class="col-md-8">
+            <h2 class="fw-bold mb-1"><i class="bi bi-house-door text-primary me-2"></i> {{ APP_NAME }}</h2>
+            <p class="text-muted mb-0">مرحباً بك <strong>{{ session.full_name }}</strong>، إليك نظرة عامة على حالة النظام.</p>
+        </div>
+        <div class="col-md-4 mt-3 mt-md-0">
+            <div class="dashboard-header-actions">
+                <span class="dashboard-status"><i class="bi bi-circle-fill"></i> نشط</span>
+                <span class="dashboard-role"><i class="bi bi-person-badge"></i> {{ 'مدير النظام' if session.user_role == 'admin' else session.user_role }}</span>
+                <a href="{{ url_for('logout') }}" class="dashboard-logout">
+                    <i class="bi bi-box-arrow-right"></i> تسجيل خروج
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Appointments Alert -->
+    {% if upcoming_appointments %}
+    <div class="card border-warning mb-4 shadow-sm border-start border-4">
+        <div class="card-header bg-white border-bottom-0 pb-0">
+            <h5 class="card-title text-warning fw-bold"><i class="bi bi-calendar-event me-2"></i> مواعيد صيانة قريبة</h5>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                {% for fault in upcoming_appointments %}
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                    <a href="{{ url_for('fault_details', id=fault.id) }}" class="text-decoration-none text-dark d-flex align-items-center">
+                        <i class="bi bi-tools text-muted me-3 fs-5"></i>
+                        <div>
+                            <div class="fw-bold">{{ fault.title }}</div>
+                            <small class="text-muted"><i class="bi bi-clock me-1"></i> {{ fault.scheduled_date.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                    </a>
+                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
+                        <i class="bi bi-hourglass-split me-1"></i> خلال {{ fault.days_until }} يوم
+                    </span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4 dashboard-stats">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <a href="{{ url_for('view_faults') }}" class="text-decoration-none">
+                <div class="card dashboard-stat-card stat-blue shadow-sm h-100 border-0 rounded-3 hover-shadow transition-all">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                            <i class="bi bi-ticket-detailed fs-3 text-primary"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-0 text-dark">{{ total_faults or 0 }}</h3>
+                            <p class="text-muted mb-0">إجمالي الأعطال</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <a href="{{ url_for('view_faults') }}?status=in_progress" class="text-decoration-none">
+                <div class="card dashboard-stat-card stat-yellow shadow-sm h-100 border-0 rounded-3 hover-shadow transition-all">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="rounded-circle bg-warning bg-opacity-10 p-3 me-3">
+                            <i class="bi bi-arrow-repeat fs-3 text-warning"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-0 text-dark">{{ pending_faults or 0 }}</h3>
+                            <p class="text-muted mb-0">قيد المعالجة</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <a href="{{ url_for('view_faults') }}?status=resolved" class="text-decoration-none">
+                <div class="card dashboard-stat-card stat-green shadow-sm h-100 border-0 rounded-3 hover-shadow transition-all">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                            <i class="bi bi-check-circle fs-3 text-success"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-0 text-dark">{{ resolved_faults or 0 }}</h3>
+                            <p class="text-muted mb-0">تم حلها</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <a href="{{ url_for('view_faults') }}?priority=critical" class="text-decoration-none">
+                <div class="card dashboard-stat-card stat-red shadow-sm h-100 border-0 rounded-3 hover-shadow transition-all">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="rounded-circle bg-danger bg-opacity-10 p-3 me-3">
+                            <i class="bi bi-exclamation-octagon fs-3 text-danger"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-0 text-dark">{{ critical_faults or 0 }}</h3>
+                            <p class="text-muted mb-0">حالات حرجة</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+
+    <!-- Charts and Integration Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card dashboard-card shadow-sm h-100 border-0">
+                <div class="card-body status-distribution-card">
+                    <div class="status-distribution-header">
+                        <span class="status-distribution-title">توزيع الأعطال حسب الحالة</span>
+                        <span class="status-distribution-icon"><i class="bi bi-lightning-charge"></i></span>
+                    </div>
+
+                    <div class="status-progress-row">
+                        <div class="status-progress-meta">
+                            <span class="status-progress-number">20%</span>
+                            <span class="status-progress-label">جديد</span>
+                        </div>
+                        <div class="status-progress-track">
+                            <span class="status-progress-fill status-new-fill" style="width: 20%;"></span>
+                        </div>
+                    </div>
+
+                    <div class="status-progress-row">
+                        <div class="status-progress-meta">
+                            <span class="status-progress-number">20%</span>
+                            <span class="status-progress-label">قيد المعالجة</span>
+                        </div>
+                        <div class="status-progress-track">
+                            <span class="status-progress-fill status-pending-fill" style="width: 20%;"></span>
+                        </div>
+                    </div>
+
+                    <div class="status-progress-row last-row">
+                        <div class="status-progress-meta">
+                            <span class="status-progress-number">13%</span>
+                            <span class="status-progress-label">مغلق</span>
+                        </div>
+                        <div class="status-progress-track">
+                            <span class="status-progress-fill status-closed-fill" style="width: 13%;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card dashboard-card shadow-sm h-100 border-0">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-4"><i class="bi bi-diagram-3 text-primary me-2"></i> توزيع الأعطال حسب القسم</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-3 border-0">
+                            <span><i class="bi bi-pc-display me-2 text-primary"></i> تقنية المعلومات</span>
+                            <span class="badge bg-light text-dark border rounded-pill px-3"> </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-3 border-0">
+                            <span><i class="bi bi-globe me-2 text-info"></i> الشبكات</span>
+                            <span class="badge bg-light text-dark border rounded-pill px-3"> </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-3 border-0">
+                            <span><i class="bi bi-headset me-2 text-success"></i> الدعم الفني</span>
+                            <span class="badge bg-light text-dark border rounded-pill px-3"> </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-3 border-0">
+                            <span><i class="bi bi-gear-wide-connected me-2 text-warning"></i> التشغيل</span>
+                            <span class="badge bg-light text-dark border rounded-pill px-3"> </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-3 border-0">
+                            <span><i class="bi bi-wrench-adjustable me-2 text-danger"></i> الصيانة</span>
+                            <span class="badge bg-light text-dark border rounded-pill px-3"> </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Priority and Actions Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card dashboard-card shadow-sm h-100 border-0">
+                <div class="card-body priority-distribution-card">
+                    <div class="priority-distribution-header">
+                        <span class="priority-distribution-title">الأعطال حسب الأولوية</span>
+                        <span class="priority-distribution-icon"><i class="bi bi-sort-up"></i></span>
+                    </div>
+
+                    <div class="priority-progress-row">
+                        <div class="priority-progress-meta">
+                            <span class="priority-progress-number">36%</span>
+                            <span class="priority-progress-label">حرج</span>
+                        </div>
+                        <div class="priority-progress-track">
+                            <span class="priority-progress-fill priority-critical-fill" style="width: 36%;"></span>
+                        </div>
+                    </div>
+
+                    <div class="priority-progress-row">
+                        <div class="priority-progress-meta">
+                            <span class="priority-progress-number">35%</span>
+                            <span class="priority-progress-label">عالي</span>
+                        </div>
+                        <div class="priority-progress-track">
+                            <span class="priority-progress-fill priority-high-fill" style="width: 35%;"></span>
+                        </div>
+                    </div>
+
+                    <div class="priority-progress-row last-row">
+                        <div class="priority-progress-meta">
+                            <span class="priority-progress-number">29%</span>
+                            <span class="priority-progress-label">متوسط</span>
+                        </div>
+                        <div class="priority-progress-track">
+                            <span class="priority-progress-fill priority-medium-fill" style="width: 29%;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card dashboard-card quick-actions-card shadow-sm h-100 border-0 bg-light">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-4"><i class="bi bi-lightning-charge text-warning me-2"></i> إجراءات سريعة</h5>
+                    <div class="row g-3 quick-action-grid">
+                        <div class="col-sm-6">
+                            <a href="{{ url_for('add_fault') }}" class="quick-action-btn action-light w-100 text-center py-3 shadow-sm rounded-3">
+                                <i class="bi bi-plus-circle fs-4 d-block mb-2"></i>
+                                <span class="fw-bold">إضافة عطل</span>
+                            </a>
+                        </div>
+                        <div class="col-sm-6">
+                            <a href="{{ url_for('view_faults') }}" class="quick-action-btn action-violet w-100 text-center py-3 shadow-sm rounded-3">
+                                <i class="bi bi-card-list fs-4 d-block mb-2"></i>
+                                <span class="fw-bold">عرض الأعطال</span>
+                            </a>
+                        </div>
+                        <div class="col-sm-6">
+                            <a href="{{ url_for('dashboard_stats') }}" class="quick-action-btn action-cyan w-100 text-center py-3 shadow-sm rounded-3">
+                                <i class="bi bi-bar-chart-fill fs-4 d-block mb-2"></i>
+                                <span class="fw-bold">إحصائيات متقدمة</span>
+                            </a>
+                        </div>
+                        <div class="col-sm-6">
+                            <a href="{{ url_for('technician_support') }}" class="quick-action-btn action-blue w-100 text-center py-3 shadow-sm rounded-3">
+                                <i class="bi bi-headset fs-4 d-block mb-2"></i>
+                                <span class="fw-bold">دعم الفنيين</span>
+                            </a>
+                        </div>
+                        {% if session.user_role == 'admin' %}
+                        <div class="col-12">
+                            <a href="{{ url_for('admin_users') }}" class="quick-action-btn action-red w-100 text-center py-3 shadow-sm rounded-3">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-people-fill fs-3 ms-3"></i>
+                                    <span class="fw-bold fs-5">{{ 'User Management' if is_english else 'إدارة المستخدمين' }}</span>
+                                </div>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="mt-5 text-center text-muted border-top pt-4">
+        <p class="mb-0"><i class="bi bi-c-circle"></i> 2026 {{ APP_NAME }} | الإصدار 2.0</p>
+    </footer>
+
+</div>
+
+<style>
+.dashboard-page {
+    max-width: 1500px;
+    margin: 0 auto;
+}
+.dashboard-header {
+    position: relative;
+    padding: 24px 28px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #172554, #1d4ed8 58%, #2563eb);
+    border-radius: 20px;
+    box-shadow: 0 14px 30px rgba(30, 64, 175, 0.18);
+}
+.dashboard-header h2 {
+    color: #ffffff;
+}
+.dashboard-header p {
+    color: #dbeafe !important;
+}
+.dashboard-header > .col-md-8 {
+    padding-left: 300px;
+}
+.dashboard-header .badge {
+    background: rgba(255, 255, 255, 0.16) !important;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+}
+.dashboard-header .btn-outline-danger {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.55);
+}
+.dashboard-header .btn-outline-danger:hover {
+    color: #172554;
+    background: #ffffff;
+}
+.dashboard-header-actions {
+    display: flex;
+    direction: ltr;
+    justify-content: flex-end;
+    align-self: flex-start;
+    margin-top: 0;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.dashboard-header-actions > * {
+    direction: rtl;
+}
+.dashboard-header > .col-md-4 {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    position: absolute;
+    top: 24px;
+    left: 28px;
+    right: auto;
+    width: auto;
+    margin: 0 !important;
+}
+html.lang-en .dashboard-header > .col-md-8 {
+    padding-left: 12px;
+    padding-right: 300px;
+}
+html.lang-en .dashboard-header > .col-md-4 {
+    left: auto;
+    right: 28px;
+}
+html.lang-en .dashboard-header-actions {
+    direction: ltr;
+}
+html.lang-en .dashboard-header-actions > * {
+    direction: ltr;
+}
+.dashboard-status,
+.dashboard-role,
+.dashboard-logout {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 9px 14px;
+    border-radius: 999px;
+    font-size: 0.86rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.dashboard-status { order: 3; }
+.dashboard-role { order: 2; }
+.dashboard-logout { order: 1; }
+.dashboard-status {
+    color: #dcfce7;
+    background: rgba(22, 163, 74, 0.26);
+    border: 1px solid rgba(187, 247, 208, 0.35);
+}
+.dashboard-status i {
+    color: #86efac;
+    font-size: 0.55rem;
+}
+.dashboard-role {
+    color: #dbeafe;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(219, 234, 254, 0.28);
+}
+.dashboard-logout {
+    color: #ffffff;
+    text-decoration: none;
+    background: rgba(220, 38, 38, 0.82);
+    border: 1px solid rgba(254, 202, 202, 0.35);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+.dashboard-logout:hover {
+    color: #ffffff;
+    background: #dc2626;
+    transform: translateY(-2px);
+}
+.dashboard-stat-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.07) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.dashboard-stat-card::after {
+    content: "";
+    position: absolute;
+    left: -18px;
+    bottom: -28px;
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    opacity: 0.1;
+}
+.dashboard-stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12) !important;
+}
+.dashboard-stat-card .card-body {
+    padding: 22px;
+}
+.dashboard-stat-card .rounded-circle {
+    width: 58px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    padding: 0 !important;
+}
+.stat-blue { border-top: 4px solid #2563eb !important; }
+.stat-yellow { border-top: 4px solid #f59e0b !important; }
+.stat-green { border-top: 4px solid #16a34a !important; }
+.stat-red { border-top: 4px solid #dc2626 !important; }
+.stat-blue::after { background: #2563eb; }
+.stat-yellow::after { background: #f59e0b; }
+.stat-green::after { background: #16a34a; }
+.stat-red::after { background: #dc2626; }
+.dashboard-card {
+    border-radius: 16px !important;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06) !important;
+}
+.dashboard-card .card-body {
+    padding: 24px;
+}
+.dashboard-card .card-title {
+    color: #1e293b;
+}
+.status-distribution-card {
+    padding-top: 22px !important;
+}
+.status-distribution-header,
+.priority-distribution-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.status-distribution-title,
+.priority-distribution-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #111827;
+}
+.status-distribution-icon,
+.priority-distribution-icon {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+    color: #ffffff;
+    font-size: 14px;
+    box-shadow: 0 8px 18px rgba(14, 165, 233, 0.22);
+}
+.status-progress-row,
+.priority-progress-row {
+    margin-bottom: 22px;
+}
+.status-progress-row.last-row,
+.priority-progress-row.last-row {
+    margin-bottom: 0;
+}
+.status-progress-meta,
+.priority-progress-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: #111827;
+}
+.status-progress-number,
+.priority-progress-number {
+    font-size: 18px;
+    color: #111827;
+    min-width: 52px;
+    text-align: left;
+    font-weight: 800;
+}
+.status-progress-label,
+.priority-progress-label {
+    font-size: 16px;
+    flex: 1;
+    text-align: right;
+    color: #1f2937;
+}
+.status-progress-track,
+.priority-progress-track {
+    width: 100%;
+    height: 12px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+.status-progress-fill,
+.priority-progress-fill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+}
+.status-new-fill {
+    background: linear-gradient(90deg, #2563eb, #60a5fa);
+}
+.status-pending-fill {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+.status-closed-fill {
+    background: linear-gradient(90deg, #16a34a, #4ade80);
+}
+.priority-critical-fill {
+    background: linear-gradient(90deg, #ef4444, #f87171);
+}
+.priority-high-fill {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+.priority-medium-fill {
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+}
+.quick-actions-card {
+    background: #f8fafc !important;
+}
+.quick-action-grid {
+    margin-top: 4px;
+}
+.quick-action-btn {
+    min-height: 108px;
+    border: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #ffffff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+}
+.quick-action-btn i {
+    display: block;
+    margin-bottom: 4px;
+}
+.quick-action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 20px rgba(15, 23, 42, 0.14) !important;
+    filter: brightness(1.02);
+    color: #ffffff;
+}
+.action-light {
+    background: linear-gradient(135deg, #eef2f7, #e5ebf3);
+    color: #1b2a4a;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+}
+.action-violet {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+}
+.action-cyan {
+    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+}
+.action-blue {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+.action-red {
+    background: linear-gradient(135deg, #ef4444, #f87171);
+}
+.dashboard-page footer {
+    color: #64748b !important;
+}
+@media (max-width: 767.98px) {
+    .dashboard-page {
+        padding-top: 1rem !important;
+    }
+    .dashboard-header {
+        padding: 20px;
+    }
+    .dashboard-header > .col-md-4 {
+        position: static;
+        width: 100%;
+        margin-top: 12px !important;
+    }
+    .dashboard-header > .col-md-8,
+    html.lang-en .dashboard-header > .col-md-8 {
+        padding-left: 0;
+        padding-right: 0;
+    }
+    .dashboard-header-actions {
+        justify-content: flex-end;
+        margin-top: 12px;
+        width: 100%;
+    }
+    .dashboard-header .btn {
+        margin-top: 10px;
+    }
+    .dashboard-card .card-body {
+        padding: 18px;
+    }
+}
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+</style>
+
+{% endblock %}

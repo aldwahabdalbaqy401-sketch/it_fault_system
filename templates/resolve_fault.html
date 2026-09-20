@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}حل المشكلة{% endblock %}
+
+{% block content %}
+<div class="form-wrapper">
+    <div class="form-header">
+        <h2>✅ حل المشكلة</h2>
+        <p>سجل ملاحظاتك عن حل المشكلة</p>
+    </div>
+
+    <div class="form-container">
+        <div style="margin-bottom: 20px; padding: 16px; background: #f8fafc; border-radius: 12px;">
+            <p><strong>📌 البلاغ:</strong> {{ fault.title }}</p>
+            <p><strong>📝 الوصف:</strong> {{ fault.description or 'لا يوجد وصف' }}</p>
+            <p><strong>⚡ الأولوية:</strong> <span class="priority-{{ fault.priority }}">{{ fault.priority }}</span></p>
+            <p><strong>📊 الحالة:</strong> <span class="status-{{ fault.status }}">{{ fault.status }}</span></p>
+        </div>
+
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="form-group">
+                <label for="technician_notes">📝 ملاحظات الحل</label>
+                <textarea id="technician_notes" name="technician_notes" rows="5" placeholder="اكتب ملاحظاتك عن كيفية حل المشكلة..." required></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success">✅ تم الحل</button>
+                <a href="{{ url_for('technician_support') }}" class="btn btn-secondary">⬅️ رجوع</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

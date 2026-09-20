@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block title %}المحادثة{% endblock %}
+
+{% block content %}
+<div class="chat-wrapper" dir="rtl" lang="ar">
+    <div class="chat-header">
+        <div>
+            <span class="chat-eyebrow"><i class="bi bi-chat-square-text"></i> قناة البلاغ</span>
+            <h2>محادثة البلاغ <span>#{{ fault.id }}</span></h2>
+            <p>{{ fault.title }}</p>
+        </div>
+        <a href="{{ url_for('fault_details', id=fault.id) }}" class="btn btn-secondary"><i class="bi bi-arrow-right"></i> رجوع</a>
+    </div>
+
+    <div class="chat-messages" id="chatMessages" aria-live="polite">
+        {% if not messages %}<div class="chat-empty"><i class="bi bi-chat-dots"></i><strong>لا توجد رسائل بعد</strong><span>ابدأ المحادثة مع الأطراف المرتبطة بهذا البلاغ.</span></div>{% endif %}
+        {% for msg in messages %}
+        <div class="message {% if msg.sender_id == session.user_id %}sent{% else %}received{% endif %}">
+            <div class="message-sender">{{ msg.sender_name }}</div>
+            <div class="message-text" dir="auto">
+                {% if msg.image %}
+                    <img src="{{ url_for('static', filename='attachments/' + msg.image) }}" 
+                         alt="صورة مرفقة" 
+                         style="max-width: 200px; max-height: 150px; border-radius: 8px; margin-top: 6px; cursor: pointer; border: 1px solid #e2e8f0;"
+                         onclick="window.open(this.src, '_blank')">
+                {% endif %}
+                <p style="margin: 4px 0 0 0;">{{ msg.message }}</p>
+            </div>
+            <div class="message-time">{{ msg.created_at.strftime('%H:%M') }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="chat-input">
+        <form method="POST" action="{{ url_for('send_message', fault_id=fault.id) }}" enctype="multipart/form-data" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <!-- ===== قائمة المستلمين (محدثة) ===== -->
+            <select name="receiver_id" required class="chat-recipient">
+                <option value="">اختر المستلم</option>
+                {% for chat_user in chat_users %}
+                    <option value="{{ chat_user.id }}">{{ chat_user.full_name or 'مستخدم' }} (@{{ chat_user.username }}) · {{ chat_user.role }}</option>
+                {% endfor %}
+            </select>
+            
+            <input type="text" id="chatMessageInput" name="message" placeholder="اكتب رسالتك..." class="chat-message-input" dir="auto" lang="ar" maxlength="2000">
+            
+            <!-- ===== رفع الصور ===== -->
+            <label for="imageUpload" class="chat-attach" title="إرفاق صورة">
+                <i class="bi bi-paperclip"></i> صورة
+                <input type="file" id="imageUpload" name="image" accept="image/*" style="display: none;" onchange="previewImage(this)">
+            </label>
+            
+            <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> إرسال</button>
+        </form>
+
+        <!-- ===== معاينة الصورة قبل الإرسال ===== -->
+        <div id="imagePreview" style="margin-top: 10px; display: none; align-items: center; gap: 10px;">
+            <img id="previewImg" src="#" alt="معاينة الصورة" style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 2px solid #e2e8f0;">
+            <button onclick="removeImage()" style="background: #ef4444; color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;">✕</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function validateChatForm(form) {
+    const msg = document.getElementById('chatMessageInput').value.trim();
+    const file = document.getElementById('imageUpload').files;
+    if (!msg && (!file || file.length === 0)) {
+        alert(window.APP_LANGUAGE === 'en' ? 'Please enter a message or attach an image' : 'يرجى كتابة رسالة أو إرفاق صورة');
+        return false;
+    }
+    return true;
+}
+
+function previewImage(input) {
+    const preview = document.getElementById('imagePreview');
+    const img = document.getElementById('previewImg');
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            img.src = e.target.result;
+            preview.style.display = 'flex';
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function removeImage() {
+    document.getElementById('imageUpload').value = '';
+    document.getElementById('imagePreview').style.display = 'none';
+}
+
+// ===== تمرير الشات للأسفل تلقائياً =====
+document.addEventListener('DOMContentLoaded', function() {
+    const chatForm = document.querySelector('.chat-input form');
+    if (chatForm) {
+        chatForm.onsubmit = function() { return validateChatForm(this); };
+    }
+    const chatMessages = document.getElementById('chatMessages');
+    if (chatMessages) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+});
+</script>
+
+<style>
+.chat-wrapper { 
+    max-width: 800px; 
+    margin: auto; 
+}
+.chat-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; direction: rtl;
+}
+.chat-eyebrow { color: #2563eb; font-size: 12px; font-weight: 800; }
+.chat-header h2 { margin: 5px 0 2px; color: #172554; }
+.chat-header h2 span { color: #64748b; }
+.chat-header p { margin: 0; color: #64748b; }
+.chat-messages { 
+    height: 450px; 
+    overflow-y: auto; 
+    background: #f8fafc; 
+    padding: 15px; 
+    border-radius: 12px; 
+    border: 1px solid #e2e8f0;
+    direction: rtl;
+    scrollbar-color: #93c5fd #eff6ff;
+}
+.chat-empty { display: flex; height: 100%; align-items: center; justify-content: center; flex-direction: column; gap: 7px; color: #64748b; text-align: center; }
+.chat-empty i { color: #0f766e; font-size: 34px; }
+.chat-empty strong { color: #334155; }
+.message { 
+    margin-bottom: 12px; 
+    padding: 10px 14px; 
+    border-radius: 12px; 
+    max-width: 75%;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    unicode-bidi: plaintext;
+    line-height: 1.8;
+}
+.message.sent { 
+    background: #4a6cf7; 
+    color: white; 
+    margin-left: auto; 
+    text-align: right;
+}
+.message.received { 
+    background: white; 
+    border: 1px solid #e2e8f0; 
+    margin-right: auto; 
+}
+.message-sender { 
+    font-size: 12px; 
+    font-weight: 600; 
+    opacity: 0.7; 
+}
+.message-text img {
+    max-width: 200px;
+    max-height: 150px;
+    border-radius: 8px;
+    margin-top: 6px;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+.message-text img:hover {
+    transform: scale(1.02);
+}
+.message.sent .message-text img {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+.message-text p {
+    margin: 4px 0 0 0;
+    white-space: pre-wrap;
+    unicode-bidi: plaintext;
+}
+.message-time { 
+    font-size: 11px; 
+    opacity: 0.6; 
+    margin-top: 4px; 
+}
+.chat-input { 
+    margin-top: 15px; 
+}
+.chat-recipient, .chat-message-input { padding: 11px 13px; border: 1px solid #cbd5e1; border-radius: 10px; font: inherit; font-family: var(--font-ui, var(--font-arabic)); direction: rtl; }
+.chat-recipient { flex: 1; min-width: 180px; background: #fff; }
+.chat-message-input { flex: 2; min-width: 180px; direction: auto; text-align: start; }
+.chat-recipient:focus, .chat-message-input:focus { outline: 0; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+.chat-attach { cursor: pointer; background: #eff6ff; padding: 11px 15px; border-radius: 10px; display: flex; align-items: center; gap: 6px; border: 1px solid #bfdbfe; color: #1d4ed8; font-weight: 700; }
+.chat-input .btn { min-height: 44px; border-radius: 10px; font-weight: 700; }
+@media (max-width: 600px) { .chat-wrapper { padding: 0 8px; } .chat-header { align-items: flex-start; flex-direction: column; } .chat-messages { height: 55vh; padding: 10px; } .message { max-width: 90%; } .chat-input form > * { width: 100%; } }
+</style>
+{% endblock %}

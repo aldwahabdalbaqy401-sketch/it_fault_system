@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}تعديل المستخدم - {{ user.full_name or user.username }}{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 800px;">
+    
+    <!-- Header Section -->
+    <div class="mb-4 text-center">
+        <h2 class="fw-bold"><i class="bi bi-person-gear text-primary me-2"></i> تعديل بيانات المستخدم</h2>
+        <p class="text-muted">تعديل بيانات وصلاحيات الحساب: <span class="badge bg-secondary">@{{ user.username }}</span></p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 p-md-5">
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="row g-4">
+                    <!-- Username & Full Name (Read-only display) -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-muted"><i class="bi bi-person me-1"></i> اسم المستخدم</label>
+                        <input type="text" class="form-control bg-light" value="{{ user.username }}" disabled>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-muted"><i class="bi bi-card-heading me-1"></i> الاسم الكامل</label>
+                        <input type="text" class="form-control bg-light" value="{{ user.full_name or '-' }}" disabled>
+                    </div>
+
+                    <!-- Email & Department -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-muted"><i class="bi bi-envelope me-1"></i> البريد الإلكتروني</label>
+                        <input type="email" class="form-control bg-light" value="{{ user.email or '-' }}" disabled>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-muted"><i class="bi bi-building me-1"></i> الكلية / القسم</label>
+                        <input type="text" class="form-control bg-light" value="{{ user.department or '-' }}" disabled>
+                    </div>
+
+                    <!-- Role -->
+                    <div class="col-md-6">
+                        <label for="role" class="form-label fw-bold"><i class="bi bi-shield-lock me-1"></i> الصلاحية <span class="text-danger">*</span></label>
+                        <select class="form-select bg-light" id="role" name="role" required>
+                            <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>🔴 أدمن (مدير النظام)</option>
+                            <option value="supervisor" {% if user.role == 'supervisor' %}selected{% endif %}>🟡 مشرف</option>
+                            <option value="technician" {% if user.role == 'technician' %}selected{% endif %}>🔵 فني دعم تقني</option>
+                            <option value="user" {% if user.role == 'user' %}selected{% endif %}>🟢 مستخدم عادي</option>
+                        </select>
+                    </div>
+
+                    <!-- User Type -->
+                    <div class="col-md-6">
+                        <label for="user_type" class="form-label fw-bold"><i class="bi bi-person-badge me-1"></i> نوع المستخدم <span class="text-danger">*</span></label>
+                        <select class="form-select bg-light" id="user_type" name="user_type" required>
+                            <option value="student" {% if user.user_type == 'student' %}selected{% endif %}>طالب</option>
+                            <option value="employee" {% if user.user_type == 'employee' %}selected{% endif %}>موظف</option>
+                            <option value="faculty" {% if user.user_type == 'faculty' %}selected{% endif %}>عضو هيئة تدريس</option>
+                            <option value="admin" {% if user.user_type == 'admin' %}selected{% endif %}>إداري</option>
+                        </select>
+                    </div>
+
+                    <!-- Password Reset Section (Optional) -->
+                    <div class="col-12 mt-4">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <h6 class="fw-bold mb-2 text-primary"><i class="bi bi-key-fill me-1"></i> تعيين كلمة مرور جديدة (اختياري)</h6>
+                            <p class="text-muted small mb-3">اترك الحقلين فارغين إذا كنت لا ترغب في تغيير كلمة مرور المستخدم الحالية.</p>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="password" class="form-label fw-bold small">كلمة المرور الجديدة</label>
+                                    <input type="password" class="form-control" id="password" name="password" placeholder="6 أحرف على الأقل" minlength="6">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="confirm_password" class="form-label fw-bold small">تأكيد كلمة المرور الجديدة</label>
+                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="أعد كتابة كلمة المرور" minlength="6">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Actions -->
+                <div class="d-flex gap-2 justify-content-end">
+                    <a href="{{ url_for('admin_users') }}" class="btn btn-light rounded-pill px-4 fw-bold">
+                        <i class="bi bi-x-circle me-1"></i> إلغاء
+                    </a>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">
+                        <i class="bi bi-check2-circle me-1"></i> حفظ التعديلات
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

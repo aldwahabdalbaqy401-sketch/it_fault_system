@@ -1,0 +1,54 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# === بيئة افتراضية ===
+venv/
+env/
+.env
+.venv/
+
+# === إعدادات حساسة ===
+.env
+*.env
+instance/
+
+# === قواعد البيانات ===
+*.db
+*.sqlite3
+*.sqlite
+
+# === ملفات مرفوعة (لا تُرفع على Git) ===
+static/attachments/*
+static/uploads/*
+!static/attachments/.gitkeep
+!static/uploads/.gitkeep
+
+# === ملفات المستخدمين ===
+static/images/uploads/*
+
+# === IDE وأدوات التطوير ===
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# === تقارير الاختبار ===
+.pytest_cache/
+.coverage
+htmlcov/
+
+# === ملفات السجل ===
+*.log
+logs/
+
+# === ملفات مؤقتة ===
+*.tmp
+*.bak

@@ -1,0 +1,372 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ 'Advanced Statistics' if is_english else 'إحصائيات متقدمة' }}{% endblock %}
+
+{% block content %}
+<div class="stats-page stats-page-modern">
+    <div class="stats-hero">
+        <div class="header-left">
+            <span class="stats-eyebrow"><i class="bi bi-graph-up-arrow"></i> {{ 'Analysis Center' if is_english else 'مركز التحليل' }}</span>
+            <h1>{{ 'Advanced Statistics' if is_english else 'الإحصائيات المتقدمة' }}</h1>
+            <p>{{ 'A clear picture of the volume of faults and the speed of their processing.' if is_english else 'صورة واضحة عن حجم البلاغات وسرعة معالجتها.' }}</p>
+        </div>
+        <div class="header-right">
+            <span class="stats-date"><i class="bi bi-calendar3"></i> {{ 'Last 7 days of trends' if is_english else 'آخر 7 أيام للاتجاهات' }}</span>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-light"><i class="bi bi-arrow-right"></i> {{ 'Dashboard' if is_english else 'لوحة التحكم' }}</a>
+        </div>
+    </div>
+
+    <div class="stats-toolbar">
+        <div><span class="section-kicker">{{ 'Performance Summary' if is_english else 'ملخص الأداء' }}</span><h2>{{ 'Key Indicators' if is_english else 'المؤشرات الرئيسية' }}</h2><p class="stats-live-note"><i class="bi bi-arrow-repeat"></i> {{ 'Automatically updates when the page opens after adding a report.' if is_english else 'تُحدّث تلقائيًا عند فتح الصفحة بعد إضافة أي بلاغ' }}</p></div>
+        <div class="stats-actions">
+            <a href="{{ url_for('view_faults') }}" class="btn btn-outline-primary"><i class="bi bi-list-check"></i> {{ 'View reports' if is_english else 'عرض البلاغات' }}</a>
+            <a href="{{ url_for('add_fault') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> {{ 'Add report' if is_english else 'إضافة بلاغ' }}</a>
+        </div>
+    </div>
+
+    <div class="stats-cards">
+        <div class="stat-card modern-card blue"><span class="metric-icon"><i class="bi bi-collection"></i></span><div><div class="stat-number">{{ total_faults }}</div><div class="stat-label">{{ 'Total Reports' if is_english else 'إجمالي البلاغات' }}</div></div><small>{{ 'All recorded reports' if is_english else 'كل البلاغات المسجلة' }}</small>
+        </div>
+        <div class="stat-card modern-card green"><span class="metric-icon"><i class="bi bi-check2-circle"></i></span><div><div class="stat-number">{{ resolved_faults }}</div><div class="stat-label">{{ 'Completed reports' if is_english else 'بلاغات مكتملة' }}</div></div><small>{{ ((resolved_faults / total_faults * 100)|round(0)) if total_faults else 0 }}% {{ 'of total' if is_english else 'من الإجمالي' }}</small>
+        </div>
+        <div class="stat-card modern-card amber"><span class="metric-icon"><i class="bi bi-hourglass-split"></i></span><div><div class="stat-number">{{ total_faults - resolved_faults }}</div><div class="stat-label">{{ 'In progress' if is_english else 'قيد المتابعة' }}</div></div><small>{{ 'Needs attention' if is_english else 'تحتاج إلى إجراء' }}</small>
+        </div>
+        <div class="stat-card modern-card red"><span class="metric-icon"><i class="bi bi-exclamation-octagon"></i></span><div><div class="stat-number">{{ critical_faults }}</div><div class="stat-label">{{ 'Critical reports' if is_english else 'بلاغات حرجة' }}</div></div><small>{{ 'Urgent priority' if is_english else 'أولوية عاجلة' }}</small>
+        </div>
+    </div>
+
+    <!-- ===== الرسوم البيانية ===== -->
+    <div class="chart-grid">
+        <div class="chart-container">
+            <div class="chart-heading"><div><span>{{ 'Report distribution' if is_english else 'توزيع البلاغات' }}</span><h3>{{ 'By priority' if is_english else 'حسب الأولوية' }}</h3></div><span class="chart-total">{{ total_faults }} {{ 'report(s)' if is_english else 'بلاغ' }}</span><i class="bi bi-pie-chart"></i></div>
+            <canvas id="priorityChart" height="200"></canvas>
+        </div>
+        <div class="chart-container">
+            <div class="chart-heading"><div><span>{{ 'Processing flow' if is_english else 'مسار المعالجة' }}</span><h3>{{ 'By status' if is_english else 'حسب الحالة' }}</h3></div><i class="bi bi-bar-chart"></i></div>
+            <canvas id="statusChart" height="200"></canvas>
+        </div>
+        <div class="chart-container chart-wide">
+            <div class="chart-heading"><div><span>{{ 'Recent activity' if is_english else 'النشاط الأخير' }}</span><h3>{{ 'Reports in the last 7 days' if is_english else 'البلاغات خلال آخر 7 أيام' }}</h3></div><i class="bi bi-activity"></i></div>
+            <canvas id="weeklyChart" height="150"></canvas>
+        </div>
+    </div>
+
+    <!-- ===== الأشرطة البيانية ===== -->
+    <div class="chart-section">
+        <div class="section-heading"><div><span class="section-kicker">{{ 'Quick Read' if is_english else 'قراءة سريعة' }}</span><h2>{{ 'Priority' if is_english else 'الأولوية' }}</h2></div><span>{{ 'Share of each level from the total reports' if is_english else 'نسبة كل مستوى من إجمالي البلاغات' }}</span></div>
+        <div class="priority-bars">
+            {% for stat in priority_stats %}
+            <div class="priority-item">
+                <span class="priority-label">{{ stat.label }}</span>
+                <div class="bar-container" role="progressbar" aria-label="{{ stat.label }}" aria-valuenow="{{ stat.percent }}" aria-valuemin="0" aria-valuemax="100">
+                    <div class="bar {% if stat.count == 0 %}empty-bar{% endif %}" style="width: {{ stat.percent }}%;"></div>
+                </div>
+                <span class="priority-percent">
+                    <strong>{{ stat.count }}</strong><small>{{ "%.1f"|format(stat.percent) }}%</small>
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="chart-section">
+        <div class="section-heading"><div><span class="section-kicker">{{ 'Work Status' if is_english else 'حالة العمل' }}</span><h2>{{ 'Current Progress' if is_english else 'التقدم الحالي' }}</h2></div><span>{{ 'Distribution of reports by processing stage' if is_english else 'توزيع البلاغات حسب مرحلة المعالجة' }}</span></div>
+        <div class="priority-bars">
+            {% for stat in status_stats %}
+            <div class="priority-item">
+                <span class="priority-label">{{ stat.label }}</span>
+                <div class="bar-container" role="progressbar" aria-label="{{ stat.label }}" aria-valuenow="{{ stat.percent }}" aria-valuemin="0" aria-valuemax="100">
+                    <div class="bar {% if stat.count == 0 %}empty-bar{% endif %}" style="width: {{ stat.percent }}%; background: #10b981;"></div>
+                </div>
+                <span class="priority-percent">
+                    <strong>{{ stat.count }}</strong><small>{{ "%.1f"|format(stat.percent) }}%</small>
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="dashboard-footer">
+        <span>© 2026 {{ APP_NAME }}</span>
+        <span>{{ 'Version 2.0' if is_english else 'الإصدار 2.0' }}</span>
+    </div>
+</div>
+
+<!-- ===== Chart.js ===== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ===== بيانات الأولويات =====
+    var priorityLabels = [];
+    var priorityData = [];
+    var priorityColors = {
+        'critical': '#ef4444',
+        'high': '#f59e0b',
+        'medium': '#4a6cf7',
+        'low': '#10b981'
+    };
+    var priorityNames = {critical: 'حرجة', high: 'عالية', medium: 'متوسطة', low: 'منخفضة'};
+    var priorityColorsList = [];
+
+    {% for stat in priority_stats %}
+        priorityLabels.push(window.translateAppText ? window.translateAppText('{{ stat.label }}') : '{{ stat.label }}');
+        priorityData.push({{ stat.count }});
+        priorityColorsList.push(priorityColors['{{ stat.priority }}'] || '#6b7280');
+    {% endfor %}
+
+    // ===== الرسم البياني للأولويات =====
+    var priorityCtx = document.getElementById('priorityChart');
+    if (priorityCtx) {
+        new Chart(priorityCtx, {
+            type: 'doughnut',
+            data: {
+                labels: priorityLabels,
+                datasets: [{
+                    data: priorityData,
+                    backgroundColor: priorityColorsList,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { family: window.APP_LANGUAGE === 'en' ? 'Plus Jakarta Sans' : 'Readex Pro' }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // ===== بيانات الحالات =====
+    var statusLabels = [];
+    var statusData = [];
+    var statusColors = {
+        'new': '#3b82f6',
+        'in_progress': '#f59e0b',
+        'resolved': '#10b981',
+        'closed': '#6b7280'
+    };
+    var statusNames = {new: 'جديد', in_progress: 'قيد المعالجة', resolved: 'تم الحل', closed: 'مغلق'};
+    var statusColorsList = [];
+
+    {% for stat in status_stats %}
+        statusLabels.push(window.translateAppText ? window.translateAppText('{{ stat.label }}') : '{{ stat.label }}');
+        statusData.push({{ stat.count }});
+        statusColorsList.push(statusColors['{{ stat.status }}'] || '#6b7280');
+    {% endfor %}
+
+    // ===== الرسم البياني للحالات =====
+    var statusCtx = document.getElementById('statusChart');
+    if (statusCtx) {
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    data: statusData,
+                    backgroundColor: statusColorsList,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { family: window.APP_LANGUAGE === 'en' ? 'Plus Jakarta Sans' : 'Readex Pro' }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // ===== البيانات الأسبوعية =====
+    var weeklyLabels = [];
+    var weeklyData = [];
+
+    {% for stat in weekly_stats %}
+        weeklyLabels.push('{{ stat.date }}');
+        weeklyData.push({{ stat.count }});
+    {% endfor %}
+
+    // ===== الرسم البياني الأسبوعي =====
+    var weeklyCtx = document.getElementById('weeklyChart');
+    if (weeklyCtx) {
+        new Chart(weeklyCtx, {
+            type: 'bar',
+            data: {
+                labels: weeklyLabels,
+                datasets: [{
+                    label: window.APP_LANGUAGE === 'en' ? 'Number of faults' : 'عدد الأعطال',
+                    data: weeklyData,
+                    backgroundColor: 'rgba(74, 108, 247, 0.7)',
+                    borderColor: '#4a6cf7',
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + ' عطل';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            font: { family: window.APP_LANGUAGE === 'en' ? 'Plus Jakarta Sans' : 'Readex Pro' }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: { family: window.APP_LANGUAGE === 'en' ? 'Plus Jakarta Sans' : 'Readex Pro' }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+
+<style>
+.stats-page-modern { animation: stats-page-in 0.45s ease-out both; }
+.stats-page-modern .stats-hero {
+    background: linear-gradient(135deg, #172554, #1d4ed8 58%, #2563eb);
+    box-shadow: 0 16px 34px rgba(30, 64, 175, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+.stats-page-modern .stats-hero::after {
+    content: "";
+    position: absolute;
+    left: -5%;
+    bottom: -48px;
+    width: 110%;
+    height: 90px;
+    border-radius: 50% 50% 0 0 / 70% 70% 0 0;
+    background: rgba(147, 197, 253, 0.2);
+    transform: rotate(-2deg);
+    pointer-events: none;
+}
+.stats-page-modern .stats-hero > * {
+    position: relative;
+    z-index: 1;
+}
+.stats-page-modern .stats-eyebrow,
+.stats-page-modern .section-kicker {
+    color: #bfdbfe;
+}
+.stats-page-modern .stats-hero p {
+    color: #dbeafe;
+}
+.stats-page-modern .stats-hero .header-right,
+.stats-page-modern .stats-actions {
+    position: relative;
+    z-index: 2;
+}
+.stats-page-modern .stats-hero .btn-light,
+.stats-page-modern .stats-actions .btn {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border-radius: 10px;
+    font-weight: 700;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.stats-page-modern .stats-hero .btn-light {
+    color: #1e3a8a;
+    background: #ffffff;
+    border: 0;
+    box-shadow: 0 7px 16px rgba(7, 24, 64, 0.16);
+}
+.stats-page-modern .stats-actions .btn {
+    min-width: 142px;
+    border-width: 1px;
+}
+.stats-page-modern .stats-hero .btn:hover,
+.stats-page-modern .stats-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 9px 18px rgba(30, 64, 175, 0.18);
+}
+.stats-page-modern .stats-actions .btn-primary {
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    border-color: transparent;
+}
+.stats-page-modern .stats-actions .btn-outline-primary:hover {
+    color: #ffffff;
+    background: #2563eb;
+}
+.stats-page-modern .modern-card,
+.stats-page-modern .chart-container,
+.stats-page-modern .chart-section {
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.07);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.stats-page-modern .modern-card:hover,
+.stats-page-modern .chart-container:hover,
+.stats-page-modern .chart-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.11);
+}
+.stats-page-modern .stat-number,
+.stats-page-modern .stats-toolbar h2,
+.stats-page-modern .section-heading h2,
+.stats-page-modern .chart-heading h3 {
+    color: #172554;
+}
+.stats-page-modern .bar {
+    background: linear-gradient(90deg, #2563eb, #4f46e5);
+}
+@keyframes stats-page-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.stats-page { max-width: 1180px; margin: 0 auto; padding: 10px 0 30px; }
+.stats-hero { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 28px 32px; margin-bottom: 26px; color: #fff; border-radius: 18px; background: linear-gradient(135deg, #12343b, #176b67); box-shadow: 0 12px 30px rgba(18,52,59,.18); }
+.stats-eyebrow, .section-kicker { color: #99f6e4; font-size: 11px; font-weight: 800; letter-spacing: .08em; }
+.stats-hero h1 { margin: 5px 0; font-size: 28px; }
+.stats-hero p { margin: 0; color: rgba(255,255,255,.75); }
+.stats-hero .header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.stats-date { color: #ccfbf1; font-size: 12px; }
+.stats-toolbar, .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; }
+.stats-toolbar { margin-bottom: 14px; }
+.stats-live-note { margin: 5px 0 0; color: #64748b; font-size: 11px; }
+.stats-live-note i { color: #0f766e; margin-left: 4px; }
+.stats-toolbar h2, .section-heading h2 { margin: 4px 0 0; color: #12343b; font-size: 21px; }
+.stats-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.stats-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 28px; }
+.modern-card { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 10px; position: relative; min-height: 130px; padding: 18px; border: 1px solid #e2e8f0; border-top: 4px solid; border-radius: 14px; background: #fff; box-shadow: 0 5px 18px rgba(15,23,42,.06); }
+.modern-card small { grid-column: 1 / -1; color: #64748b; font-size: 11px; }
+.modern-card.blue { border-top-color: #2563eb; }.modern-card.green { border-top-color: #059669; }.modern-card.amber { border-top-color: #d97706; }.modern-card.red { border-top-color: #dc2626; }
+.metric-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 11px; color: #0f766e; background: #ccfbf1; font-size: 19px; }
+.blue .metric-icon { color: #2563eb; background: #dbeafe; }.green .metric-icon { color: #059669; background: #d1fae5; }.amber .metric-icon { color: #d97706; background: #fef3c7; }.red .metric-icon { color: #dc2626; background: #fee2e2; }
+.stat-number { color: #12343b; font-size: 27px; font-weight: 800; line-height: 1; }.stat-label { color: #475569; font-size: 12px; font-weight: 700; margin-top: 5px; }
+.chart-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 28px; }
+.chart-container { min-width: 0; padding: 20px; border: 1px solid #e2e8f0; border-radius: 14px; background: #fff; box-shadow: 0 5px 18px rgba(15,23,42,.05); }.chart-wide { grid-column: 1 / -1; }
+.chart-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }.chart-heading span, .section-heading > span { color: #64748b; font-size: 11px; }.chart-heading h3 { color: #12343b; font-size: 17px; margin: 3px 0 0; }.chart-heading > i { color: #0f766e; font-size: 21px; }.chart-total { margin-right: auto; padding: 5px 9px; color: #0f766e !important; background: #ccfbf1; border-radius: 999px; font-weight: 800; white-space: nowrap; }
+.chart-container canvas { max-height: 250px; }
+.chart-section { padding: 20px; margin-bottom: 16px; border: 1px solid #e2e8f0; border-radius: 14px; background: #fff; box-shadow: 0 5px 18px rgba(15,23,42,.05); }.section-heading { margin-bottom: 20px; }.priority-item { display: grid; grid-template-columns: 105px 1fr 58px; align-items: center; gap: 12px; margin: 14px 0; }.priority-label { color: #334155; font-size: 13px; font-weight: 700; }.bar-container { height: 12px; overflow: hidden; border-radius: 999px; background: #e2e8f0; }.bar { min-width: 0; height: 100%; border-radius: inherit; background: #2563eb; transition: width .45s ease; }.bar.empty-bar { background: transparent; }.priority-percent { display: flex; flex-direction: column; align-items: flex-start; color: #64748b; font-size: 11px; text-align: left; line-height: 1.1; }.priority-percent strong { color: #1e293b; font-size: 13px; }.priority-percent small { font-size: 10px; }
+.dashboard-footer { display: flex; justify-content: space-between; color: #64748b; font-size: 12px; padding: 18px 4px 0; }
+@media (max-width: 850px) { .stats-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 650px) { .stats-page { padding: 0 4px 24px; }.stats-hero { align-items: flex-start; flex-direction: column; padding: 22px; }.stats-hero h1 { font-size: 24px; }.stats-toolbar, .section-heading { align-items: flex-start; flex-direction: column; }.chart-grid { grid-template-columns: 1fr; }.chart-wide { grid-column: auto; }.priority-item { grid-template-columns: 78px 1fr 45px; gap: 7px; }.dashboard-footer { flex-direction: column; gap: 5px; } }
+</style>
+{% endblock %}

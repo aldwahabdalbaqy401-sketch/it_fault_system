@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="{{ page_lang }}" dir="{{ page_direction }}" class="{% if is_english %}lang-en{% else %}lang-ar{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{% block title %}{{ APP_NAME }}{% endblock %}</title>
+    <!-- Bootstrap 5 layout direction -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap{% if not is_english %}.rtl{% endif %}.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS (Keep if needed) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <style>
+        /* التعديلات البسيطة على التصميم */
+        :root {
+            --app-font-ar: var(--font-arabic);
+            --app-font-en: var(--font-english);
+        }
+
+        body {
+            font-family: var(--app-font-ar);
+            background-color: #f8f9fa;
+            line-height: 1.7;
+        }
+
+        h1, h2, h3, h4, h5, h6,
+        .navbar-brand,
+        .nav-link,
+        .btn,
+        .form-label,
+        .form-control,
+        .form-select,
+        input,
+        select,
+        textarea,
+        button,
+        label,
+        .badge,
+        .card-title,
+        .stat-number,
+        .stat-label,
+        .table,
+        .table th,
+        .table td,
+        .dropdown-item,
+        .modal-title,
+        .alert,
+        .toast,
+        .small,
+        .fw-bold,
+        .fw-semibold,
+        .fw-medium {
+            font-family: var(--app-font-ar) !important;
+        }
+        html.lang-en body {
+            font-family: var(--app-font-en);
+        }
+
+        html.lang-en h1, html.lang-en h2, html.lang-en h3, html.lang-en h4, html.lang-en h5, html.lang-en h6,
+        html.lang-en .navbar-brand, html.lang-en .nav-link, html.lang-en .btn,
+        html.lang-en .form-label, html.lang-en .form-control, html.lang-en .form-select,
+        html.lang-en input, html.lang-en select, html.lang-en textarea, html.lang-en button,
+        html.lang-en label, html.lang-en .badge, html.lang-en .card-title,
+        html.lang-en .table, html.lang-en .table th, html.lang-en .table td,
+        html.lang-en .dropdown-item, html.lang-en .modal-title, html.lang-en .alert,
+        html.lang-en .toast, html.lang-en .small {
+            font-family: var(--app-font-en) !important;
+        }
+        html.lang-en .navbar-brand img {
+            margin-left: 0 !important;
+            margin-right: 15px !important;
+        }
+        html.lang-en .bi-arrow-right,
+        html.lang-en .bi-arrow-left,
+        html.lang-en .bi-arrow-return-right,
+        html.lang-en .bi-box-arrow-left,
+        html.lang-en .bi-box-arrow-right {
+            transform: scaleX(-1);
+        }
+        html.lang-en .user-info-header i {
+            margin-left: 0 !important;
+            margin-right: 4px !important;
+        }
+        html.lang-en .action-arrow {
+            margin-right: 0 !important;
+            margin-left: auto !important;
+        }
+        html.lang-en .action-card:hover .action-arrow {
+            transform: translateX(4px) scaleX(-1);
+        }
+        .dark-mode-toggle {
+            width: 42px;
+            height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 12px;
+            color: #fff !important;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+        .dark-mode-toggle:hover,
+        .dark-mode-toggle:focus-visible {
+            background: rgba(255, 255, 255, 0.16);
+            transform: translateY(-1px);
+        }
+        .navbar-brand img {
+            height: 45px;
+            margin-left: 10px;
+        }
+        .navbar {
+            position: relative;
+            z-index: 1050;
+            overflow: visible !important;
+            min-height: 82px;
+            background: linear-gradient(135deg, #0f3d70 0%, #1769aa 52%, #0e7490 100%) !important;
+            box-shadow: 0 8px 24px rgba(15, 61, 112, 0.22);
+        }
+        .navbar-bg-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+            border-radius: inherit;
+        }
+        .navbar-bg-shapes::before,
+        .navbar-bg-shapes::after {
+            position: absolute;
+            content: '';
+            pointer-events: none;
+            border-radius: 50%;
+        }
+        .navbar-bg-shapes::before {
+            right: -8%;
+            bottom: -52px;
+            width: 116%;
+            height: 86px;
+            background: rgba(255, 255, 255, 0.12);
+            transform: rotate(-2deg);
+        }
+        .navbar-bg-shapes::after {
+            left: -10%;
+            bottom: -66px;
+            width: 120%;
+            height: 88px;
+            background: rgba(14, 116, 144, 0.72);
+            transform: rotate(2deg);
+        }
+        .navbar::before,
+        .navbar::after {
+            display: none !important;
+        }
+        .navbar > .container {
+            position: relative;
+            z-index: 1;
+            min-height: 82px;
+            overflow: visible !important;
+        }
+        .navbar-collapse {
+            overflow: visible !important;
+        }
+        .navbar-brand {
+            padding: 8px 0;
+        }
+        .navbar-brand img {
+            transition: transform 0.25s ease;
+        }
+        .navbar-brand:hover img {
+            transform: scale(1.04);
+        }
+        .navbar-brand, .nav-link {
+            color: #fff !important;
+        }
+        .language-link {
+            font-size: 0.82rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .navbar .nav-link {
+            padding: 10px 12px;
+            border-radius: 10px;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+        .navbar .nav-link:hover,
+        .navbar .nav-link:focus-visible {
+            background: rgba(255, 255, 255, 0.14);
+            transform: translateY(-1px);
+        }
+        .navbar .navbar-toggler {
+            position: relative;
+            z-index: 2;
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            padding: 7px 9px;
+        }
+        .navbar .navbar-toggler:focus {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+        }
+        @media (max-width: 767.98px) {
+            .navbar,
+            .navbar > .container {
+                min-height: 72px;
+            }
+            .navbar-brand img {
+                height: 48px !important;
+                margin-left: 9px !important;
+            }
+            .navbar-brand span:last-child {
+                font-size: 15px !important;
+            }
+            .navbar-collapse {
+                margin: 8px 0 10px;
+                padding: 8px;
+                background: rgba(8, 47, 84, 0.42);
+                border: 1px solid rgba(255, 255, 255, 0.14);
+                border-radius: 12px;
+            }
+            .navbar-nav {
+                align-items: stretch !important;
+            }
+            .navbar-nav .nav-link {
+                text-align: center;
+            }
+        }
+        #notifDropdownToggle::after {
+            display: none !important;
+        }
+        .notif-delete-btn {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: #adb5bd;
+            font-size: 14px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s, background 0.2s, color 0.2s;
+            z-index: 5;
+            flex-shrink: 0;
+        }
+        [dir='rtl'] .notif-delete-btn {
+            left: auto;
+            right: 10px;
+        }
+        .notif-item-wrapper:hover .notif-delete-btn,
+        .notif-delete-btn:focus {
+            opacity: 1;
+        }
+        .notif-delete-btn:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        body.dark-mode .notif-delete-btn:hover {
+            background: #450a0a;
+            color: #f87171;
+        }
+        .notif-item-wrapper {
+            position: relative;
+        }
+        .notif-item-wrapper .notif-item {
+            padding-inline-end: 16px;
+            padding-inline-start: 40px;
+        }
+        .dropdown-menu-notif {
+            width: 340px;
+            max-width: 90vw;
+            max-height: 420px;
+            overflow-y: auto;
+            padding: 0;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 14px 35px rgba(0, 0, 0, 0.2) !important;
+            margin-top: 8px !important;
+            z-index: 1060 !important;
+        }
+        .notif-item {
+            border-bottom: 1px solid #e9ecef;
+            padding: 12px 16px;
+            display: block;
+            text-decoration: none;
+            color: #212529;
+            transition: background 0.2s;
+        }
+        .notif-item:hover {
+            background: #f8f9fa;
+        }
+        .notif-item.unread {
+            background: #eef2ff;
+            border-inline-start: 4px solid #4f46e5;
+        }
+        body.dark-mode .dropdown-menu-notif {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #f1f5f9;
+        }
+        body.dark-mode .dropdown-menu-notif .dropdown-header {
+            background-color: #0f172a !important;
+            color: #f8fafc !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode .dropdown-menu-notif .dropdown-header span {
+            color: #f8fafc !important;
+        }
+        body.dark-mode .notif-item {
+            color: #e2e8f0;
+            border-color: #334155;
+        }
+        body.dark-mode .notif-item:hover {
+            background: #334155;
+        }
+        body.dark-mode .notif-item.unread {
+            background: #1e1b4b;
+            border-inline-start-color: #818cf8;
+        }
+        body.dark-mode .notif-item .text-muted {
+            color: #94a3b8 !important;
+        }
+        body.dark-mode .dropdown-menu-notif .dropdown-divider {
+            border-color: #334155;
+        }
+        
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1055;
+        }
+        
+        .notif-icon-anim:hover {
+            transform: scale(1.1) rotate(5deg);
+            transition: transform 0.2s;
+        }
+        .chat-nav-btn {
+            width: 42px;
+            height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            color: #fff !important;
+            border: 1px solid rgba(255,255,255,0.22);
+            text-decoration: none;
+            transition: background 0.2s ease, transform 0.2s ease;
+            position: relative;
+        }
+        .chat-nav-btn:hover {
+            background: rgba(255,255,255,0.16);
+            transform: translateY(-2px);
+            color: #fff !important;
+        }
+        .chat-nav-btn i {
+            transition: transform 0.2s;
+        }
+        .chat-nav-btn:hover i {
+            transform: scale(1.15) rotate(-8deg);
+        }
+        .chat-unread-dot {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 9px;
+            height: 9px;
+            background: #22c55e;
+            border-radius: 50%;
+            border: 2px solid #1769aa;
+            display: none;
+            animation: pulse-dot 1.4s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50%       { transform: scale(1.35); opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg mb-4">
+        <div class="navbar-bg-shapes"></div>
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('login') }}">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="{{ 'Logo' if is_english else 'الشعار' }}" style="height: 60px; margin-left: 15px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));">
+                <div>
+                    <span class="d-block text-warning mb-1" style="font-size: 13px; font-weight: bold; letter-spacing: 0.5px;"><i class="bi bi-bank"></i> {{ 'White Nile University' if is_english else 'جامعة النيل الأبيض' }}</span>
+                    <span class="text-white" style="font-size: 19px; font-weight: 900; text-shadow: 1px 1px 3px rgba(0,0,0,0.4);">{{ APP_NAME }}</span>
+                </div>
+            </a>
+            
+            <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    {% if session.get('user_id') %}
+                        <!-- Chat Button (always visible) -->
+                        <li class="nav-item me-2">
+                            <a class="chat-nav-btn" href="{{ url_for('technician_support') if session.get('user_role') in ['admin','supervisor','technician'] else url_for('user_dashboard') }}" 
+                               id="chatNavBtn"
+                               title="{{ 'Chat' if is_english else 'المحادثة' }}">
+                                <i class="bi bi-chat-dots-fill fs-5"></i>
+                                <span class="chat-unread-dot" id="chatNavDot"></span>
+                            </a>
+                        </li>
+                        <!-- Notifications Dropdown -->
+                        <li class="nav-item dropdown me-3">
+                            <a class="nav-link dropdown-toggle position-relative text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="notifDropdownToggle">
+                                <i class="bi bi-bell-fill fs-4 notif-icon-anim"></i>
+                                <span id="notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light" style="display: none; font-size: 0.70rem; padding: 0.35em 0.6em;">
+                                    0
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-notif shadow-lg" aria-labelledby="notifDropdownToggle" id="notifList">
+                                <li><h6 class="dropdown-header d-flex justify-content-between align-items-center bg-light border-bottom py-2">
+                                    <span class="fw-bold text-dark"><i class="bi bi-bell-fill text-primary me-2"></i> {{ 'Notifications' if is_english else 'الإشعارات' }}</span>
+                                    <button class="btn btn-sm btn-link text-decoration-none" onclick="markAllReadHeader()">{{ 'Read' if is_english else 'مقروء' }}</button>
+                                </h6></li>
+                                <div id="notifItemsContainer">
+                                    <li><a class="dropdown-item text-center text-muted small py-3" href="#">{{ 'Loading...' if is_english else 'جاري التحميل...' }}</a></li>
+                                </div>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-center text-primary" href="{{ url_for('notifications') }}">{{ 'View all notifications' if is_english else 'عرض كل الإشعارات' }}</a></li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                    
+                    <li class="nav-item language-switcher">
+                        {% if is_english %}
+                        <a class="nav-link language-link" href="{{ url_for('set_language', language='ar') }}" title="العربية">
+                            <i class="bi bi-translate"></i> العربية
+                        </a>
+                        {% else %}
+                        <a class="nav-link language-link" href="{{ url_for('set_language', language='en') }}" title="English">
+                            <i class="bi bi-translate"></i> English
+                        </a>
+                        {% endif %}
+                    </li>
+
+                    <!-- Dark Mode Toggle -->
+                    <li class="nav-item me-2">
+                        <button class="btn btn-link nav-link dark-mode-toggle" id="darkModeToggle" type="button" title="{{ 'Toggle dark mode' if is_english else 'تبديل الوضع الليلي' }}" aria-label="{{ 'Toggle dark mode' if is_english else 'تبديل الوضع الليلي' }}">
+                            <i class="bi bi-moon-fill fs-5"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container main-content-area">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Bootstrap Toasts for Flash Messages -->
+    <div class="toast-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% set bs_class = 'primary' %}
+                    {% if category == 'success' %}{% set bs_class = 'success' %}{% endif %}
+                    {% if category == 'danger' %}{% set bs_class = 'danger' %}{% endif %}
+                    {% if category == 'warning' %}{% set bs_class = 'warning' %}{% endif %}
+                    {% if category == 'info' %}{% set bs_class = 'info' %}{% endif %}
+                    
+                    <div class="toast align-items-center text-bg-{{ bs_class }} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+                        <div class="d-flex">
+                            <div class="toast-body d-flex align-items-center gap-2">
+                                {% if bs_class == 'success' %}<i class="bi bi-check-circle-fill fs-5"></i>
+                                {% elif bs_class == 'danger' %}<i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                                {% elif bs_class == 'warning' %}<i class="bi bi-exclamation-circle-fill fs-5"></i>
+                                {% else %}<i class="bi bi-info-circle-fill fs-5"></i>{% endif %}
+                                <span>{{ message }}</span>
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Translate legacy template labels that have not yet been moved to bilingual Jinja text. -->
+    <script>
+        window.APP_LANGUAGE = {{ current_language|tojson }};
+        (function () {
+            if (window.APP_LANGUAGE !== 'en') return;
+            const translations = {
+                'لوحة التحكم': 'Dashboard', 'إضافة عطل': 'Add Fault', 'إضافة عطل جديد': 'Add New Fault',
+                'عرض الأعطال': 'View Faults', 'قائمة الأعطال': 'Fault List', 'بلاغاتي': 'My Faults',
+                'إضافة بلاغ': 'Add Report', 'عرض البلاغات': 'View Reports', 'الإشعارات': 'Notifications',
+                'دعم الفنيين': 'Technician Support', 'الإحصائيات المتقدمة': 'Advanced Statistics',
+                'لوحة التحكم الرئيسية': 'Main Dashboard', 'نظام إدارة وتتبع الأعطال التقنية': 'Technical Fault Management and Tracking System',
+                'مرحباً بك': 'Welcome', 'إليك نظرة عامة على حالة النظام.': 'Here is an overview of the system status.',
+                'نشط': 'Active', 'مدير النظام': 'System Administrator', 'مواعيد صيانة قريبة': 'Upcoming maintenance appointments',
+                'خلال': 'In', 'يوم': 'day(s)', 'إجمالي الأعطال': 'Total faults', 'تم حلها': 'Resolved',
+                'حالات حرجة': 'Critical cases', 'توزيع الأعطال حسب الحالة': 'Faults by status', 'توزيع الأعطال حسب القسم': 'Faults by department',
+                'الأعطال حسب الأولوية': 'Faults by priority', 'تقنية المعلومات': 'Information Technology', 'الشبكات': 'Networks',
+                'الدعم الفني': 'Technical Support', 'التشغيل': 'Operations', 'الصيانة': 'Maintenance',
+                'حرج': 'Critical', 'عالي': 'High', 'متوسط': 'Medium', 'منخفض': 'Low',
+                'إجراءات سريعة': 'Quick actions', 'إحصائيات متقدمة': 'Advanced statistics',
+                'مركز الدعم الفني': 'Technical Support Center', 'مركز البلاغات': 'Reports Center',
+                'مركز العمليات': 'Operations Center', 'مركز التحليل': 'Analysis Center',
+                'العنوان': 'Title', 'عنوان العطل': 'Fault title', 'الوصف': 'Description', 'وصف العطل': 'Fault description',
+                'النوع': 'Type', 'نوع العطل': 'Fault type', 'المكان': 'Location', 'مكان العطل': 'Fault location',
+                'الأولوية': 'Priority', 'الحالة': 'Status', 'موعد الصيانة': 'Maintenance date',
+                'إرفاق ملف': 'Attach file', 'اختياري': 'Optional', 'الكل': 'All', 'تصفية': 'Filter',
+                'إعادة ضبط': 'Reset', 'بحث بالعنوان': 'Search by title', 'من تاريخ': 'From date', 'إلى تاريخ': 'To date',
+                'جديد': 'New', 'قيد المعالجة': 'In progress', 'تم الحل': 'Resolved', 'مغلق': 'Closed',
+                'منخفضة': 'Low', 'متوسطة': 'Medium', 'عالية': 'High', 'حرجة': 'Critical',
+                'غير محدد': 'Not specified', 'لا يوجد وصف': 'No description', 'إلغاء': 'Cancel', 'حفظ العطل': 'Save fault',
+                'حفظ': 'Save', 'رجوع': 'Back', 'تعديل': 'Edit', 'حذف': 'Delete', 'محادثة': 'Chat',
+                'تسجيل خروج': 'Sign out', 'خروج': 'Sign out', 'إرسال': 'Send', 'صورة': 'Image',
+                'اسم المستخدم': 'Username', 'الاسم الكامل': 'Full name', 'البريد الإلكتروني': 'Email',
+                'كلمة المرور': 'Password', 'تأكيد كلمة المرور': 'Confirm password', 'الصلاحية': 'Role',
+                'نوع المستخدم': 'User type', 'مستخدم': 'User', 'فني': 'Technician', 'مشرف': 'Supervisor', 'أدمن': 'Admin',
+                'طالب': 'Student', 'موظف': 'Employee', 'عضو هيئة تدريس': 'Faculty member', 'إداري': 'Administrative',
+                'لا توجد بلاغات مسندة إليك حالياً': 'No faults are currently assigned to you',
+                'لا توجد رسائل بعد': 'No messages yet', 'اختر المستلم': 'Select recipient', 'اكتب رسالتك...': 'Write your message...',
+                'تفاصيل البلاغ': 'Report details', 'تاريخ الإضافة': 'Created date', 'آخر تحديث': 'Last updated',
+                'قيم مستوى الخدمة': 'Rate the service', 'تم التقييم': 'Rated', 'الإجراءات': 'Actions',
+                'إجمالي الأعطال': 'Total faults', 'إجمالي البلاغات': 'Total reports', 'بلاغات مكتملة': 'Completed reports',
+                'قيد المتابعة': 'Under follow-up', 'بلاغات حرجة': 'Critical reports', 'الإجراءات السريعة': 'Quick actions',
+                'نسبة الحل': 'Resolution rate', 'نسبة الإنجاز': 'Completion rate', 'دليل المستخدم': 'User guide',
+                'هل أنت متأكد من الحذف؟': 'Are you sure you want to delete this?',
+                'هل أنت متأكد من حذف هذا المستخدم؟': 'Are you sure you want to delete this user?',
+                'الصفحة غير موجودة': 'Page not found', 'العودة للرئيسية': 'Back to home',
+                'خطأ داخلي في الخادم': 'Internal server error', 'جاري التحميل...': 'Loading...',
+                'مقروء': 'Read', 'عرض كل الإشعارات': 'View all notifications',
+                'تم تفعيل الوضع الليلي': 'Dark mode enabled', 'تم تفعيل الوضع النهاري': 'Light mode enabled',
+                'الملف المختار:': 'Selected file:', 'جارٍ الحفظ...': 'Saving...',
+                'أولوية منخفضة للطلبات غير العاجلة': 'Low priority for non-urgent requests',
+                'أولوية متوازنة للبلاغات العادية': 'Balanced priority for normal reports',
+                'أولوية عالية وتحتاج إلى متابعة قريبة': 'High priority and needs close follow-up',
+                'بلاغ حرج يحتاج إلى تدخل عاجل': 'Critical report requiring urgent intervention',
+                'عدد الأعطال': 'Number of faults', 'الرسائل الجديدة': 'New messages'
+            };
+            const translationKeys = Object.keys(translations).sort((left, right) => right.length - left.length);
+            const translate = value => {
+                if (!value || !/[\u0600-\u06FF]/.test(value)) return value;
+                return translationKeys.reduce((translated, arabic) => translated.split(arabic).join(translations[arabic]), value);
+            };
+            window.translateAppText = translate;
+            document.addEventListener('DOMContentLoaded', function () {
+                const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+                const nodes = [];
+                while (walker.nextNode()) nodes.push(walker.currentNode);
+                nodes.forEach(node => { if (node.parentElement && !['SCRIPT', 'STYLE'].includes(node.parentElement.tagName)) node.nodeValue = translate(node.nodeValue); });
+                document.querySelectorAll('input[placeholder], textarea[placeholder], [title], [aria-label], option').forEach(element => {
+                    ['placeholder', 'title', 'aria-label'].forEach(attribute => { if (element.hasAttribute(attribute)) element.setAttribute(attribute, translate(element.getAttribute(attribute))); });
+                    if (element.tagName === 'OPTION') element.textContent = translate(element.textContent);
+                });
+                document.title = translate(document.title);
+            });
+        }());
+    </script>
+    
+    <!-- Toast Initialization -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+            var toastList = toastElList.map(function (toastEl) {
+                return new bootstrap.Toast(toastEl).show()
+            })
+        });
+        
+        // Custom JS Toast function for JS calls
+        function showToast(message, type = 'info') {
+            const container = document.querySelector('.toast-container');
+            const icons = {
+                success: 'bi-check-circle-fill',
+                danger: 'bi-exclamation-triangle-fill',
+                warning: 'bi-exclamation-circle-fill',
+                info: 'bi-info-circle-fill'
+            };
+            
+            const toastHTML = `
+            <div class="toast align-items-center text-bg-${type} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body d-flex align-items-center gap-2">
+                        <i class="bi ${icons[type] || icons.info} fs-5"></i>
+                        <span>${window.translateAppText ? window.translateAppText(message) : message}</span>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>`;
+            
+            container.insertAdjacentHTML('beforeend', toastHTML);
+            const newToast = container.lastElementChild;
+            const bsToast = new bootstrap.Toast(newToast, {delay: 5000});
+            bsToast.show();
+            
+            newToast.addEventListener('hidden.bs.toast', () => {
+                newToast.remove();
+            });
+        }
+    </script>
+
+    <!-- Dark Mode Script -->
+    <script>
+        (function () {
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        }());
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('darkModeToggle');
+            if (!toggleBtn) return;
+            const icon = toggleBtn.querySelector('i');
+            const body = document.body;
+            
+            const darkMode = localStorage.getItem('darkMode');
+            if (darkMode === 'enabled') {
+                body.classList.add('dark-mode');
+                document.documentElement.classList.add('dark-mode');
+                icon.classList.replace('bi-moon-fill', 'bi-sun-fill');
+            }
+            
+            toggleBtn.addEventListener('click', function() {
+                body.classList.toggle('dark-mode');
+                document.documentElement.classList.toggle('dark-mode');
+                if (body.classList.contains('dark-mode')) {
+                    localStorage.setItem('darkMode', 'enabled');
+                    icon.classList.replace('bi-moon-fill', 'bi-sun-fill');
+                    toggleBtn.title = window.APP_LANGUAGE === 'en' ? 'Switch to light mode' : 'تفعيل الوضع النهاري';
+                    toggleBtn.setAttribute('aria-label', toggleBtn.title);
+                    showToast(window.APP_LANGUAGE === 'en' ? 'Dark mode enabled' : 'تم تفعيل الوضع الليلي', 'info');
+                } else {
+                    localStorage.setItem('darkMode', 'disabled');
+                    icon.classList.replace('bi-sun-fill', 'bi-moon-fill');
+                    toggleBtn.title = window.APP_LANGUAGE === 'en' ? 'Toggle dark mode' : 'تبديل الوضع الليلي';
+                    toggleBtn.setAttribute('aria-label', toggleBtn.title);
+                    showToast(window.APP_LANGUAGE === 'en' ? 'Light mode enabled' : 'تم تفعيل الوضع النهاري', 'info');
+                }
+            });
+        });
+    </script>
+
+    <!-- Notifications Script -->
+    {% if session.get('user_id') %}
+    <script>
+        function updateChatUnread() {
+            fetch('/api/chat/unread')
+                .then(response => response.json())
+                .then(data => {
+                    const dot = document.getElementById('chatNavDot');
+                    const btn = document.getElementById('chatNavBtn');
+                    if (!btn) return;
+                    const count = Number(data.count || 0);
+                    // Show/hide pulse dot
+                    if (dot) dot.style.display = count ? 'block' : 'none';
+                    // Update href to latest chat if available
+                    if (count && data.latest) {
+                        btn.href = `/chat/${data.latest.fault_id}`;
+                        btn.title = `رسالة جديدة من ${data.latest.full_name || data.latest.username}`;
+                    }
+                })
+                .catch(() => {});
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateChatUnread();
+            setInterval(updateChatUnread, 15000);
+        });
+
+        function updateNotificationsDropdown() {
+            fetch('/api/notifications/latest')
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('notifItemsContainer');
+                    const badge = document.getElementById('notif-badge');
+                    
+                    if (data.notifications && data.notifications.length > 0) {
+                        let unreadCount = data.notifications.filter(n => !n.is_read).length;
+                        
+                        if (unreadCount > 0) {
+                            badge.textContent = unreadCount;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                        
+                        let html = '';
+                        data.notifications.forEach(notif => {
+                            const isUnread = !notif.is_read ? 'unread' : '';
+                            const targetHref = notif.fault_id ? `/fault_details/${notif.fault_id}` : '/notifications';
+                            const faultBadge = notif.fault_id ? `<span class="badge bg-light text-dark border"><i class="bi bi-hash"></i>${notif.fault_id}</span>` : '';
+                            html += `
+                                <li>
+                                    <div class="notif-item-wrapper">
+                                        <button class="notif-delete-btn" onclick="deleteNotification(event, ${notif.id})" title="إزالة الإشعار" aria-label="إزالة الإشعار">&times;</button>
+                                        <a href="${targetHref}" class="notif-item text-start ${isUnread}">
+                                            <div class="fw-bold mb-1">${notif.message}</div>
+                                            <div class="small text-muted d-flex justify-content-between align-items-center mt-2">
+                                                ${faultBadge}
+                                                <span dir="ltr"><i class="bi bi-clock me-1"></i>${notif.created_at || ''}</span>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </li>
+                            `;
+                        });
+                        container.innerHTML = html;
+                    } else {
+                        badge.style.display = 'none';
+                        container.innerHTML = `<li><div class="dropdown-item text-center text-muted small py-3"><i class="bi bi-bell-slash fs-4 d-block mb-2"></i> لا توجد إشعارات</div></li>`;
+                    }
+                })
+                .catch(err => console.error('Error fetching notifications:', err));
+        }
+
+        function markAllReadHeader() {
+            fetch('/api/notifications/mark_read', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    updateNotificationsDropdown();
+                    showToast('تم تحديد جميع الإشعارات كمقروءة', 'success');
+                }
+            });
+        }
+
+        function deleteNotification(event, notifId) {
+            event.preventDefault();
+            event.stopPropagation();
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+            fetch(`/api/notifications/delete/${notifId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    updateNotificationsDropdown();
+                }
+            })
+            .catch(err => console.error('Error deleting notification:', err));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateNotificationsDropdown();
+            setInterval(updateNotificationsDropdown, 30000);
+        });
+    </script>
+    {% endif %}
+
+</body>
+</html>

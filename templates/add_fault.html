@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+
+{% block title %}إضافة عطل جديد{% endblock %}
+
+{% block content %}
+<div class="container py-4 add-fault-page">
+    
+    <!-- Header Section -->
+    <div class="add-fault-hero mb-4">
+        <div class="add-fault-hero-icon"><i class="bi bi-life-preserver"></i></div>
+        <div>
+            <span class="add-fault-eyebrow">مركز الدعم الفني</span>
+            <h2 class="fw-bold mb-1">إضافة عطل جديد</h2>
+            <p class="mb-0">سجل تفاصيل العطل التقني ليتم معالجته بأسرع وقت</p>
+        </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card add-fault-card border-0">
+        <div class="card-body p-4 p-md-5">
+            <form method="POST" enctype="multipart/form-data" id="addFaultForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="row g-4">
+                    <!-- Title -->
+                    <div class="col-12">
+                        <label for="title" class="form-label fw-bold"><i class="bi bi-type me-1"></i> عنوان العطل <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-lg bg-light" id="title" name="title" placeholder="مثال: تعطل الشبكة الداخلية" required>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="col-12">
+                        <label for="description" class="form-label fw-bold"><i class="bi bi-card-text me-1"></i> وصف العطل <span class="text-danger">*</span></label>
+                        <textarea class="form-control bg-light" id="description" name="description" rows="4" maxlength="2000" placeholder="اكتب وصفاً مفصلاً للعطل..." required></textarea>
+                        <div class="field-meta"><span>اذكر الأعراض ومكان حدوث المشكلة</span><span id="descriptionCounter">0 / 2000</span></div>
+                    </div>
+
+                    <!-- Fault Type & Location -->
+                    <div class="col-md-6">
+                        <label for="fault_type" class="form-label fw-bold"><i class="bi bi-tags me-1"></i> نوع العطل <span class="text-danger">*</span></label>
+                        <select class="form-select bg-light" id="fault_type" name="fault_type" required>
+                            <option value="" disabled selected>اختر النوع...</option>
+                            <option value="hardware">💻 أجهزة (Hardware)</option>
+                            <option value="software">💽 برمجيات (Software)</option>
+                            <option value="network">🌐 شبكات (Network)</option>
+                            <option value="database">🗄️ قواعد بيانات (Database)</option>
+                            <option value="internet">🌍 إنترنت واتصال</option>
+                            <option value="security">🔒 أمني (Security)</option>
+                            <option value="other">⚙️ أخرى</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="location" class="form-label fw-bold"><i class="bi bi-geo-alt me-1"></i> مكان العطل</label>
+                        <input type="text" class="form-control bg-light" id="location" name="location" placeholder="مثال: مبنى الهندسة، معمل 3">
+                    </div>
+
+                    <!-- Priority & Status -->
+                    <div class="col-md-6">
+                        <label for="priority" class="form-label fw-bold"><i class="bi bi-exclamation-triangle me-1"></i> الأولوية</label>
+                        <select class="form-select bg-light" id="priority" name="priority">
+                            <option value="low">🟢 منخفضة</option>
+                            <option value="medium" selected>🟡 متوسطة</option>
+                            <option value="high">🟠 عالية</option>
+                            <option value="critical">🔴 حرجة</option>
+                        </select>
+                        <div id="priorityHint" class="priority-hint medium-hint"><i class="bi bi-info-circle"></i> أولوية متوازنة للبلاغات العادية</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="status" class="form-label fw-bold"><i class="bi bi-info-circle me-1"></i> الحالة</label>
+                        <select class="form-select bg-light" id="status" name="status">
+                            <option value="new">🆕 جديد</option>
+                            {% if session.get('user_role') != 'user' %}
+                            <option value="in_progress">🔄 قيد المعالجة</option>
+                            <option value="resolved">✅ تم الحل</option>
+                            <option value="closed">🔒 مغلق</option>
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <!-- Scheduled Date -->
+                    <div class="col-md-6">
+                        <label for="scheduled_date" class="form-label fw-bold"><i class="bi bi-calendar-event me-1"></i> موعد الصيانة (اختياري)</label>
+                        <input type="datetime-local" class="form-control bg-light" id="scheduled_date" name="scheduled_date">
+                    </div>
+
+                    <!-- Attachment -->
+                    <div class="col-md-6">
+                        <label for="attachment" class="form-label fw-bold"><i class="bi bi-paperclip me-1"></i> إرفاق ملف (اختياري)</label>
+                        <input type="file" class="form-control bg-light" id="attachment" name="attachment" accept=".png,.jpg,.jpeg,.gif,.pdf,.doc,.docx,.xls,.xlsx">
+                        <div class="form-text small">الملفات: PNG, JPG, PDF, DOC, XLS (الحد الأقصى 16MB)</div>
+                        <div id="attachmentName" class="attachment-name" aria-live="polite"></div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Actions -->
+                <div class="d-flex gap-2 justify-content-end">
+                    <a href="{{ url_for('user_dashboard' if session.get('user_role') == 'user' else 'dashboard') }}" class="btn btn-light rounded-pill px-4 fw-bold add-fault-cancel">
+                        <i class="bi bi-x-circle me-1"></i> إلغاء
+                    </a>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold add-fault-submit" id="submitFaultButton">
+                        <i class="bi bi-save me-1"></i> حفظ العطل
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control:focus, .form-select:focus {
+    background-color: #fff !important;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+</style>
+<style>
+.add-fault-page {
+    max-width: 860px;
+}
+.add-fault-hero {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 22px 26px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #172554, #1d4ed8 58%, #2563eb);
+    border-radius: 20px;
+    box-shadow: 0 12px 28px rgba(30, 64, 175, 0.18);
+}
+.add-fault-hero-icon {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    flex: 0 0 54px;
+    color: #dbeafe;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 16px;
+    font-size: 1.65rem;
+    box-shadow: 0 8px 18px rgba(7, 24, 64, 0.16);
+}
+.add-fault-eyebrow {
+    display: block;
+    color: #bfdbfe;
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-bottom: 3px;
+}
+.add-fault-hero p {
+    color: #dbeafe;
+}
+.add-fault-card {
+    border-radius: 20px;
+    box-shadow: 0 16px 42px rgba(15, 23, 42, 0.09);
+}
+.add-fault-card .card-body {
+    padding: 32px;
+}
+.add-fault-card .form-label {
+    color: #334155;
+}
+.add-fault-card .form-label i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+    color: #2563eb;
+    background: #eff6ff;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    margin-left: 3px;
+    text-align: center;
+}
+.add-fault-card .form-control,
+.add-fault-card .form-select {
+    min-height: 46px;
+    border-color: #e2e8f0;
+    border-radius: 10px;
+}
+.add-fault-card textarea.form-control {
+    min-height: 118px;
+    resize: vertical;
+}
+.add-fault-card .form-control:focus,
+.add-fault-card .form-select:focus {
+    transform: translateY(-1px);
+}
+.add-fault-card .form-text {
+    color: #64748b;
+}
+.field-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 5px;
+    color: #64748b;
+    font-size: 0.75rem;
+}
+.priority-hint {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.medium-hint { color: #2563eb; }
+.low-hint { color: #047857; }
+.high-hint { color: #b45309; }
+.critical-hint { color: #b91c1c; }
+.attachment-name {
+    min-height: 18px;
+    margin-top: 5px;
+    color: #2563eb;
+    font-size: 0.75rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+.add-fault-submit {
+    min-width: 145px;
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    border: 0;
+}
+.add-fault-submit:hover {
+    background: linear-gradient(135deg, #1d4ed8, #4338ca);
+}
+.add-fault-cancel {
+    min-width: 105px;
+    border: 1px solid #e2e8f0;
+}
+.add-fault-card .btn i {
+    display: inline-block;
+    font-size: 1rem;
+    vertical-align: -1px;
+}
+.add-fault-submit i {
+    color: #dbeafe;
+}
+.add-fault-cancel i {
+    color: #64748b;
+}
+@media (max-width: 767.98px) {
+    .add-fault-page {
+        padding-top: 1rem !important;
+    }
+    .add-fault-hero {
+        padding: 18px;
+    }
+    .add-fault-hero h2 {
+        font-size: 1.35rem;
+    }
+    .add-fault-card .card-body {
+        padding: 22px 18px;
+    }
+    .add-fault-card .d-flex {
+        flex-direction: column-reverse;
+    }
+    .add-fault-card .d-flex .btn,
+    .add-fault-card .d-flex a {
+        width: 100%;
+    }
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('addFaultForm');
+    const description = document.getElementById('description');
+    const counter = document.getElementById('descriptionCounter');
+    const priority = document.getElementById('priority');
+    const priorityHint = document.getElementById('priorityHint');
+    const attachment = document.getElementById('attachment');
+    const attachmentName = document.getElementById('attachmentName');
+    const submitButton = document.getElementById('submitFaultButton');
+
+    function updateDescriptionCounter() {
+        counter.textContent = `${description.value.length} / 2000`;
+    }
+
+    function updatePriorityHint() {
+        const hints = {
+            low: ['low-hint', 'أولوية منخفضة للطلبات غير العاجلة', 'Low priority for non-urgent requests'],
+            medium: ['medium-hint', 'أولوية متوازنة للبلاغات العادية', 'Balanced priority for normal reports'],
+            high: ['high-hint', 'أولوية عالية وتحتاج إلى متابعة قريبة', 'High priority and needs close follow-up'],
+            critical: ['critical-hint', 'بلاغ حرج يحتاج إلى تدخل عاجل', 'Critical report requiring urgent intervention']
+        };
+        const [className, arabicText, englishText] = hints[priority.value] || hints.medium;
+        const text = window.APP_LANGUAGE === 'en' ? englishText : arabicText;
+        priorityHint.className = `priority-hint ${className}`;
+        priorityHint.innerHTML = `<i class="bi bi-info-circle"></i> ${text}`;
+    }
+
+    description.addEventListener('input', updateDescriptionCounter);
+    priority.addEventListener('change', updatePriorityHint);
+    attachment.addEventListener('change', function () {
+        const prefix = window.APP_LANGUAGE === 'en' ? 'Selected file:' : 'الملف المختار:';
+        attachmentName.textContent = attachment.files.length ? `${prefix} ${attachment.files[0].name}` : '';
+    });
+    form.addEventListener('submit', function () {
+        submitButton.disabled = true;
+        const savingText = window.APP_LANGUAGE === 'en' ? 'Saving...' : 'جارٍ الحفظ...';
+        submitButton.innerHTML = `<span class="spinner-border spinner-border-sm ms-1" aria-hidden="true"></span> ${savingText}`;
+    });
+    updateDescriptionCounter();
+    updatePriorityHint();
+});
+</script>
+{% endblock %}
