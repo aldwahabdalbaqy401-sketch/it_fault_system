@@ -111,7 +111,11 @@ def set_language(language):
 # ========== دالة الاتصال بقاعدة البيانات ==========
 def get_db_connection():
     try:
-        conn = psycopg2.connect(Config.DATABASE_URL, sslmode='require')
+        db_url = (Config.DATABASE_URL or '').strip()
+        if not db_url:
+            print("❌ DATABASE_URL is empty!")
+            return None
+        conn = psycopg2.connect(db_url, sslmode='require')
         return conn
     except Exception as e:
         print(f"❌ خطأ في الاتصال بقاعدة البيانات: {e}")
