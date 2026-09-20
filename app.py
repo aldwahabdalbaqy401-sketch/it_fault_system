@@ -337,7 +337,21 @@ def login():
         conn.close()
 
         if user:
-            if bcrypt.check_password_hash(user['password'], password):
+            # التحقق الآمن من كلمة المرور
+            password_matches = False
+            user_pwd = user.get('password') or ''
+            try:
+                if bcrypt.check_password_hash(user_pwd, password):
+                    password_matches = True
+            except Exception:
+                try:
+                    import bcrypt as pybcrypt
+                    if pybcrypt.checkpw(password.encode('utf-8'), user_pwd.encode('utf-8')):
+                        password_matches = True
+                except Exception:
+                    pass
+
+            if password_matches:
                 session['user_id'] = user['id']
                 session['username'] = user['username']
                 session['user_role'] = user['role']
