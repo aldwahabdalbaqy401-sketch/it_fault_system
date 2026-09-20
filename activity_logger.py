@@ -6,7 +6,8 @@ from config import Config
 
 def log_activity(action, details=None):
     try:
-        conn = psycopg2.connect(Config.DATABASE_URL, sslmode='require')
+        db_url = (getattr(Config, 'DATABASE_URL', '') or getattr(Config, 'DEFAULT_DB_URL', '')).strip().replace('\r', '').replace('\n', '')
+        conn = psycopg2.connect(db_url, sslmode='require')
         cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         user_id = session.get('user_id')
         ip = request.remote_addr if request else '0.0.0.0'

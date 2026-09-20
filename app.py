@@ -656,10 +656,10 @@ def dashboard():
     # ===== جلب المواعيد القريبة (خلال 3 أيام) =====
     cursor.execute("""
         SELECT id, title, scheduled_date, 
-               DATEDIFF(scheduled_date, NOW()) as days_until
+               EXTRACT(DAY FROM (scheduled_date - NOW())) as days_until
         FROM faults 
         WHERE scheduled_date IS NOT NULL 
-          AND scheduled_date BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 3 DAY)
+          AND scheduled_date BETWEEN NOW() AND NOW() + INTERVAL '3 days'
           AND status NOT IN ('resolved', 'closed')
         ORDER BY scheduled_date ASC
     """)
@@ -1002,7 +1002,7 @@ def dashboard_stats():
     cursor.execute("""
         SELECT DATE(created_at) as date, COUNT(*) as count 
         FROM faults 
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'
         GROUP BY DATE(created_at)
         ORDER BY date ASC
     """)
