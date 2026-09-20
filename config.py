@@ -6,11 +6,11 @@ load_dotenv()  # تحميل متغيرات .env تلقائياً
 
 class Config:
     # ===== قاعدة بيانات Supabase (PostgreSQL) =====
-    # يمكن استخدام DATABASE_URL مباشرة أو الحقول المنفصلة
-    DATABASE_URL = os.getenv('DATABASE_URL', '')
+    DEFAULT_DB_URL = 'postgresql://postgres.sgsshggrhegoytypqslt:gedo0904613916@aws-1-eu-west-1.pooler.supabase.com:5432/postgres'
+    DATABASE_URL = (os.getenv('DATABASE_URL') or DEFAULT_DB_URL).strip().replace('\r', '').replace('\n', '').strip("'").strip('"')
 
     # ===== إعدادات الأمان =====
-    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-only-change-this-secret-key')
+    SECRET_KEY = os.getenv('SECRET_KEY', 'aldwahab-super-secret-key-2026')
 
     # ===== إعدادات CSRF (Flask-WTF) =====
     WTF_CSRF_ENABLED = True

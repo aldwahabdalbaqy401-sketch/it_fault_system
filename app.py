@@ -114,17 +114,24 @@ last_db_error = ""
 def get_db_connection():
     global last_db_error
     try:
-        db_url = (Config.DATABASE_URL or '').strip()
+        db_url = Config.DATABASE_URL
         if not db_url:
-            last_db_error = "DATABASE_URL is empty in Config!"
-            print(f"❌ {last_db_error}")
-            return None
+            db_url = Config.DEFAULT_DB_URL
+        db_url = db_url.strip().replace('\r', '').replace('\n', '').strip("'").strip('"')
         conn = psycopg2.connect(db_url, sslmode='require')
         last_db_error = ""
         return conn
     except Exception as e:
         last_db_error = str(e)
         print(f"❌ خطأ في الاتصال بقاعدة البيانات: {e}")
+        # محاولة أخيرة بالرابط الافتراضي النظيف إذا كان مختلفاً
+        try:
+            if db_url != Config.DEFAULT_DB_URL:
+                conn = psycopg2.connect(Config.DEFAULT_DB_URL, sslmode='require')
+                last_db_error = ""
+                return conn
+        except Exception:
+            pass
         return None
 
 def get_cursor(conn):
