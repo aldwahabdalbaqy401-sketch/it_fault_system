@@ -118,7 +118,7 @@ def get_db_connection():
         if not db_url:
             db_url = Config.DEFAULT_DB_URL
         db_url = db_url.strip().replace('\r', '').replace('\n', '').strip("'").strip('"')
-        conn = psycopg2.connect(db_url, sslmode='require')
+        conn = psycopg2.connect(db_url, sslmode='require', cursor_factory=psycopg2.extras.RealDictCursor)
         last_db_error = ""
         return conn
     except Exception as e:
@@ -127,7 +127,7 @@ def get_db_connection():
         # محاولة أخيرة بالرابط الافتراضي النظيف إذا كان مختلفاً
         try:
             if db_url != Config.DEFAULT_DB_URL:
-                conn = psycopg2.connect(Config.DEFAULT_DB_URL, sslmode='require')
+                conn = psycopg2.connect(Config.DEFAULT_DB_URL, sslmode='require', cursor_factory=psycopg2.extras.RealDictCursor)
                 last_db_error = ""
                 return conn
         except Exception:
