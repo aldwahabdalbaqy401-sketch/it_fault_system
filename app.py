@@ -1905,7 +1905,10 @@ def page_not_found(e):
 
 @app.errorhandler(500)
 def internal_error(e):
-    return render_template('500.html'), 500
+    import traceback
+    error_details = traceback.format_exc()
+    print("🔥 500 ERROR OCCURRED:\n", error_details)
+    return render_template('500.html', error_details=error_details), 500
 
 @app.errorhandler(403)
 def forbidden(e):

@@ -73,6 +73,11 @@
         <div class="error-desc">
             {{ 'An unexpected server error occurred. Please try again or contact the system administrator.' if is_english else 'حدث خطأ غير متوقع في الخادم. يرجى المحاولة مرة أخرى أو التواصل مع مسؤول النظام.' }}
         </div>
+        {% if error_details %}
+        <div style="background: rgba(0,0,0,0.4); color: #fca5a5; padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; font-family: monospace; overflow-x: auto; max-height: 250px; margin-bottom: 25px; border: 1px solid rgba(239,68,68,0.4);" dir="ltr">
+            <pre style="margin: 0; white-space: pre-wrap;">{{ error_details }}</pre>
+        </div>
+        {% endif %}
         <a href="{{ url_for('login') }}" class="btn-home">🏠 {{ 'Back to home' if is_english else 'العودة للرئيسية' }}</a>
     </div>
 </body>
