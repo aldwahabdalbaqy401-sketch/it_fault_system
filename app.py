@@ -1181,10 +1181,10 @@ def technician_support():
     cursor.execute('SELECT COUNT(*) as total FROM faults WHERE assigned_to IS NOT NULL')
     total_assigned = cursor.fetchone()['total']
     
-    cursor.execute('SELECT COUNT(*) as pending FROM faults WHERE assigned_to IS NOT NULL AND status IN ("new", "in_progress")')
+    cursor.execute("SELECT COUNT(*) as pending FROM faults WHERE assigned_to IS NOT NULL AND status IN ('new', 'in_progress')")
     pending_assigned = cursor.fetchone()['pending']
     
-    cursor.execute('SELECT COUNT(*) as resolved FROM faults WHERE assigned_to IS NOT NULL AND status = "resolved"')
+    cursor.execute("SELECT COUNT(*) as resolved FROM faults WHERE assigned_to IS NOT NULL AND status = 'resolved'")
     resolved_assigned = cursor.fetchone()['resolved']
     
     cursor.close()
@@ -1277,7 +1277,7 @@ def receive_fault(id):
     
     cursor = conn.cursor()
     cursor.execute(
-        'UPDATE faults SET status = "in_progress", received_at = NOW() WHERE id = %s AND assigned_to = %s',
+        "UPDATE faults SET status = 'in_progress', received_at = NOW() WHERE id = %s AND assigned_to = %s",
         (id, session['user_id'])
     )
     conn.commit()
@@ -1299,7 +1299,7 @@ def start_fault(id):
     
     cursor = conn.cursor()
     cursor.execute(
-        'UPDATE faults SET status = "in_progress", started_at = NOW() WHERE id = %s AND assigned_to = %s',
+        "UPDATE faults SET status = 'in_progress', started_at = NOW() WHERE id = %s AND assigned_to = %s",
         (id, session['user_id'])
     )
     conn.commit()
@@ -1339,7 +1339,7 @@ def resolve_fault(id):
         notes = request.form.get('technician_notes', '')
         cursor = conn.cursor()
         cursor.execute(
-            'UPDATE faults SET status = "resolved", completed_at = NOW(), technician_notes = %s WHERE id = %s AND assigned_to = %s',
+            "UPDATE faults SET status = 'resolved', completed_at = NOW(), technician_notes = %s WHERE id = %s AND assigned_to = %s",
             (notes, id, session['user_id'])
         )
         conn.commit()
@@ -1387,7 +1387,7 @@ def close_fault(id):
     
     cursor = conn.cursor()
     cursor.execute(
-        'UPDATE faults SET status = "closed" WHERE id = %s',
+        "UPDATE faults SET status = 'closed' WHERE id = %s",
         (id,)
     )
     conn.commit()
