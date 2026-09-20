@@ -109,15 +109,21 @@ def set_language(language):
     return redirect(referrer or url_for('login'))
 
 # ========== دالة الاتصال بقاعدة البيانات ==========
+last_db_error = ""
+
 def get_db_connection():
+    global last_db_error
     try:
         db_url = (Config.DATABASE_URL or '').strip()
         if not db_url:
-            print("❌ DATABASE_URL is empty!")
+            last_db_error = "DATABASE_URL is empty in Config!"
+            print(f"❌ {last_db_error}")
             return None
         conn = psycopg2.connect(db_url, sslmode='require')
+        last_db_error = ""
         return conn
     except Exception as e:
+        last_db_error = str(e)
         print(f"❌ خطأ في الاتصال بقاعدة البيانات: {e}")
         return None
 
@@ -314,7 +320,7 @@ def login():
 
         conn = get_db_connection()
         if not conn:
-            flash('مشكلة في الاتصال بقاعدة البيانات', 'danger')
+            flash(f'مشكلة في الاتصال بقاعدة البيانات: {last_db_error}', 'danger')
             return render_template('login.html')
 
         cursor = conn.cursor()
