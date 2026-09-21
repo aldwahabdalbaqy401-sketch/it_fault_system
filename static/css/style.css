@@ -121,7 +121,7 @@ html.dark-mode, body.dark-mode {
 /* ============================================================
    ===== الإعدادات العامة والتهيئة (Reset & Base) =====
    ============================================================ */
-* {
+*, *::before, *::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -131,6 +131,9 @@ html {
     font-size: 16px;
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 html.lang-en {
@@ -145,13 +148,23 @@ body {
     font-family: var(--font-ui, var(--font-arabic));
     background: var(--page-bg);
     min-height: 100vh;
+    min-height: 100dvh;
     color: var(--text);
     font-size: 0.95rem;
     line-height: 1.65;
     font-weight: 400;
     text-rendering: optimizeLegibility;
+    width: 100%;
+    max-width: 100vw;
     overflow-x: hidden;
+    position: relative;
     transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+img, svg, picture, video {
+    max-width: 100%;
+    height: auto;
+    display: inline-block;
 }
 
 button, input, select, textarea, optgroup, option {

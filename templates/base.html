@@ -594,12 +594,12 @@
     {% endif %}
 
     <!-- Main Content -->
-    <main class="{% if session.get('user_id') %}container main-content-area py-3{% else %}w-100 p-0 m-0{% endif %}">
+    <main class="{% if session.get('user_id') and request.endpoint not in ['login', 'forgot_password', 'reset_password'] %}container main-content-area py-3{% else %}w-100 p-0 m-0 overflow-hidden{% endif %}">
         {% block content %}{% endblock %}
     </main>
 
     <!-- Native Mobile App Bottom Navigation Bar (Visible only on mobile devices) -->
-    {% if session.get('user_id') %}
+    {% if session.get('user_id') and request.endpoint not in ['login', 'forgot_password', 'reset_password'] %}
     <nav class="mobile-app-bottom-nav d-md-none" aria-label="Mobile Navigation">
         {% if session.get('user_role') in ['admin', 'supervisor'] %}
             <a href="{{ url_for('dashboard') }}" class="mobile-app-nav-item">
