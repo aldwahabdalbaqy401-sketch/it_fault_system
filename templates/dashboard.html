@@ -6,12 +6,12 @@
 <div class="container-fluid py-4 dashboard-page">
     
     <!-- Header Section -->
-    <div class="row mb-4 align-items-center dashboard-header">
-        <div class="col-md-8">
-            <h2 class="fw-bold mb-1"><i class="bi bi-house-door text-primary me-2"></i> {{ 'Technical Fault Management System' if is_english else 'نظام إدارة وتتبع الأعطال التقنية' }}</h2>
-            <p class="text-muted mb-0">مرحباً بك <strong>{{ session.full_name }}</strong>، إليك نظرة عامة على حالة النظام.</p>
-        </div>
-        <div class="col-md-4 mt-3 mt-md-0">
+    <div class="dashboard-header mb-3">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div class="header-titles">
+                <h2 class="fw-bold mb-0 header-main-title"><i class="bi bi-house-door text-primary me-1"></i> {{ 'Technical Fault Management System' if is_english else 'نظام إدارة وتتبع الأعطال التقنية' }}</h2>
+                <p class="text-white-50 mb-0 header-sub-title">مرحباً بك <strong>{{ session.full_name }}</strong>، إليك نظرة عامة على حالة النظام.</p>
+            </div>
             <div class="dashboard-header-actions">
                 <span class="dashboard-status"><i class="bi bi-circle-fill"></i> نشط</span>
                 <span class="dashboard-role"><i class="bi bi-person-badge"></i> {{ 'مدير النظام' if session.user_role == 'admin' else session.user_role }}</span>
@@ -24,22 +24,22 @@
 
     <!-- Upcoming Appointments Alert -->
     {% if upcoming_appointments %}
-    <div class="card border-warning mb-4 shadow-sm border-start border-4">
-        <div class="card-header bg-white border-bottom-0 pb-0">
-            <h5 class="card-title text-warning fw-bold"><i class="bi bi-calendar-event me-2"></i> مواعيد صيانة قريبة</h5>
+    <div class="card border-warning mb-3 shadow-sm border-start border-4">
+        <div class="card-header bg-white border-bottom-0 pb-0 py-2">
+            <h6 class="card-title text-warning fw-bold mb-0"><i class="bi bi-calendar-event me-2"></i> مواعيد صيانة قريبة</h6>
         </div>
-        <div class="card-body">
+        <div class="card-body py-2">
             <ul class="list-group list-group-flush">
                 {% for fault in upcoming_appointments %}
-                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-1">
                     <a href="{{ url_for('fault_details', id=fault.id) }}" class="text-decoration-none text-dark d-flex align-items-center">
-                        <i class="bi bi-tools text-muted me-3 fs-5"></i>
+                        <i class="bi bi-tools text-muted me-2 fs-6"></i>
                         <div>
-                            <div class="fw-bold">{{ fault.title }}</div>
+                            <div class="fw-bold small">{{ fault.title }}</div>
                             <small class="text-muted"><i class="bi bi-clock me-1"></i> {{ fault.scheduled_date.strftime('%Y-%m-%d %H:%M') }}</small>
                         </div>
                     </a>
-                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
+                    <span class="badge bg-warning text-dark rounded-pill px-2 py-1 small">
                         <i class="bi bi-hourglass-split me-1"></i> خلال {{ fault.days_until }} يوم
                     </span>
                 </li>
@@ -49,8 +49,8 @@
     </div>
     {% endif %}
 
-    <!-- Stats Cards -->
-    <div class="row g-1 g-sm-2 g-md-3 g-xl-4 mb-2 mb-md-4 dashboard-stats">
+    <!-- Stats Cards (4 Horizontal Cards in 1 Row) -->
+    <div class="row g-1 g-sm-2 g-md-3 g-xl-4 mb-2 mb-md-3 dashboard-stats">
         <div class="col-3">
             <a href="{{ url_for('view_faults') }}" class="text-decoration-none">
                 <div class="card dashboard-stat-card stat-blue shadow-sm h-100 border-0 rounded-3 hover-shadow transition-all">
@@ -122,8 +122,8 @@
     </div>
 
 
-    <!-- Charts and Integration Row -->
-    <div class="row g-2 g-md-4 mb-2 mb-md-4">
+    <!-- Charts and Integration Row (Side-by-Side: 2 Columns) -->
+    <div class="row g-1 g-sm-2 g-md-4 mb-2 mb-md-3">
         <div class="col-6">
             <div class="card dashboard-card shadow-sm h-100 border-0">
                 <div class="card-body status-distribution-card">
@@ -168,27 +168,30 @@
         <div class="col-6">
             <div class="card dashboard-card shadow-sm h-100 border-0">
                 <div class="card-body department-distribution-card">
-                    <h5 class="card-title fw-bold mb-3 mb-md-4"><i class="bi bi-diagram-3 text-primary me-2"></i> توزيع الأعطال حسب القسم</h5>
+                    <div class="department-distribution-header d-flex justify-content-between align-items-center mb-2">
+                        <span class="department-distribution-title fw-bold">توزيع الأعطال حسب القسم</span>
+                        <span class="department-distribution-icon text-primary"><i class="bi bi-diagram-3"></i></span>
+                    </div>
                     <ul class="list-group list-group-flush department-list">
-                        <li class="list-group-item d-flex justify-content-between align-items-center py-2 py-md-3 border-0">
-                            <span><i class="bi bi-pc-display me-1 me-md-2 text-primary"></i> تقنية المعلومات</span>
-                            <span class="badge bg-light text-dark border rounded-pill px-2 px-md-3"> </span>
+                        <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <span><i class="bi bi-pc-display me-1 text-primary"></i> تقنية المعلومات</span>
+                            <span class="badge bg-light text-dark border rounded-pill"> </span>
                         </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center py-2 py-md-3 border-0">
-                            <span><i class="bi bi-globe me-1 me-md-2 text-info"></i> الشبكات</span>
-                            <span class="badge bg-light text-dark border rounded-pill px-2 px-md-3"> </span>
+                        <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <span><i class="bi bi-globe me-1 text-info"></i> الشبكات</span>
+                            <span class="badge bg-light text-dark border rounded-pill"> </span>
                         </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center py-2 py-md-3 border-0">
-                            <span><i class="bi bi-headset me-1 me-md-2 text-success"></i> الدعم الفني</span>
-                            <span class="badge bg-light text-dark border rounded-pill px-2 px-md-3"> </span>
+                        <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <span><i class="bi bi-headset me-1 text-success"></i> الدعم الفني</span>
+                            <span class="badge bg-light text-dark border rounded-pill"> </span>
                         </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center py-2 py-md-3 border-0">
-                            <span><i class="bi bi-gear-wide-connected me-1 me-md-2 text-warning"></i> التشغيل</span>
-                            <span class="badge bg-light text-dark border rounded-pill px-2 px-md-3"> </span>
+                        <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <span><i class="bi bi-gear-wide-connected me-1 text-warning"></i> التشغيل</span>
+                            <span class="badge bg-light text-dark border rounded-pill"> </span>
                         </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center py-2 py-md-3 border-0">
-                            <span><i class="bi bi-wrench-adjustable me-1 me-md-2 text-danger"></i> الصيانة</span>
-                            <span class="badge bg-light text-dark border rounded-pill px-2 px-md-3"> </span>
+                        <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <span><i class="bi bi-wrench-adjustable me-1 text-danger"></i> الصيانة</span>
+                            <span class="badge bg-light text-dark border rounded-pill"> </span>
                         </li>
                     </ul>
                 </div>
@@ -196,8 +199,8 @@
         </div>
     </div>
 
-    <!-- Priority and Actions Row -->
-    <div class="row g-2 g-md-4 mb-2 mb-md-4">
+    <!-- Priority and Actions Row (Side-by-Side: 2 Columns) -->
+    <div class="row g-1 g-sm-2 g-md-4 mb-2 mb-md-3">
         <div class="col-6">
             <div class="card dashboard-card shadow-sm h-100 border-0">
                 <div class="card-body priority-distribution-card">
@@ -242,39 +245,39 @@
         <div class="col-6">
             <div class="card dashboard-card quick-actions-card shadow-sm h-100 border-0 bg-light">
                 <div class="card-body">
-                    <h5 class="card-title fw-bold mb-3 mb-md-4"><i class="bi bi-lightning-charge text-warning me-2"></i> إجراءات سريعة</h5>
-                    <div class="row g-1 g-md-3 quick-action-grid">
+                    <div class="quick-actions-header d-flex justify-content-between align-items-center mb-2">
+                        <span class="quick-actions-title fw-bold"><i class="bi bi-lightning-charge text-warning me-1"></i> إجراءات سريعة</span>
+                    </div>
+                    <div class="row g-1 g-md-2 quick-action-grid">
                         <div class="col-6">
-                            <a href="{{ url_for('add_fault') }}" class="quick-action-btn action-light w-100 text-center py-2 py-md-3 shadow-sm rounded-3">
-                                <i class="bi bi-plus-circle fs-4 d-block mb-1 mb-md-2"></i>
-                                <span class="fw-bold">إضافة عطل</span>
+                            <a href="{{ url_for('add_fault') }}" class="quick-action-btn action-light w-100 text-center shadow-sm rounded-2">
+                                <i class="bi bi-plus-circle"></i>
+                                <span>إضافة عطل</span>
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="{{ url_for('view_faults') }}" class="quick-action-btn action-violet w-100 text-center py-2 py-md-3 shadow-sm rounded-3">
-                                <i class="bi bi-card-list fs-4 d-block mb-1 mb-md-2"></i>
-                                <span class="fw-bold">عرض الأعطال</span>
+                            <a href="{{ url_for('view_faults') }}" class="quick-action-btn action-violet w-100 text-center shadow-sm rounded-2">
+                                <i class="bi bi-card-list"></i>
+                                <span>عرض الأعطال</span>
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="{{ url_for('dashboard_stats') }}" class="quick-action-btn action-cyan w-100 text-center py-2 py-md-3 shadow-sm rounded-3">
-                                <i class="bi bi-bar-chart-fill fs-4 d-block mb-1 mb-md-2"></i>
-                                <span class="fw-bold">إحصائيات متقدمة</span>
+                            <a href="{{ url_for('dashboard_stats') }}" class="quick-action-btn action-cyan w-100 text-center shadow-sm rounded-2">
+                                <i class="bi bi-bar-chart-fill"></i>
+                                <span>إحصائيات</span>
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="{{ url_for('technician_support') }}" class="quick-action-btn action-blue w-100 text-center py-2 py-md-3 shadow-sm rounded-3">
-                                <i class="bi bi-headset fs-4 d-block mb-1 mb-md-2"></i>
-                                <span class="fw-bold">دعم الفنيين</span>
+                            <a href="{{ url_for('technician_support') }}" class="quick-action-btn action-blue w-100 text-center shadow-sm rounded-2">
+                                <i class="bi bi-headset"></i>
+                                <span>دعم الفنيين</span>
                             </a>
                         </div>
                         {% if session.user_role == 'admin' %}
                         <div class="col-12">
-                            <a href="{{ url_for('admin_users') }}" class="quick-action-btn action-red w-100 text-center py-2 py-md-3 shadow-sm rounded-3">
-                                <div class="d-flex align-items-center justify-content-center">
-                                    <i class="bi bi-people-fill fs-4 ms-2"></i>
-                                    <span class="fw-bold">{{ 'User Management' if is_english else 'إدارة المستخدمين' }}</span>
-                                </div>
+                            <a href="{{ url_for('admin_users') }}" class="quick-action-btn action-red w-100 text-center shadow-sm rounded-2">
+                                <i class="bi bi-people-fill ms-1"></i>
+                                <span>{{ 'Users' if is_english else 'إدارة المستخدمين' }}</span>
                             </a>
                         </div>
                         {% endif %}
@@ -285,8 +288,8 @@
     </div>
 
     <!-- Footer Section -->
-    <footer class="mt-4 mt-md-5 text-center text-muted border-top pt-3 pt-md-4">
-        <p class="mb-0"><i class="bi bi-c-circle"></i> 2026 {{ APP_NAME }} | الإصدار 2.0</p>
+    <footer class="mt-3 mt-md-4 text-center text-muted border-top pt-2 pt-md-3">
+        <p class="mb-0 small"><i class="bi bi-c-circle"></i> 2026 {{ APP_NAME }} | الإصدار 2.0</p>
     </footer>
 
 </div>
@@ -620,57 +623,51 @@ html.lang-en .dashboard-header-actions > * {
     color: #64748b !important;
 }
 
-/* ===== التجاوب للشاشات الصغيرة والمتوسطة (Mobile & Tablet) ===== */
+/* ===== التجاوب للشاشات الصغيرة والمتوسطة (Mobile & Tablet: Samsung / Honor / etc.) ===== */
 @media (max-width: 767.98px) {
     .dashboard-page {
-        padding-top: 0.5rem !important;
-        padding-left: 6px !important;
-        padding-right: 6px !important;
+        padding-top: 0.35rem !important;
+        padding-left: 4px !important;
+        padding-right: 4px !important;
     }
     .dashboard-header {
-        padding: 14px 16px;
-        border-radius: 14px;
+        padding: 12px 14px;
+        border-radius: 12px;
     }
-    .dashboard-header h2 {
-        font-size: 1.2rem;
+    .header-main-title {
+        font-size: 0.92rem !important;
+        line-height: 1.25;
     }
-    .dashboard-header p {
-        font-size: 0.80rem;
-    }
-    .dashboard-header > .col-md-4 {
-        position: static;
-        width: 100%;
-        margin-top: 8px !important;
-    }
-    .dashboard-header > .col-md-8,
-    html.lang-en .dashboard-header > .col-md-8 {
-        padding-left: 0;
-        padding-right: 0;
+    .header-sub-title {
+        font-size: 0.65rem !important;
+        line-height: 1.3;
+        margin-top: 2px;
     }
     .dashboard-header-actions {
         justify-content: flex-start;
-        margin-top: 6px;
+        margin-top: 4px;
         width: 100%;
-        gap: 5px;
+        gap: 4px;
     }
     .dashboard-status,
     .dashboard-role,
     .dashboard-logout {
-        min-height: 28px;
-        padding: 4px 8px;
-        font-size: 0.72rem;
+        min-height: 24px;
+        padding: 2px 7px;
+        font-size: 0.62rem;
+        border-radius: 999px;
     }
 
     /* كروت الإحصائيات الأربعة في صف واحد تماماً كالابتوب */
     .dashboard-stat-card {
-        border-radius: 10px !important;
+        border-radius: 8px !important;
         border-top-width: 3px !important;
     }
     .dashboard-stat-card::after {
         display: none;
     }
     .dashboard-stat-card .card-body {
-        padding: 7px 5px !important;
+        padding: 5px 4px !important;
     }
     .stat-card-inner {
         flex-direction: row;
@@ -679,22 +676,22 @@ html.lang-en .dashboard-header-actions > * {
         gap: 2px;
     }
     .dashboard-stat-card .stat-icon-circle {
-        width: 24px;
-        height: 24px;
-        min-width: 24px;
-        font-size: 0.80rem;
-        border-radius: 6px;
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        font-size: 0.70rem;
+        border-radius: 5px;
     }
     .dashboard-stat-card .stat-count {
-        font-size: 1rem !important;
+        font-size: 0.95rem !important;
         line-height: 1;
-        margin-bottom: 2px !important;
+        margin-bottom: 1px !important;
         font-weight: 800;
     }
     .dashboard-stat-card .stat-title {
-        font-size: 0.55rem !important;
+        font-size: 0.50rem !important;
         font-weight: 700;
-        line-height: 1.1;
+        line-height: 1;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -702,75 +699,79 @@ html.lang-en .dashboard-header-actions > * {
 
     /* كروت توزيع الحالات والأقسام (جنباً إلى جنب مثل اللابتوب) */
     .dashboard-card {
-        border-radius: 12px !important;
+        border-radius: 10px !important;
     }
     .dashboard-card .card-body {
-        padding: 10px 10px !important;
+        padding: 8px 8px !important;
     }
     .status-distribution-card,
-    .department-distribution-card {
-        padding-top: 10px !important;
+    .department-distribution-card,
+    .priority-distribution-card {
+        padding-top: 8px !important;
     }
     .status-distribution-title,
     .priority-distribution-title,
-    .dashboard-card .card-title {
-        font-size: 11px !important;
-        margin-bottom: 8px !important;
+    .department-distribution-title,
+    .quick-actions-title {
+        font-size: 0.66rem !important;
+        margin-bottom: 6px !important;
         font-weight: 800;
     }
     .status-distribution-icon,
-    .priority-distribution-icon {
-        width: 18px;
-        height: 18px;
-        font-size: 9px;
+    .priority-distribution-icon,
+    .department-distribution-icon {
+        width: 16px;
+        height: 16px;
+        font-size: 8px;
     }
     .status-progress-row,
     .priority-progress-row {
-        margin-bottom: 8px;
+        margin-bottom: 5px;
     }
     .status-progress-meta,
     .priority-progress-meta {
-        font-size: 10px;
-        margin-bottom: 3px;
+        font-size: 0.58rem !important;
+        margin-bottom: 2px;
         font-weight: 700;
     }
     .status-progress-number,
     .priority-progress-number {
-        font-size: 10px;
-        min-width: 28px;
+        font-size: 0.58rem !important;
+        min-width: 22px;
     }
     .status-progress-label,
     .priority-progress-label {
-        font-size: 10px;
+        font-size: 0.58rem !important;
     }
     .status-progress-track,
     .priority-progress-track {
-        height: 5px;
+        height: 4px;
     }
 
     /* قائمة الأقسام */
     .department-list .list-group-item {
-        padding: 4px 0 !important;
-        font-size: 10px !important;
+        padding: 2px 0 !important;
+        font-size: 0.56rem !important;
+        background: transparent;
     }
     .department-list .list-group-item i {
-        font-size: 10.5px !important;
+        font-size: 8px !important;
     }
     .department-list .badge {
-        padding: 2px 4px !important;
-        font-size: 8.5px !important;
+        padding: 1px 3px !important;
+        font-size: 7px !important;
     }
 
     /* أزرار الإجراءات السريعة المصغرة */
     .quick-action-btn {
-        min-height: 46px !important;
-        padding: 4px 2px !important;
-        font-size: 0.65rem !important;
-        border-radius: 7px !important;
+        min-height: 38px !important;
+        padding: 2px 2px !important;
+        font-size: 0.58rem !important;
+        border-radius: 6px !important;
     }
     .quick-action-btn i {
-        font-size: 0.95rem !important;
-        margin-bottom: 1px !important;
+        font-size: 0.80rem !important;
+        margin-bottom: 0px !important;
     }
 }
 
