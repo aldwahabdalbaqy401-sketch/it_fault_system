@@ -14,7 +14,7 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- Custom CSS (Keep if needed) -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=25">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
@@ -444,7 +444,7 @@
                 <img src="{{ url_for('static', filename='images/logo.png') }}" alt="{{ 'Logo' if is_english else 'الشعار' }}" class="navbar-logo-img">
                 <div class="navbar-brand-text">
                     <span class="d-block text-warning brand-uni-name"><i class="bi bi-bank"></i> {{ 'White Nile University' if is_english else 'جامعة النيل الأبيض' }}</span>
-                    <span class="text-white brand-app-title">{{ 'Fault System' if is_english else 'نظام الأعطال' }}</span>
+                    <span class="text-white brand-app-title">{{ 'Technical Fault System' if is_english else 'نظام إدارة وتتبع الأعطال التقنية' }}</span>
                 </div>
             </a>
             <button class="navbar-toggler bg-light rounded-3 border-0 p-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
