@@ -3,138 +3,423 @@
 {% block title %}{{ 'Sign in' if is_english else 'تسجيل الدخول' }}{% endblock %}
 
 {% block content %}
-<div class="login-wrapper">
-    <div class="login-box card border-0 shadow-lg rounded-4 overflow-hidden">
-        
-        <!-- Header Banner with University Logo -->
-        <div class="login-top-banner text-center p-4">
-            <div class="d-inline-flex align-items-center justify-content-center mb-2">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="{{ 'Logo' if is_english else 'الشعار' }}" class="login-logo-img">
-            </div>
-            <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 mb-2 fw-semibold">
-                <i class="bi bi-bank"></i> {{ 'White Nile University' if is_english else 'جامعة النيل الأبيض' }}
-            </span>
-            <h2 class="h5 fw-bold text-white mb-1">{{ 'Technical Fault Management System' if is_english else 'نظام إدارة وتتبع الأعطال التقنية' }}</h2>
-            <p class="text-white text-opacity-75 small mb-0">{{ 'Integrated platform for receiving and tracking reports' if is_english else 'منصة متكاملة لاستقبال البلاغات التقنية ومتابعة الدعم' }}</p>
-        </div>
-
-        <!-- Login Form Body -->
-        <div class="card-body p-4 p-md-5">
-            <div class="text-center mb-4">
-                <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center mb-2" style="width: 58px; height: 58px; font-size: 24px;">
-                    <i class="bi bi-person-fill-lock"></i>
+<div class="login-screen-container">
+    <div class="login-card-container">
+        <div class="login-card card border-0">
+            
+            <!-- University Header Banner -->
+            <div class="login-card-header text-center">
+                <div class="login-glow-circle"></div>
+                <div class="logo-wrapper mb-3">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="{{ 'Logo' if is_english else 'شعار جامعة النيل الأبيض' }}" class="login-logo">
                 </div>
-                <h3 class="h5 fw-bold mb-1">{{ 'Sign in' if is_english else 'تسجيل الدخول' }}</h3>
-                <p class="text-muted small mb-0">{{ 'Please enter your account details' if is_english else 'يرجى إدخال بيانات حسابك للمتابعة' }}</p>
+                <div class="badge-uni mb-2">
+                    <i class="bi bi-bank"></i>
+                    <span>{{ 'White Nile University' if is_english else 'جامعة النيل الأبيض' }}</span>
+                </div>
+                <h1 class="login-system-title mb-1">
+                    {{ 'Technical Fault System' if is_english else 'نظام إدارة وتتبع الأعطال التقنية' }}
+                </h1>
+                <p class="login-system-subtitle mb-0">
+                    {{ 'Smart Support & Maintenance Portal' if is_english else 'المنصة الإلكترونية الموحدة للبلاغات والدعم الفني' }}
+                </p>
             </div>
 
-            <form method="POST">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-                <!-- Username Input -->
-                <div class="mb-3">
-                    <label for="username" class="form-label small fw-bold text-muted">
-                        <i class="bi bi-person me-1"></i> {{ 'Username' if is_english else 'اسم المستخدم' }}
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-at"></i></span>
-                        <input type="text" class="form-control border-start-0 bg-light" id="username" name="username" 
-                               placeholder="{{ 'Enter username' if is_english else 'أدخل اسم المستخدم' }}" required autocomplete="username">
-                    </div>
+            <!-- Login Form Body -->
+            <div class="login-card-body">
+                <div class="login-welcome-bar text-center mb-4">
+                    <h2 class="login-heading mb-1">{{ 'Sign in' if is_english else 'تسجيل الدخول' }}</h2>
+                    <p class="text-muted small mb-0">{{ 'Enter your credentials to continue' if is_english else 'أدخل اسم المستخدم وكلمة المرور للمتابعة' }}</p>
                 </div>
 
-                <!-- Password Input -->
-                <div class="mb-3">
-                    <label for="password" class="form-label small fw-bold text-muted">
-                        <i class="bi bi-key me-1"></i> {{ 'Password' if is_english else 'كلمة المرور' }}
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-lock"></i></span>
-                        <input type="password" class="form-control border-start-0 border-end-0 bg-light" id="password" name="password" 
-                               placeholder="{{ 'Enter password' if is_english else 'أدخل كلمة المرور' }}" required autocomplete="current-password">
-                        <button class="btn btn-light border border-start-0" type="button" onclick="togglePassword()">
-                            <i class="bi bi-eye-slash text-muted" id="eyeIcon"></i>
-                        </button>
-                    </div>
-                </div>
+                <form method="POST" class="login-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                <!-- Remember & Forgot Password -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="remember" id="remember">
-                        <label class="form-check-label small text-muted" for="remember">
-                            {{ 'Remember me' if is_english else 'تذكرني' }}
+                    <!-- Username Field -->
+                    <div class="mb-3">
+                        <label for="username" class="form-label-custom">
+                            <i class="bi bi-person"></i>
+                            <span>{{ 'Username' if is_english else 'اسم المستخدم' }}</span>
                         </label>
+                        <div class="input-container">
+                            <i class="bi bi-at input-icon"></i>
+                            <input type="text" class="input-field" id="username" name="username" 
+                                   placeholder="{{ 'Enter username' if is_english else 'أدخل اسم المستخدم' }}" required autocomplete="username">
+                        </div>
                     </div>
-                    <a href="{{ url_for('forgot_password') }}" class="small text-decoration-none fw-bold text-primary">
-                        {{ 'Forgot password?' if is_english else 'نسيت كلمة المرور؟' }}
-                    </a>
-                </div>
 
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm">
-                    <i class="bi bi-box-arrow-in-right me-1"></i> {{ 'Sign in' if is_english else 'تسجيل الدخول' }}
-                </button>
-            </form>
-        </div>
+                    <!-- Password Field -->
+                    <div class="mb-3">
+                        <label for="password" class="form-label-custom">
+                            <i class="bi bi-shield-lock"></i>
+                            <span>{{ 'Password' if is_english else 'كلمة المرور' }}</span>
+                        </label>
+                        <div class="input-container">
+                            <i class="bi bi-key input-icon"></i>
+                            <input type="password" class="input-field password-field" id="password" name="password" 
+                                   placeholder="{{ 'Enter password' if is_english else 'أدخل كلمة المرور' }}" required autocomplete="current-password">
+                            <button class="btn-toggle-eye" type="button" onclick="togglePassword()" aria-label="Toggle Password Visibility">
+                                <i class="bi bi-eye-slash" id="eyeIcon"></i>
+                            </button>
+                        </div>
+                    </div>
 
-        <div class="card-footer text-center bg-light border-0 py-3">
-            <small class="text-muted">© 2026 {{ 'White Nile University' if is_english else 'جامعة النيل الأبيض' }}</small>
+                    <!-- Options Row -->
+                    <div class="options-row mb-4">
+                        <label class="remember-label">
+                            <input type="checkbox" name="remember" id="remember" class="checkbox-custom">
+                            <span>{{ 'Remember me' if is_english else 'تذكرني' }}</span>
+                        </label>
+                        <a href="{{ url_for('forgot_password') }}" class="forgot-link">
+                            {{ 'Forgot password?' if is_english else 'نسيت كلمة المرور؟' }}
+                        </a>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn-login-submit">
+                        <span>{{ 'Sign in' if is_english else 'تسجيل الدخول' }}</span>
+                        <i class="bi bi-arrow-left-short action-icon"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="login-card-footer text-center">
+                <span class="footer-copy">© 2026 {{ 'White Nile University • All Rights Reserved' if is_english else 'جامعة النيل الأبيض • جميع الحقوق محفوظة' }}</span>
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-.login-wrapper {
-    min-height: calc(100vh - 180px);
+/* Login Screen Container - World Class Native App Aesthetic */
+.login-screen-container {
+    min-height: 100dvh;
+    min-height: 100vh;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 0;
-    width: 100%;
+    padding: 30px 16px;
+    background: radial-gradient(circle at 20% 15%, rgba(15, 76, 129, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 85%, rgba(14, 116, 144, 0.10) 0%, transparent 50%),
+                var(--page-bg);
 }
 
-.login-box {
+html.dark-mode .login-screen-container {
+    background: radial-gradient(circle at 20% 15%, rgba(37, 99, 235, 0.16) 0%, transparent 50%),
+                radial-gradient(circle at 80% 85%, rgba(14, 165, 233, 0.14) 0%, transparent 50%),
+                #090e17;
+}
+
+.login-card-container {
     width: 100%;
-    max-width: 480px;
+    max-width: 440px;
     margin: 0 auto;
+    display: flex;
+    justify-content: center;
+}
+
+.login-card {
+    width: 100%;
+    border-radius: 28px !important;
     background: var(--surface);
-    border: 1px solid var(--border) !important;
-}
-
-.login-top-banner {
-    background: var(--primary-gradient);
-    color: #ffffff;
+    border: 1px solid rgba(15, 61, 112, 0.10) !important;
+    box-shadow: 0 20px 45px -10px rgba(15, 37, 70, 0.18), 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+    overflow: hidden;
     position: relative;
+    backdrop-filter: blur(10px);
 }
 
-.login-logo-img {
-    height: 85px;
+html.dark-mode .login-card {
+    background: #111a2e;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.75), 0 0 20px rgba(59, 130, 246, 0.15) !important;
+}
+
+/* Header Banner */
+.login-card-header {
+    background: linear-gradient(145deg, #0f3d70 0%, #1769aa 50%, #0e7490 100%);
+    padding: 34px 24px 28px;
+    position: relative;
+    overflow: hidden;
+    color: #ffffff;
+}
+
+.login-glow-circle {
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    pointer-events: none;
+}
+
+.logo-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.login-logo {
+    height: 86px;
     width: auto;
-    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
-    transition: transform 0.3s ease;
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.login-logo-img:hover {
-    transform: scale(1.05);
+.login-logo:hover {
+    transform: scale(1.08) rotate(-2deg);
 }
 
+.badge-uni {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 4px 14px;
+    border-radius: 30px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.3px;
+}
+
+.login-system-title {
+    font-size: 1.18rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.35;
+}
+
+.login-system-subtitle {
+    font-size: 0.84rem;
+    color: rgba(255, 255, 255, 0.82);
+    font-weight: 400;
+}
+
+/* Card Body */
+.login-card-body {
+    padding: 32px 28px 24px;
+}
+
+.login-heading {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.form-label-custom {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 7px;
+}
+
+.form-label-custom i {
+    font-size: 0.95rem;
+    color: var(--primary);
+}
+
+/* Custom Styled Input Containers */
+.input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--surface-muted);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    transition: all 0.25s ease;
+    overflow: hidden;
+}
+
+.input-container:focus-within {
+    border-color: var(--primary);
+    background: var(--surface);
+    box-shadow: 0 0 0 4px var(--primary-soft);
+}
+
+.input-icon {
+    padding: 0 14px;
+    color: var(--text-light);
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+}
+
+.input-field {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 13px 8px 13px 0;
+    font-size: 0.94rem;
+    font-weight: 600;
+    color: var(--text);
+    outline: none;
+    width: 100%;
+}
+
+html.lang-en .input-field {
+    padding: 13px 0 13px 8px;
+}
+
+.input-field::placeholder {
+    color: var(--text-light);
+    font-weight: 400;
+    font-size: 0.88rem;
+}
+
+.btn-toggle-eye {
+    background: transparent;
+    border: none;
+    padding: 0 14px;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.btn-toggle-eye:hover {
+    color: var(--primary);
+}
+
+/* Options Row */
+.options-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.86rem;
+}
+
+.remember-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-weight: 600;
+    user-select: none;
+}
+
+.checkbox-custom {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.forgot-link {
+    color: var(--primary);
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.forgot-link:hover {
+    color: var(--primary-light);
+    text-decoration: underline;
+}
+
+/* Submit Button */
+.btn-login-submit {
+    width: 100%;
+    height: 52px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #0f4c81 0%, #1769aa 50%, #0e7490 100%);
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px -3px rgba(15, 76, 129, 0.35);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-login-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px -3px rgba(15, 76, 129, 0.45);
+    background: linear-gradient(135deg, #135591 0%, #1a77bf 50%, #1085a4 100%);
+}
+
+.btn-login-submit:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 10px rgba(15, 76, 129, 0.3);
+}
+
+.btn-login-submit .action-icon {
+    font-size: 1.4rem;
+    transition: transform 0.25s ease;
+}
+
+.btn-login-submit:hover .action-icon {
+    transform: translateX(-4px);
+}
+
+html.lang-en .btn-login-submit .action-icon {
+    transform: scaleX(-1);
+}
+
+html.lang-en .btn-login-submit:hover .action-icon {
+    transform: scaleX(-1) translateX(-4px);
+}
+
+/* Footer */
+.login-card-footer {
+    background: var(--surface-muted);
+    border-top: 1px solid var(--border);
+    padding: 14px 20px;
+}
+
+.footer-copy {
+    font-size: 0.78rem;
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+/* Mobile Responsiveness */
 @media (max-width: 576px) {
-    .login-wrapper {
-        padding: 0;
-    }
-    
-    .login-box {
-        border-radius: 18px !important;
-        box-shadow: var(--shadow) !important;
+    .login-screen-container {
+        padding: 16px 12px;
+        align-items: center;
     }
 
-    .login-logo-img {
-        height: 70px;
+    .login-card {
+        border-radius: 24px !important;
     }
 
-    .card-body {
-        padding: 24px 18px !important;
+    .login-card-header {
+        padding: 28px 18px 22px;
+    }
+
+    .login-logo {
+        height: 74px;
+    }
+
+    .login-system-title {
+        font-size: 1.08rem;
+    }
+
+    .login-card-body {
+        padding: 24px 18px 20px;
+    }
+
+    .btn-login-submit {
+        height: 48px;
+        font-size: 0.95rem;
     }
 }
 </style>
@@ -154,3 +439,4 @@ function togglePassword() {
 }
 </script>
 {% endblock %}
+

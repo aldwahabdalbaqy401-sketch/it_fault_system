@@ -394,15 +394,16 @@
 </head>
 <body>
 
-    <!-- Navbar -->
+    <!-- Header / Navbar -->
+    {% if session.get('user_id') %}
     <nav class="navbar navbar-expand-lg mb-4">
         <div class="navbar-bg-shapes"></div>
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('login') }}">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="{{ 'Logo' if is_english else 'الشعار' }}" style="height: 60px; margin-left: 15px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('dashboard' if session.get('user_role') in ['admin','supervisor'] else 'user_dashboard') }}">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="{{ 'Logo' if is_english else 'الشعار' }}" style="height: 50px; margin-left: 12px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));">
                 <div>
-                    <span class="d-block text-warning mb-1" style="font-size: 13px; font-weight: bold; letter-spacing: 0.5px;"><i class="bi bi-bank"></i> {{ 'White Nile University' if is_english else 'جامعة النيل الأبيض' }}</span>
-                    <span class="text-white" style="font-size: 19px; font-weight: 900; text-shadow: 1px 1px 3px rgba(0,0,0,0.4);">{{ APP_NAME }}</span>
+                    <span class="d-block text-warning mb-1" style="font-size: 12px; font-weight: bold;"><i class="bi bi-bank"></i> {{ 'White Nile University' if is_english else 'جامعة النيل الأبيض' }}</span>
+                    <span class="text-white" style="font-size: 17px; font-weight: 900;">{{ APP_NAME }}</span>
                 </div>
             </a>
             <button class="navbar-toggler bg-light rounded-3 border-0 p-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -411,7 +412,6 @@
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <!-- Navigation Links for Logged in Users -->
-                {% if session.get('user_id') %}
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center">
                     {% if session.get('user_role') in ['admin', 'supervisor'] %}
                         <li class="nav-item">
@@ -463,57 +463,53 @@
                         </li>
                     {% endif %}
                 </ul>
-                {% endif %}
 
                 <ul class="navbar-nav ms-auto align-items-center">
-                    {% if session.get('user_id') %}
-                        <!-- Chat Button (always visible) -->
-                        <li class="nav-item me-2">
-                            <a class="chat-nav-btn" href="{{ url_for('technician_support') if session.get('user_role') in ['admin','supervisor','technician'] else url_for('user_dashboard') }}" 
-                                id="chatNavBtn"
-                                title="{{ 'Chat' if is_english else 'المحادثة' }}">
-                                <i class="bi bi-chat-dots-fill fs-5"></i>
-                                <span class="chat-unread-dot" id="chatNavDot"></span>
-                            </a>
-                        </li>
-                        <!-- Notifications Dropdown -->
-                        <li class="nav-item dropdown me-3">
-                            <a class="nav-link dropdown-toggle position-relative text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="notifDropdownToggle">
-                                <i class="bi bi-bell-fill fs-4 notif-icon-anim"></i>
-                                <span id="notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light" style="display: none; font-size: 0.70rem; padding: 0.35em 0.6em;">
-                                    0
-                                </span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-notif shadow-lg" aria-labelledby="notifDropdownToggle" id="notifList">
-                                <li><h6 class="dropdown-header d-flex justify-content-between align-items-center bg-light border-bottom py-2">
-                                    <span class="fw-bold text-dark"><i class="bi bi-bell-fill text-primary me-2"></i> {{ 'Notifications' if is_english else 'الإشعارات' }}</span>
-                                    <button class="btn btn-sm btn-link text-decoration-none" onclick="markAllReadHeader()">{{ 'Read' if is_english else 'مقروء' }}</button>
-                                </h6></li>
-                                <div id="notifItemsContainer">
-                                    <li><a class="dropdown-item text-center text-muted small py-3" href="#">{{ 'Loading...' if is_english else 'جاري التحميل...' }}</a></li>
-                                </div>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-center text-primary" href="{{ url_for('notifications') }}">{{ 'View all notifications' if is_english else 'عرض كل الإشعارات' }}</a></li>
-                            </ul>
-                        </li>
-                        <!-- User Profile / Logout Dropdown -->
-                        <li class="nav-item dropdown me-2">
-                            <a class="nav-link dropdown-toggle text-white d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <div class="rounded-circle bg-white text-primary d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: bold;">
-                                    {{ session.get('user_name', 'U')[:1] | upper }}
-                                </div>
-                                <span class="d-none d-lg-inline">{{ session.get('user_name') }}</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow">
-                                <li class="px-3 py-2 border-bottom">
-                                    <div class="fw-bold">{{ session.get('user_name') }}</div>
-                                    <small class="badge bg-primary text-white">{{ session.get('user_role') }}</small>
-                                </li>
-                                <li><a class="dropdown-item text-danger d-flex align-items-center gap-2" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> {{ 'Sign out' if is_english else 'تسجيل الخروج' }}</a></li>
-                            </ul>
-                        </li>
-                    {% endif %}
-                    
+                    <!-- Chat Button (always visible) -->
+                    <li class="nav-item me-2">
+                        <a class="chat-nav-btn" href="{{ url_for('technician_support') if session.get('user_role') in ['admin','supervisor','technician'] else url_for('user_dashboard') }}" 
+                            id="chatNavBtn"
+                            title="{{ 'Chat' if is_english else 'المحادثة' }}">
+                            <i class="bi bi-chat-dots-fill fs-5"></i>
+                            <span class="chat-unread-dot" id="chatNavDot"></span>
+                        </a>
+                    </li>
+                    <!-- Notifications Dropdown -->
+                    <li class="nav-item dropdown me-3">
+                        <a class="nav-link dropdown-toggle position-relative text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="notifDropdownToggle">
+                            <i class="bi bi-bell-fill fs-4 notif-icon-anim"></i>
+                            <span id="notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light" style="display: none; font-size: 0.70rem; padding: 0.35em 0.6em;">
+                                0
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-notif shadow-lg" aria-labelledby="notifDropdownToggle" id="notifList">
+                            <li><h6 class="dropdown-header d-flex justify-content-between align-items-center bg-light border-bottom py-2">
+                                <span class="fw-bold text-dark"><i class="bi bi-bell-fill text-primary me-2"></i> {{ 'Notifications' if is_english else 'الإشعارات' }}</span>
+                                <button class="btn btn-sm btn-link text-decoration-none" onclick="markAllReadHeader()">{{ 'Read' if is_english else 'مقروء' }}</button>
+                            </h6></li>
+                            <div id="notifItemsContainer">
+                                <li><a class="dropdown-item text-center text-muted small py-3" href="#">{{ 'Loading...' if is_english else 'جاري التحميل...' }}</a></li>
+                            </div>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-center text-primary" href="{{ url_for('notifications') }}">{{ 'View all notifications' if is_english else 'عرض كل الإشعارات' }}</a></li>
+                        </ul>
+                    </li>
+                    <!-- User Profile / Logout Dropdown -->
+                    <li class="nav-item dropdown me-2">
+                        <a class="nav-link dropdown-toggle text-white d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="rounded-circle bg-white text-primary d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: bold;">
+                                {{ session.get('user_name', 'U')[:1] | upper }}
+                            </div>
+                            <span class="d-none d-lg-inline">{{ session.get('user_name') }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li class="px-3 py-2 border-bottom">
+                                <div class="fw-bold">{{ session.get('user_name') }}</div>
+                                <small class="badge bg-primary text-white">{{ session.get('user_role') }}</small>
+                            </li>
+                            <li><a class="dropdown-item text-danger d-flex align-items-center gap-2" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> {{ 'Sign out' if is_english else 'تسجيل الخروج' }}</a></li>
+                        </ul>
+                    </li>
                     <li class="nav-item language-switcher me-2">
                         {% if is_english %}
                         <a class="nav-link language-link" href="{{ url_for('set_language', language='ar') }}" title="العربية">
@@ -525,7 +521,6 @@
                         </a>
                         {% endif %}
                     </li>
-
                     <!-- Dark Mode Toggle -->
                     <li class="nav-item">
                         <button class="btn btn-link nav-link dark-mode-toggle" id="darkModeToggle" type="button" title="{{ 'Toggle dark mode' if is_english else 'تبديل الوضع الليلي' }}" aria-label="{{ 'Toggle dark mode' if is_english else 'تبديل الوضع الليلي' }}">
@@ -536,9 +531,29 @@
             </div>
         </div>
     </nav>
+    {% else %}
+    <!-- Floating Minimal Glass Header for Guest / Login Screens -->
+    <header class="guest-top-bar" aria-label="Quick Settings">
+        <div class="guest-bar-inner">
+            {% if is_english %}
+            <a class="guest-glass-pill" href="{{ url_for('set_language', language='ar') }}">
+                <i class="bi bi-translate"></i> <span>العربية</span>
+            </a>
+            {% else %}
+            <a class="guest-glass-pill" href="{{ url_for('set_language', language='en') }}">
+                <i class="bi bi-translate"></i> <span>English</span>
+            </a>
+            {% endif %}
+
+            <button class="guest-glass-btn" id="darkModeToggle" type="button" title="{{ 'Toggle dark mode' if is_english else 'تبديل الوضع الليلي' }}" aria-label="{{ 'Toggle dark mode' if is_english else 'تبديل الوضع الليلي' }}">
+                <i class="bi bi-moon-fill"></i>
+            </button>
+        </div>
+    </header>
+    {% endif %}
 
     <!-- Main Content -->
-    <main class="container main-content-area py-3">
+    <main class="{% if session.get('user_id') %}container main-content-area py-3{% else %}w-100 p-0 m-0{% endif %}">
         {% block content %}{% endblock %}
     </main>
 

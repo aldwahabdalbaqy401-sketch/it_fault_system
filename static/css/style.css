@@ -978,3 +978,89 @@ html.dark-mode .mobile-app-bottom-nav, body.dark-mode .mobile-app-bottom-nav {
 .mobile-app-nav-item.center-cta:active .center-cta-btn {
     transform: scale(0.92);
 }
+
+/* ============================================================
+   ===== شريط التنقل الشفاف للضيوف (Guest Floating Bar) =====
+   ============================================================ */
+.guest-top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1060;
+    padding: 16px 20px;
+    pointer-events: none;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.guest-bar-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    pointer-events: auto;
+}
+
+.guest-glass-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(15, 61, 112, 0.15);
+    border-radius: 30px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    transition: all 0.25s ease;
+}
+
+.guest-glass-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(15, 61, 112, 0.15);
+    background: #ffffff;
+    color: var(--primary-dark);
+}
+
+.guest-glass-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(15, 61, 112, 0.15);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    transition: all 0.25s ease;
+}
+
+.guest-glass-btn:hover {
+    transform: translateY(-2px) rotate(15deg);
+    background: #ffffff;
+    box-shadow: 0 6px 20px rgba(15, 61, 112, 0.15);
+}
+
+html.dark-mode .guest-glass-pill,
+html.dark-mode .guest-glass-btn {
+    background: rgba(17, 26, 46, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #f8fafc;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+html.dark-mode .guest-glass-pill:hover,
+html.dark-mode .guest-glass-btn:hover {
+    background: #16223b;
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 6px 25px rgba(59, 130, 246, 0.25);
+}
