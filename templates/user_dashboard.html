@@ -32,18 +32,18 @@
                 <span>نسبة الحل</span>
             </div>
             <div class="mission-stats">
-                <div class="stat-item">
+                <a href="{{ url_for('my_faults') }}" class="stat-item text-decoration-none text-white">
                     <i class="bi bi-collection"></i><span id="totalFaults" class="stat-number">{{ total_faults or 0 }}</span>
                     <span class="stat-label">إجمالي الأعطال</span>
-                </div>
-                <div class="stat-item">
+                </a>
+                <a href="{{ url_for('my_faults') }}?status=resolved" class="stat-item text-decoration-none text-white">
                     <i class="bi bi-check2-circle"></i><span id="resolvedFaults" class="stat-number">{{ resolved_faults or 0 }}</span>
                     <span class="stat-label">تم حلها</span>
-                </div>
-                <div class="stat-item">
+                </a>
+                <a href="{{ url_for('my_faults') }}?status=in_progress" class="stat-item text-decoration-none text-white">
                     <i class="bi bi-hourglass-split"></i><span id="pendingFaults" class="stat-number">{{ pending_faults or 0 }}</span>
                     <span class="stat-label">قيد المعالجة</span>
-                </div>
+                </a>
             </div>
         </div>
         <div class="user-progress-summary" aria-label="ملخص نسب البلاغات">
