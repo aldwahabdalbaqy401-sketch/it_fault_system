@@ -31,5 +31,7 @@ class Config:
     MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER') or os.getenv('MAIL_USERNAME') or 'noreply@whitenile.edu.sd'
 
     # ===== اسم المشروع =====
-    APP_NAME    = 'نظام إدارة وتتبع الأعطال التقنية – بالتطبيق على جامعة النيل الأبيض'
-    APP_NAME_EN = 'Technical Fault Management and Tracking System – Applied at White Nile University'
+    APP_NAME       = 'نظام إدارة وتتبع الأعطال التقنية'
+    APP_NAME_EN    = 'Technical Fault Management System'
+    APP_FULL_TITLE = 'نظام إدارة وتتبع الأعطال التقنية – جامعة النيل الأبيض'
+    APP_FULL_TITLE_EN = 'Technical Fault Management System – White Nile University'

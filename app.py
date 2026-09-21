@@ -85,7 +85,8 @@ def inject_app_name():
     language = session.get('language', 'ar')
     is_english = language == 'en'
     return {
-        'APP_NAME': Config.APP_NAME_EN if is_english else Config.APP_NAME,
+        'APP_NAME': getattr(Config, 'APP_NAME_EN', 'Technical Fault System') if is_english else getattr(Config, 'APP_NAME', 'نظام إدارة وتتبع الأعطال التقنية'),
+        'APP_FULL_TITLE': getattr(Config, 'APP_FULL_TITLE_EN', 'Technical Fault Management System') if is_english else getattr(Config, 'APP_FULL_TITLE', 'نظام إدارة وتتبع الأعطال التقنية – جامعة النيل الأبيض'),
         'APP_NAME_AR': Config.APP_NAME,
         'APP_NAME_EN': Config.APP_NAME_EN,
         'current_language': language,
