@@ -1,51 +1,51 @@
 /* ============================================================
    style.css - نظام إدارة وتتبع الأعطال التقنية
-   جامعة النيل الأبيض - White Nile University
-   الإصدار المحدث الشامل © 2026
+   الإصدار المحدث الشامل © 2026 - Premium Modern Design
    ============================================================ */
-
-/* ===== استيراد الخطوط الحديثة الفاخرة ===== */
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap');
 
 /* ============================================================
    ===== متغيرات التصميم ونظام الألوان (Design Tokens) =====
    ============================================================ */
 :root {
-    /* الخطوط */
-    --font-arabic: 'Cairo', 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    /* الخطوط العصرية فائقة السرعة والوضوح */
+    --font-arabic: 'Readex Pro', 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-english: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-ui: var(--font-arabic);
 
-    /* الألوان الأساسية - هوية جامعة النيل الأبيض */
-    --primary: #0f4c81;
-    --primary-dark: #0a3156;
-    --primary-light: #2563eb;
-    --primary-soft: #eff6ff;
-    --primary-gradient: linear-gradient(135deg, #0f3d70 0%, #1769aa 52%, #0e7490 100%);
-    --primary-gradient-hover: linear-gradient(135deg, #134e8d 0%, #1d7fcb 52%, #1192b4 100%);
+    /* الألوان الأساسية الملكية (Royal Tech Palette) */
+    --primary: #2563eb;
+    --primary-dark: #1e3a8a;
+    --primary-light: #3b82f6;
+    --primary-soft: rgba(37, 99, 235, 0.08);
+    --primary-gradient: linear-gradient(135deg, #0b192e 0%, #1e3a8a 50%, #2563eb 100%);
+    --primary-gradient-hover: linear-gradient(135deg, #0e223f 0%, #2563eb 50%, #3b82f6 100%);
 
-    /* ألوان التمييز والتأكيد */
-    --secondary: #0ea5e9;
-    --secondary-soft: #e0f2fe;
-    --accent: #f59e0b;
-    --accent-soft: #fef3c7;
+    /* ألوان التمييز والتأكيد المشرقة */
+    --secondary: #06b6d4;
+    --secondary-soft: rgba(6, 182, 212, 0.1);
+    --accent: #8b5cf6;
+    --accent-soft: rgba(139, 92, 246, 0.1);
 
-    /* ألوان الحالات (Status Colors) */
+    /* ألوان الحالات (Vibrant Status Colors) */
     --success: #10b981;
-    --success-dark: #047857;
+    --success-dark: #059669;
     --success-soft: #ecfdf5;
+    --success-gradient: linear-gradient(135deg, #059669 0%, #10b981 100%);
     
     --warning: #f59e0b;
-    --warning-dark: #b45309;
+    --warning-dark: #d97706;
     --warning-soft: #fffbeb;
+    --warning-gradient: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
     
     --danger: #ef4444;
-    --danger-dark: #b91c1c;
+    --danger-dark: #dc2626;
     --danger-soft: #fef2f2;
+    --danger-gradient: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
     
-    --info: #06b6d4;
-    --info-dark: #0e7490;
-    --info-soft: #cffafe;
+    --info: #0ea5e9;
+    --info-dark: #0284c7;
+    --info-soft: #f0f9ff;
+    --info-gradient: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
 
     --gray: #64748b;
     --gray-light: #94a3b8;
@@ -53,11 +53,11 @@
     --dark: #0f172a;
 
     /* ألوان الأسطح والخلفيات (Light Mode) */
-    --page-bg: #f3f6fa;
+    --page-bg: #f8fafc;
     --surface: #ffffff;
-    --surface-muted: #f8fafc;
-    --surface-soft: #eef4ff;
-    --surface-hover: #f1f5f9;
+    --surface-muted: #f1f5f9;
+    --surface-soft: #e2e8f0;
+    --surface-hover: #eef2f6;
     --border: #e2e8f0;
     --border-subtle: #edf2f7;
 
@@ -67,55 +67,55 @@
     --text-light: #94a3b8;
     --text-inverse: #ffffff;
 
-    /* الظلال والعمق */
-    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
-    --shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
-    --shadow-md: 0 10px 25px -3px rgba(15, 23, 42, 0.09), 0 4px 6px -2px rgba(15, 23, 42, 0.04);
-    --shadow-lg: 0 20px 35px -5px rgba(15, 23, 42, 0.12), 0 10px 10px -5px rgba(15, 23, 42, 0.04);
-    --shadow-glow: 0 0 20px rgba(15, 76, 129, 0.22);
+    /* الظلال والعمق المتطور */
+    --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
+    --shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+    --shadow-md: 0 12px 28px -4px rgba(15, 23, 42, 0.09), 0 4px 8px -2px rgba(15, 23, 42, 0.04);
+    --shadow-lg: 0 20px 40px -6px rgba(15, 23, 42, 0.12), 0 8px 12px -3px rgba(15, 23, 42, 0.04);
+    --shadow-glow: 0 0 24px rgba(37, 99, 235, 0.28);
 
     /* الحواف والتأثيرات */
-    --radius-sm: 8px;
-    --radius: 14px;
-    --radius-lg: 22px;
+    --radius-sm: 10px;
+    --radius: 16px;
+    --radius-lg: 24px;
     --radius-full: 9999px;
-    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* ===== متغيرات الوضع الليلي (Dark Mode) ===== */
+/* ===== متغيرات الوضع الليلي الفاخر (Obsidian Dark Mode) ===== */
 html.dark-mode, body.dark-mode {
-    --page-bg: #090e17;
-    --surface: #111a2e;
-    --surface-muted: #16223b;
-    --surface-soft: #1c2b4a;
-    --surface-hover: #22345a;
-    --border: #233352;
-    --border-subtle: #19263e;
+    --page-bg: #090d16;
+    --surface: #111827;
+    --surface-muted: #172033;
+    --surface-soft: #1f2d47;
+    --surface-hover: #263859;
+    --border: #1f293d;
+    --border-subtle: #192336;
 
     --text: #f8fafc;
     --text-muted: #94a3b8;
     --text-light: #64748b;
 
     --primary: #3b82f6;
-    --primary-dark: #1d4ed8;
+    --primary-dark: #2563eb;
     --primary-light: #60a5fa;
-    --primary-soft: rgba(59, 130, 246, 0.15);
-    --primary-gradient: linear-gradient(135deg, #0c2340 0%, #133e68 52%, #0e4c60 100%);
-    --primary-gradient-hover: linear-gradient(135deg, #102e54 0%, #184c7e 52%, #125e77 100%);
+    --primary-soft: rgba(59, 130, 246, 0.16);
+    --primary-gradient: linear-gradient(135deg, #091322 0%, #172a4d 50%, #2563eb 100%);
+    --primary-gradient-hover: linear-gradient(135deg, #0c1a30 0%, #1e3a6e 50%, #3b82f6 100%);
 
-    --secondary-soft: rgba(14, 165, 233, 0.15);
-    --accent-soft: rgba(245, 158, 11, 0.15);
-    --success-soft: rgba(16, 185, 129, 0.15);
-    --warning-soft: rgba(245, 158, 11, 0.15);
-    --danger-soft: rgba(239, 68, 68, 0.15);
-    --info-soft: rgba(6, 182, 212, 0.15);
+    --secondary-soft: rgba(6, 182, 212, 0.16);
+    --accent-soft: rgba(139, 92, 246, 0.16);
+    --success-soft: rgba(16, 185, 129, 0.16);
+    --warning-soft: rgba(245, 158, 11, 0.16);
+    --danger-soft: rgba(239, 68, 68, 0.16);
+    --info-soft: rgba(14, 165, 233, 0.16);
 
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-    --shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
-    --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.55);
-    --shadow-lg: 0 20px 35px rgba(0, 0, 0, 0.65);
-    --shadow-glow: 0 0 25px rgba(59, 130, 246, 0.35);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+    --shadow: 0 4px 22px rgba(0, 0, 0, 0.48);
+    --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.58);
+    --shadow-lg: 0 20px 42px rgba(0, 0, 0, 0.68);
+    --shadow-glow: 0 0 28px rgba(59, 130, 246, 0.4);
 }
 
 /* ============================================================
