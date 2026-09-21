@@ -172,12 +172,45 @@
             overflow: visible !important;
         }
         .navbar-brand {
-            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            max-width: calc(100% - 65px);
+            padding: 6px 0;
+            text-decoration: none;
         }
-        .navbar-brand img {
+        .navbar-logo-img {
+            height: 46px;
+            width: auto;
+            margin-left: 10px;
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
             transition: transform 0.25s ease;
+            flex-shrink: 0;
         }
-        .navbar-brand:hover img {
+        html.lang-en .navbar-logo-img {
+            margin-left: 0;
+            margin-right: 10px;
+        }
+        .navbar-brand-text {
+            min-width: 0;
+            line-height: 1.25;
+            display: flex;
+            flex-direction: column;
+        }
+        .brand-uni-name {
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .brand-app-title {
+            font-size: 15px;
+            font-weight: 900;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .navbar-brand:hover .navbar-logo-img {
             transform: scale(1.04);
         }
         .navbar-brand, .nav-link {
@@ -202,7 +235,8 @@
             position: relative;
             z-index: 2;
             border: 1px solid rgba(255, 255, 255, 0.45);
-            padding: 7px 9px;
+            padding: 6px 8px;
+            flex-shrink: 0;
         }
         .navbar .navbar-toggler:focus {
             box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
@@ -210,14 +244,21 @@
         @media (max-width: 767.98px) {
             .navbar,
             .navbar > .container {
-                min-height: 72px;
+                min-height: 66px;
             }
-            .navbar-brand img {
-                height: 48px !important;
-                margin-left: 9px !important;
+            .navbar-logo-img {
+                height: 38px !important;
+                margin-left: 8px !important;
             }
-            .navbar-brand span:last-child {
-                font-size: 15px !important;
+            html.lang-en .navbar-logo-img {
+                margin-left: 0 !important;
+                margin-right: 8px !important;
+            }
+            .brand-uni-name {
+                font-size: 10px !important;
+            }
+            .brand-app-title {
+                font-size: 13px !important;
             }
             .navbar-collapse {
                 margin: 8px 0 10px;
@@ -395,15 +436,15 @@
 <body>
 
     <!-- Header / Navbar -->
-    {% if session.get('user_id') %}
+    {% if session.get('user_id') and request.endpoint not in ['login', 'forgot_password', 'reset_password'] %}
     <nav class="navbar navbar-expand-lg mb-4">
         <div class="navbar-bg-shapes"></div>
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('dashboard' if session.get('user_role') in ['admin','supervisor'] else 'user_dashboard') }}">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="{{ 'Logo' if is_english else 'الشعار' }}" style="height: 50px; margin-left: 12px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));">
-                <div>
-                    <span class="d-block text-warning mb-1" style="font-size: 12px; font-weight: bold;"><i class="bi bi-bank"></i> {{ 'White Nile University' if is_english else 'جامعة النيل الأبيض' }}</span>
-                    <span class="text-white" style="font-size: 17px; font-weight: 900;">{{ APP_NAME }}</span>
+            <a class="navbar-brand d-flex align-items-center me-2" href="{{ url_for('dashboard' if session.get('user_role') in ['admin','supervisor'] else 'user_dashboard') }}">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="{{ 'Logo' if is_english else 'الشعار' }}" class="navbar-logo-img">
+                <div class="navbar-brand-text">
+                    <span class="d-block text-warning brand-uni-name"><i class="bi bi-bank"></i> {{ 'White Nile University' if is_english else 'جامعة النيل الأبيض' }}</span>
+                    <span class="text-white brand-app-title">{{ APP_NAME }}</span>
                 </div>
             </a>
             <button class="navbar-toggler bg-light rounded-3 border-0 p-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
