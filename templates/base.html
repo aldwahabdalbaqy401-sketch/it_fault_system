@@ -2,7 +2,11 @@
 <html lang="{{ page_lang }}" dir="{{ page_direction }}" class="{% if is_english %}lang-en{% else %}lang-ar{% endif %}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0f3d70">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{% block title %}{{ APP_NAME }}{% endblock %}</title>
     <!-- Bootstrap 5 layout direction -->
@@ -10,7 +14,7 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- Custom CSS (Keep if needed) -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=9">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
@@ -115,10 +119,11 @@
         .navbar {
             position: relative;
             z-index: 1050;
-            overflow: visible !important;
-            min-height: 82px;
+            overflow: hidden !important;
+            width: 100%;
+            min-height: 76px;
             background: linear-gradient(135deg, #0f3d70 0%, #1769aa 52%, #0e7490 100%) !important;
-            box-shadow: 0 8px 24px rgba(15, 61, 112, 0.22);
+            box-shadow: 0 4px 20px rgba(15, 61, 112, 0.22);
         }
         .navbar-bg-shapes {
             position: absolute;
@@ -129,7 +134,6 @@
             overflow: hidden;
             pointer-events: none;
             z-index: 0;
-            border-radius: inherit;
         }
         .navbar-bg-shapes::before,
         .navbar-bg-shapes::after {
@@ -139,19 +143,19 @@
             border-radius: 50%;
         }
         .navbar-bg-shapes::before {
-            right: -8%;
-            bottom: -52px;
-            width: 116%;
-            height: 86px;
-            background: rgba(255, 255, 255, 0.12);
+            right: -5%;
+            bottom: -40px;
+            width: 100%;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.08);
             transform: rotate(-2deg);
         }
         .navbar-bg-shapes::after {
-            left: -10%;
-            bottom: -66px;
-            width: 120%;
-            height: 88px;
-            background: rgba(14, 116, 144, 0.72);
+            left: -5%;
+            bottom: -50px;
+            width: 100%;
+            height: 80px;
+            background: rgba(14, 116, 144, 0.5);
             transform: rotate(2deg);
         }
         .navbar::before,
@@ -401,19 +405,73 @@
                     <span class="text-white" style="font-size: 19px; font-weight: 900; text-shadow: 1px 1px 3px rgba(0,0,0,0.4);">{{ APP_NAME }}</span>
                 </div>
             </a>
-            
-            <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler bg-light rounded-3 border-0 p-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="bi bi-list fs-3 text-dark"></i>
             </button>
             
             <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Navigation Links for Logged in Users -->
+                {% if session.get('user_id') %}
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center">
+                    {% if session.get('user_role') in ['admin', 'supervisor'] %}
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold px-3" href="{{ url_for('dashboard') }}">
+                                <i class="bi bi-speedometer2 me-1"></i> {{ 'Dashboard' if is_english else 'لوحة التحكم' }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold px-3" href="{{ url_for('view_faults') }}">
+                                <i class="bi bi-ticket-detailed me-1"></i> {{ 'Faults' if is_english else 'البلاغات' }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold px-3" href="{{ url_for('admin_users') }}">
+                                <i class="bi bi-people me-1"></i> {{ 'Users' if is_english else 'المستخدمين' }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold px-3" href="{{ url_for('dashboard_stats') }}">
+                                <i class="bi bi-bar-chart-line me-1"></i> {{ 'Statistics' if is_english else 'الإحصائيات' }}
+                            </a>
+                        </li>
+                    {% elif session.get('user_role') == 'technician' %}
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold px-3" href="{{ url_for('technician_support') }}">
+                                <i class="bi bi-tools me-1"></i> {{ 'My Tasks' if is_english else 'مهامي الفنية' }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold px-3" href="{{ url_for('view_faults') }}">
+                                <i class="bi bi-list-check me-1"></i> {{ 'All Faults' if is_english else 'جميع البلاغات' }}
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold px-3" href="{{ url_for('user_dashboard') }}">
+                                <i class="bi bi-grid me-1"></i> {{ 'My Portal' if is_english else 'بوابتي' }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold px-3" href="{{ url_for('add_fault') }}">
+                                <i class="bi bi-plus-circle me-1"></i> {{ 'Report Fault' if is_english else 'تقديم بلاغ جديد' }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold px-3" href="{{ url_for('my_faults') }}">
+                                <i class="bi bi-clock-history me-1"></i> {{ 'My Reports' if is_english else 'سجل بلاغاتي' }}
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+                {% endif %}
+
                 <ul class="navbar-nav ms-auto align-items-center">
                     {% if session.get('user_id') %}
                         <!-- Chat Button (always visible) -->
                         <li class="nav-item me-2">
                             <a class="chat-nav-btn" href="{{ url_for('technician_support') if session.get('user_role') in ['admin','supervisor','technician'] else url_for('user_dashboard') }}" 
-                               id="chatNavBtn"
-                               title="{{ 'Chat' if is_english else 'المحادثة' }}">
+                                id="chatNavBtn"
+                                title="{{ 'Chat' if is_english else 'المحادثة' }}">
                                 <i class="bi bi-chat-dots-fill fs-5"></i>
                                 <span class="chat-unread-dot" id="chatNavDot"></span>
                             </a>
@@ -438,9 +496,25 @@
                                 <li><a class="dropdown-item text-center text-primary" href="{{ url_for('notifications') }}">{{ 'View all notifications' if is_english else 'عرض كل الإشعارات' }}</a></li>
                             </ul>
                         </li>
+                        <!-- User Profile / Logout Dropdown -->
+                        <li class="nav-item dropdown me-2">
+                            <a class="nav-link dropdown-toggle text-white d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="rounded-circle bg-white text-primary d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: bold;">
+                                    {{ session.get('user_name', 'U')[:1] | upper }}
+                                </div>
+                                <span class="d-none d-lg-inline">{{ session.get('user_name') }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                <li class="px-3 py-2 border-bottom">
+                                    <div class="fw-bold">{{ session.get('user_name') }}</div>
+                                    <small class="badge bg-primary text-white">{{ session.get('user_role') }}</small>
+                                </li>
+                                <li><a class="dropdown-item text-danger d-flex align-items-center gap-2" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> {{ 'Sign out' if is_english else 'تسجيل الخروج' }}</a></li>
+                            </ul>
+                        </li>
                     {% endif %}
                     
-                    <li class="nav-item language-switcher">
+                    <li class="nav-item language-switcher me-2">
                         {% if is_english %}
                         <a class="nav-link language-link" href="{{ url_for('set_language', language='ar') }}" title="العربية">
                             <i class="bi bi-translate"></i> العربية
@@ -453,7 +527,7 @@
                     </li>
 
                     <!-- Dark Mode Toggle -->
-                    <li class="nav-item me-2">
+                    <li class="nav-item">
                         <button class="btn btn-link nav-link dark-mode-toggle" id="darkModeToggle" type="button" title="{{ 'Toggle dark mode' if is_english else 'تبديل الوضع الليلي' }}" aria-label="{{ 'Toggle dark mode' if is_english else 'تبديل الوضع الليلي' }}">
                             <i class="bi bi-moon-fill fs-5"></i>
                         </button>
@@ -464,9 +538,82 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="container main-content-area">
+    <main class="container main-content-area py-3">
         {% block content %}{% endblock %}
-    </div>
+    </main>
+
+    <!-- Native Mobile App Bottom Navigation Bar (Visible only on mobile devices) -->
+    {% if session.get('user_id') %}
+    <nav class="mobile-app-bottom-nav d-md-none" aria-label="Mobile Navigation">
+        {% if session.get('user_role') in ['admin', 'supervisor'] %}
+            <a href="{{ url_for('dashboard') }}" class="mobile-app-nav-item">
+                <i class="bi bi-speedometer2"></i>
+                <span>{{ 'Dashboard' if is_english else 'الرئيسية' }}</span>
+            </a>
+            <a href="{{ url_for('view_faults') }}" class="mobile-app-nav-item">
+                <i class="bi bi-ticket-detailed"></i>
+                <span>{{ 'Faults' if is_english else 'البلاغات' }}</span>
+            </a>
+            <a href="{{ url_for('add_fault') }}" class="mobile-app-nav-item center-cta" title="{{ 'Add' if is_english else 'إضافة' }}">
+                <div class="center-cta-btn">
+                    <i class="bi bi-plus-lg"></i>
+                </div>
+            </a>
+            <a href="{{ url_for('admin_users') }}" class="mobile-app-nav-item">
+                <i class="bi bi-people"></i>
+                <span>{{ 'Users' if is_english else 'المستخدمين' }}</span>
+            </a>
+            <a href="{{ url_for('notifications') }}" class="mobile-app-nav-item">
+                <i class="bi bi-bell"></i>
+                <span>{{ 'Alerts' if is_english else 'الإشعارات' }}</span>
+            </a>
+        {% elif session.get('user_role') == 'technician' %}
+            <a href="{{ url_for('technician_support') }}" class="mobile-app-nav-item">
+                <i class="bi bi-tools"></i>
+                <span>{{ 'My Tasks' if is_english else 'مهامي' }}</span>
+            </a>
+            <a href="{{ url_for('view_faults') }}" class="mobile-app-nav-item">
+                <i class="bi bi-card-checklist"></i>
+                <span>{{ 'All Faults' if is_english else 'البلاغات' }}</span>
+            </a>
+            <a href="{{ url_for('technician_support') }}" class="mobile-app-nav-item center-cta" title="{{ 'Chat' if is_english else 'المحادثة' }}">
+                <div class="center-cta-btn">
+                    <i class="bi bi-chat-dots-fill"></i>
+                </div>
+            </a>
+            <a href="{{ url_for('notifications') }}" class="mobile-app-nav-item">
+                <i class="bi bi-bell"></i>
+                <span>{{ 'Alerts' if is_english else 'الإشعارات' }}</span>
+            </a>
+            <a href="{{ url_for('logout') }}" class="mobile-app-nav-item text-danger">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>{{ 'Exit' if is_english else 'خروج' }}</span>
+            </a>
+        {% else %}
+            <a href="{{ url_for('user_dashboard') }}" class="mobile-app-nav-item">
+                <i class="bi bi-grid"></i>
+                <span>{{ 'Home' if is_english else 'الرئيسية' }}</span>
+            </a>
+            <a href="{{ url_for('my_faults') }}" class="mobile-app-nav-item">
+                <i class="bi bi-clock-history"></i>
+                <span>{{ 'My Reports' if is_english else 'بلاغاتي' }}</span>
+            </a>
+            <a href="{{ url_for('add_fault') }}" class="mobile-app-nav-item center-cta" title="{{ 'Report Fault' if is_english else 'إضافة بلاغ' }}">
+                <div class="center-cta-btn">
+                    <i class="bi bi-plus-lg"></i>
+                </div>
+            </a>
+            <a href="{{ url_for('notifications') }}" class="mobile-app-nav-item">
+                <i class="bi bi-bell"></i>
+                <span>{{ 'Alerts' if is_english else 'الإشعارات' }}</span>
+            </a>
+            <a href="{{ url_for('logout') }}" class="mobile-app-nav-item text-danger">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>{{ 'Exit' if is_english else 'خروج' }}</span>
+            </a>
+        {% endif %}
+    </nav>
+    {% endif %}
 
     <!-- Bootstrap Toasts for Flash Messages -->
     <div class="toast-container">

@@ -1,57 +1,74 @@
 {% extends 'base.html' %}
 
-{% block title %}الإشعارات{% endblock %}
+{% block title %}{{ 'Notifications' if is_english else 'مركز الإشعارات والتنبيهات' }}{% endblock %}
 
 {% block content %}
-<div class="container py-4 notifications-page">
+<div class="container py-3" style="max-width: 960px;">
     
-    <!-- Header Section -->
-    <div class="notifications-hero mb-4">
-        <div class="notifications-hero-icon"><i class="bi bi-bell-fill"></i></div>
-        <div>
-            <span>مركز التنبيهات</span>
-            <h2 class="mb-0 fw-bold">الإشعارات</h2>
+    <!-- Hero Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 p-4 rounded-4 mb-4"
+         style="background: var(--primary-gradient); color: #ffffff; box-shadow: var(--shadow-md);">
+        <div class="d-flex align-items-center gap-3">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-3 bg-white bg-opacity-20 p-3" style="font-size: 2rem;">
+                <i class="bi bi-bell-fill"></i>
+            </div>
+            <div>
+                <span class="badge bg-warning text-dark fw-bold mb-1">{{ 'Notifications Hub' if is_english else 'مركز التنبيهات' }}</span>
+                <h1 class="h4 mb-0 fw-bold text-white">{{ 'System & Fault Alerts' if is_english else 'تنبيهات البلاغات والنظام' }}</h1>
+            </div>
         </div>
-        <a href="{{ url_for('user_dashboard' if session.get('user_role') == 'user' else 'dashboard') }}" class="btn btn-outline-secondary rounded-pill">
-            <i class="bi bi-arrow-right me-1"></i> رجوع للوحة
-        </a>
+        <div>
+            <a href="{{ url_for('user_dashboard' if session.get('user_role') == 'user' else 'dashboard') }}" class="btn btn-outline-light rounded-pill px-4 fw-bold">
+                <i class="bi bi-arrow-right me-1"></i> {{ 'Back to Dashboard' if is_english else 'العودة للوحة' }}
+            </a>
+        </div>
     </div>
 
-    <!-- Controls Section -->
-    <div class="notifications-toolbar d-flex justify-content-between align-items-center mb-4">
-        <div class="d-flex align-items-center">
+    <!-- Controls Bar -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 p-3 rounded-3 bg-white border shadow-sm">
+        <div class="d-flex align-items-center gap-2">
             <span class="badge bg-primary rounded-pill px-3 py-2 fs-6">
-                {{ notifications|length }} إشعارات
+                <i class="bi bi-bell me-1"></i> {{ notifications|length }} {{ 'Notifications' if is_english else 'إشعارات' }}
             </span>
         </div>
-        <button id="markAllReadButton" onclick="markAllReadPage()" class="btn btn-primary rounded-pill px-4">
-            <i class="bi bi-check2-all me-1"></i> تحديد الكل كمقروء
-        </button>
+        
+        {% if notifications %}
+        <div>
+            <button id="markAllReadButton" onclick="markAllReadPage()" class="btn btn-primary rounded-pill px-4 fw-bold">
+                <i class="bi bi-check2-all me-1"></i> {{ 'Mark All as Read' if is_english else 'تحديد الكل كمقروء' }}
+            </button>
+        </div>
+        {% endif %}
     </div>
 
     <!-- Notifications List -->
     {% if notifications %}
-        <div id="notificationsList" class="notifications-list">
+        <div class="d-flex flex-column gap-3 mb-4">
             {% for notif in notifications %}
-            <div class="notification-item {% if notif.is_read %}is-read{% else %}is-unread{% endif %}">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div class="me-auto">
-                        <div class="notification-message fw-bold mb-2">
-                            {{ notif.message }}
+            <div class="card border-0 rounded-4 shadow-sm p-3 p-md-4 transition-card {% if not notif.is_read %}border-start border-4 border-primary bg-primary bg-opacity-10{% else %}bg-white{% endif %}">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-3">
+                    <div class="d-flex align-items-start gap-3 flex-grow-1">
+                        <div class="rounded-circle p-2 d-inline-flex align-items-center justify-content-center {% if not notif.is_read %}bg-primary text-white{% else %}bg-light text-muted{% endif %}" style="width: 42px; height: 42px; font-size: 18px; flex-shrink: 0;">
+                            <i class="bi {% if not notif.is_read %}bi-bell-fill{% else %}bi-bell{% endif %}"></i>
                         </div>
-                        <div class="text-muted">
-                            <i class="bi bi-ticket-detailed me-1"></i> البلاغ: 
-                            <a href="{{ url_for('fault_details', id=notif.fault_id) }}" class="text-primary text-decoration-none fw-bold">#{{ notif.fault_id }}</a>
+                        <div>
+                            <p class="fw-bold mb-1 fs-6 text-dark">{{ notif.message }}</p>
+                            <div class="d-flex flex-wrap align-items-center gap-3 text-muted small mt-2">
+                                {% if notif.fault_id %}
+                                <a href="{{ url_for('fault_details', id=notif.fault_id) }}" class="badge bg-primary text-white text-decoration-none">
+                                    <i class="bi bi-ticket-detailed me-1"></i> {{ 'Fault' if is_english else 'البلاغ' }} #{{ notif.fault_id }}
+                                </a>
+                                {% endif %}
+                                <span dir="ltr"><i class="bi bi-clock me-1"></i> {{ notif.created_at.strftime('%Y-%m-%d %H:%M') if notif.created_at else '' }}</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="text-end ms-3">
-                        <small class="notification-time d-block mb-2">
-                            <i class="bi bi-clock me-1"></i> {{ notif.created_at.strftime('%Y-%m-%d %H:%M') if notif.created_at else '' }}
-                        </small>
-                        {% if notif.is_read %}
-                            <span class="notification-status status-read"><i class="bi bi-check-lg me-1"></i> مقروء</span>
-                        {% else %}
-                            <span class="notification-status status-new"><i class="bi bi-asterisk me-1"></i> جديد</span>
+
+                    <div class="d-flex align-items-center gap-2 align-self-end align-self-sm-center">
+                        {% if notif.fault_id %}
+                        <a href="{{ url_for('fault_details', id=notif.fault_id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            <i class="bi bi-arrow-left me-1"></i> {{ 'View' if is_english else 'عرض' }}
+                        </a>
                         {% endif %}
                     </div>
                 </div>
@@ -60,27 +77,25 @@
         </div>
     {% else %}
         <!-- Empty State -->
-        <div class="text-center py-5 bg-white rounded-3 shadow-sm border border-dashed">
-            <i class="bi bi-inbox text-muted" style="font-size: 5rem;"></i>
-            <h3 class="text-secondary mt-3">لا توجد إشعارات</h3>
-            <p class="text-muted mb-0">سوف تظهر الإشعارات هنا عند إضافة أعطال جديدة أو حدوث تحديثات بالنظام.</p>
+        <div class="card border-0 rounded-4 shadow-sm p-5 text-center bg-white my-4">
+            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mx-auto mb-3 text-muted" style="width: 90px; height: 90px; font-size: 3rem;">
+                <i class="bi bi-bell-slash"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-1">{{ 'No notifications available' if is_english else 'لا توجد أي إشعارات حالياً' }}</h5>
+            <p class="text-muted small mb-0">{{ 'You will be notified here whenever new faults, updates, or messages arrive.' if is_english else 'ستتلقى تنبيهات فورية هنا عند تقديم بلاغات جديدة أو تحديث حالات الصيانة أو استلام رسائل.' }}</p>
         </div>
     {% endif %}
 
-    <!-- Footer Actions -->
-    <div class="mt-4 text-center">
-        <a href="{{ url_for('my_faults' if session.get('user_role') == 'user' else 'view_faults') }}" class="btn btn-outline-primary rounded-pill px-4">
-            <i class="bi bi-card-list me-1"></i> عرض كل الأعطال
-        </a>
-    </div>
 </div>
 
 <script>
 function markAllReadPage() {
     const button = document.getElementById('markAllReadButton');
     const csrfToken = {{ csrf_token()|tojson }};
-    button.disabled = true;
-    button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span> جارٍ التحديث...';
+    if (button) {
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> {{ "Updating..." if is_english else "جارٍ التحديث..." }}';
+    }
 
     fetch('{{ url_for("notif_mark_read") }}', {
         method: 'POST',
@@ -92,145 +107,13 @@ function markAllReadPage() {
     .then(res => res.json())
     .then(data => {
         if(data.success) {
-            showToast('تم تحديث جميع الإشعارات كمقروءة', 'success');
-            document.querySelectorAll('.notification-item.is-unread').forEach((item) => {
-                item.classList.remove('is-unread');
-                item.classList.add('is-read');
-                const status = item.querySelector('.notification-status');
-                if (status) {
-                    status.className = 'notification-status status-read';
-                    status.innerHTML = '<i class="bi bi-check-lg me-1"></i> مقروء';
-                }
-            });
-            button.innerHTML = '<i class="bi bi-check2-all me-1"></i> تم تحديد الكل';
-        } else {
-            showToast('حدث خطأ: ' + data.message, 'danger');
-            button.disabled = false;
-            button.innerHTML = '<i class="bi bi-check2-all me-1"></i> تحديد الكل كمقروء';
+            showToast('{{ "All notifications marked as read" if is_english else "تم تحديد جميع الإشعارات كمقروءة" }}', 'success');
+            setTimeout(() => location.reload(), 800);
         }
     })
     .catch(() => {
-        showToast('تعذر تحديث الإشعارات حالياً', 'danger');
-        button.disabled = false;
-        button.innerHTML = '<i class="bi bi-check2-all me-1"></i> تحديد الكل كمقروء';
+        if (button) button.disabled = false;
     });
 }
 </script>
-
-<style>
-.notifications-page {
-    max-width: 860px;
-}
-.notifications-hero {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 22px 26px;
-    color: #ffffff;
-    background: linear-gradient(135deg, #172554, #1d4ed8 58%, #2563eb);
-    border-radius: 20px;
-    box-shadow: 0 12px 28px rgba(30, 64, 175, 0.18);
-}
-.notifications-hero > span,
-.notifications-hero div > span {
-    display: block;
-    color: #bfdbfe;
-    font-size: 0.78rem;
-    font-weight: 700;
-}
-.notifications-hero .btn {
-    margin-right: auto;
-    color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.55);
-}
-.notifications-hero-icon {
-    display: grid;
-    place-items: center;
-    width: 52px;
-    height: 52px;
-    color: #dbeafe;
-    background: rgba(255, 255, 255, 0.16);
-    border: 1px solid rgba(255, 255, 255, 0.28);
-    border-radius: 15px;
-    font-size: 1.45rem;
-}
-.notifications-toolbar {
-    padding: 14px 16px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
-}
-.notifications-list {
-    display: grid;
-    gap: 12px;
-}
-.notification-item {
-    padding: 20px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-right: 5px solid #2563eb;
-    border-radius: 14px;
-    box-shadow: 0 7px 18px rgba(15, 23, 42, 0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.notification-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.1);
-}
-.notification-item.is-read {
-    border-right-color: #94a3b8;
-    background: #f8fafc;
-}
-.notification-message {
-    color: #1e293b;
-}
-.is-read .notification-message {
-    color: #64748b;
-}
-.notification-time {
-    color: #64748b;
-}
-.notification-status {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 999px;
-    font-size: 0.76rem;
-    font-weight: 700;
-}
-.status-new {
-    color: #1d4ed8;
-    background: #dbeafe;
-}
-.status-read {
-    color: #475569;
-    background: #e2e8f0;
-}
-.border-dashed {
-    border-style: dashed !important;
-    border-width: 2px !important;
-    border-color: #dee2e6 !important;
-}
-@media (max-width: 767.98px) {
-    .notifications-hero {
-        padding: 18px;
-        flex-wrap: wrap;
-    }
-    .notifications-hero .btn {
-        width: 100%;
-        margin-top: 6px;
-    }
-    .notifications-toolbar {
-        gap: 10px;
-        align-items: stretch !important;
-        flex-direction: column;
-    }
-    .notifications-toolbar .btn {
-        width: 100%;
-    }
-    .notification-item {
-        padding: 16px;
-    }
-}
-</style>
 {% endblock %}

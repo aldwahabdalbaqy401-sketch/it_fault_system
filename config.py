@@ -28,7 +28,7 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.getenv('MAIL_USERNAME', '')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', '')
-    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', MAIL_USERNAME)
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER') or os.getenv('MAIL_USERNAME') or 'noreply@whitenile.edu.sd'
 
     # ===== اسم المشروع =====
     APP_NAME    = 'نظام إدارة وتتبع الأعطال التقنية – بالتطبيق على جامعة النيل الأبيض'

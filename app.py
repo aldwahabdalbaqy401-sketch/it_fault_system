@@ -141,30 +141,32 @@ def get_cursor(conn):
 # ========== دالة إرسال الإشعار الداخلي ==========
 def send_notification(title, description):
     try:
+        sender = app.config.get('MAIL_DEFAULT_SENDER') or 'noreply@whitenile.edu.sd'
         msg = Message(
             subject=f'🔔 عطل جديد: {title}',
+            sender=sender,
             recipients=['admin@example.com'],
             body=f'تم إضافة عطل جديد:\n\nالعنوان: {title}\nالوصف: {description}'
         )
         mail.send(msg)
-        print("✅ تم إرسال الإشعار")
     except Exception as e:
-        print(f"❌ فشل إرسال البريد: {e}")
+        print(f"Notification send info: {e}")
 
 # ========== دالة إرسال الإشعار الإلكتروني ==========
 def send_email_notification(recipient, subject, body):
     if not recipient:
         return
     try:
+        sender = app.config.get('MAIL_DEFAULT_SENDER') or 'noreply@whitenile.edu.sd'
         msg = Message(
             subject=subject,
+            sender=sender,
             recipients=[recipient],
             body=body
         )
         mail.send(msg)
-        print(f"✅ تم إرسال الإيميل إلى {recipient}")
     except Exception as e:
-        print(f"❌ فشل إرسال الإيميل: {e}")
+        print(f"Email send info: {e}")
 
 # ========== دوال مساعدة لجلب البريد الإلكتروني ==========
 def get_user_email(user_id):
@@ -1158,35 +1160,68 @@ def technician_support():
     
     cursor = conn.cursor()
     
-    if session['user_role'] in ['admin', 'supervisor']:
-        cursor.execute(
-            '''SELECT f.*, u.full_name as technician_name 
-            FROM faults f
-            LEFT JOIN users u ON f.assigned_to = u.id
-            WHERE f.assigned_to IS NOT NULL
-            ORDER BY f.id DESC'''
-        )
-    else:
-        cursor.execute(
-            '''SELECT f.*, u.full_name as technician_name 
-            FROM faults f
-            LEFT JOIN users u ON f.assigned_to = u.id
-            WHERE f.assigned_to = %s
-            ORDER BY f.id DESC''',
-            (session['user_id'],)
-        )
+    # Filter by technician if admin/supervisor selected one
+    tech_filter = request.args.get('tech_id')
+    status_filter = request.args.get('status')
     
+    query_conditions = []
+    query_params = []
+    
+    if session['user_role'] in ['admin', 'supervisor']:
+        if tech_filter and tech_filter.isdigit():
+            query_conditions.append('f.assigned_to = %s')
+            query_params.append(int(tech_filter))
+        else:
+            query_conditions.append('f.assigned_to IS NOT NULL')
+    else:
+        query_conditions.append('f.assigned_to = %s')
+        query_params.append(session['user_id'])
+        
+    if status_filter and status_filter in ['new', 'in_progress', 'resolved', 'closed']:
+        query_conditions.append('f.status = %s')
+        query_params.append(status_filter)
+        
+    where_clause = " WHERE " + " AND ".join(query_conditions) if query_conditions else ""
+    
+    cursor.execute(
+        f'''SELECT f.*, u.full_name as technician_name, u.username as technician_username,
+                  reporter.full_name as reporter_name, reporter.phone as reporter_phone
+        FROM faults f
+        LEFT JOIN users u ON f.assigned_to = u.id
+        LEFT JOIN users reporter ON f.user_id = reporter.id
+        {where_clause}
+        ORDER BY f.id DESC''',
+        tuple(query_params)
+    )
     assigned_faults = cursor.fetchall()
     
-    cursor.execute('SELECT COUNT(*) as total FROM faults WHERE assigned_to IS NOT NULL')
-    total_assigned = cursor.fetchone()['total']
-    
-    cursor.execute("SELECT COUNT(*) as pending FROM faults WHERE assigned_to IS NOT NULL AND status IN ('new', 'in_progress')")
-    pending_assigned = cursor.fetchone()['pending']
-    
-    cursor.execute("SELECT COUNT(*) as resolved FROM faults WHERE assigned_to IS NOT NULL AND status = 'resolved'")
-    resolved_assigned = cursor.fetchone()['resolved']
-    
+    # Calculate stats according to view perspective (individual technician or admin view)
+    if session['user_role'] in ['admin', 'supervisor'] and not tech_filter:
+        cursor.execute('SELECT COUNT(*) as total FROM faults WHERE assigned_to IS NOT NULL')
+        total_assigned = cursor.fetchone()['total'] or 0
+        
+        cursor.execute("SELECT COUNT(*) as pending FROM faults WHERE assigned_to IS NOT NULL AND status IN ('new', 'in_progress')")
+        pending_assigned = cursor.fetchone()['pending'] or 0
+        
+        cursor.execute("SELECT COUNT(*) as resolved FROM faults WHERE assigned_to IS NOT NULL AND status = 'resolved'")
+        resolved_assigned = cursor.fetchone()['resolved'] or 0
+    else:
+        target_tech_id = int(tech_filter) if (session['user_role'] in ['admin', 'supervisor'] and tech_filter and tech_filter.isdigit()) else session['user_id']
+        cursor.execute('SELECT COUNT(*) as total FROM faults WHERE assigned_to = %s', (target_tech_id,))
+        total_assigned = cursor.fetchone()['total'] or 0
+        
+        cursor.execute("SELECT COUNT(*) as pending FROM faults WHERE assigned_to = %s AND status IN ('new', 'in_progress')", (target_tech_id,))
+        pending_assigned = cursor.fetchone()['pending'] or 0
+        
+        cursor.execute("SELECT COUNT(*) as resolved FROM faults WHERE assigned_to = %s AND status = 'resolved'", (target_tech_id,))
+        resolved_assigned = cursor.fetchone()['resolved'] or 0
+
+    # Technicians list for admin filter dropdown
+    technicians_list = []
+    if session['user_role'] in ['admin', 'supervisor']:
+        cursor.execute("SELECT id, username, full_name FROM users WHERE role = 'technician' ORDER BY full_name ASC")
+        technicians_list = cursor.fetchall()
+
     cursor.close()
     conn.close()
     
@@ -1195,7 +1230,10 @@ def technician_support():
         assigned_faults=assigned_faults,
         total_assigned=total_assigned,
         pending_assigned=pending_assigned,
-        resolved_assigned=resolved_assigned
+        resolved_assigned=resolved_assigned,
+        technicians_list=technicians_list,
+        selected_tech=tech_filter or '',
+        selected_status=status_filter or ''
     )
 
 # ========== إسناد البلاغ ==========
@@ -1210,20 +1248,47 @@ def assign_fault(id):
     
     cursor = conn.cursor()
     
-    cursor.execute('SELECT * FROM faults WHERE id = %s', (id,))
+    cursor.execute('''
+        SELECT f.*, u.full_name as assigned_name, reporter.full_name as reporter_name
+        FROM faults f
+        LEFT JOIN users u ON f.assigned_to = u.id
+        LEFT JOIN users reporter ON f.user_id = reporter.id
+        WHERE f.id = %s
+    ''', (id,))
     fault = cursor.fetchone()
     
     if not fault:
         flash('البلاغ غير موجود', 'danger')
+        cursor.close()
+        conn.close()
         return redirect(url_for('view_faults'))
     
-    cursor.execute("SELECT id, username, full_name FROM users WHERE role = 'technician'")
+    # Query all technicians with their current active fault load
+    cursor.execute("""
+        SELECT u.id, u.username, u.full_name, u.email, u.phone, u.department,
+               COUNT(CASE WHEN f.status IN ('new', 'in_progress') THEN 1 END) as active_faults_count
+        FROM users u
+        LEFT JOIN faults f ON u.id = f.assigned_to
+        WHERE u.role = 'technician'
+        GROUP BY u.id, u.username, u.full_name, u.email, u.phone, u.department
+        ORDER BY active_faults_count ASC, u.full_name ASC
+    """)
     technicians = cursor.fetchall()
     
     if request.method == 'POST':
         assigned_to = request.form.get('assigned_to')
+        assign_note = request.form.get('assign_note', '').strip()
         
-        if assigned_to:
+        if assigned_to == 'unassign':
+            cursor.execute(
+                'UPDATE faults SET assigned_to = NULL WHERE id = %s',
+                (id,)
+            )
+            conn.commit()
+            log_activity('إلغاء إسناد بلاغ', f'ID: {id}')
+            flash('ℹ️ تم إلغاء إسناد البلاغ بنجاح', 'info')
+        elif assigned_to and assigned_to.isdigit():
+            assigned_to = int(assigned_to)
             cursor.execute(
                 'UPDATE faults SET assigned_to = %s WHERE id = %s',
                 (assigned_to, id)
@@ -1232,11 +1297,12 @@ def assign_fault(id):
             log_activity('إسناد بلاغ', f'ID: {id} إلى فني ID: {assigned_to}')
             
             # ===== إشعارات عند الإسناد =====
-            add_notification(
-                fault['user_id'],
-                id,
-                f"🔧 تم إسناد البلاغ إلى فني"
-            )
+            if fault.get('user_id'):
+                add_notification(
+                    fault['user_id'],
+                    id,
+                    f"🔧 تم إسناد بلاغك إلى أحد فنيي الدعم"
+                )
             add_notification(
                 assigned_to,
                 id,
@@ -1245,18 +1311,25 @@ def assign_fault(id):
             
             tech_email = get_user_email(assigned_to)
             if tech_email:
+                note_text = f"\nملاحظات المشرف: {assign_note}" if assign_note else ""
                 send_email_notification(
                     recipient=tech_email,
-                    subject=f'🔧 تم إسناد بلاغ إليك',
-                    body=f'تم إسناد البلاغ "{fault["title"]}" إليك.\n\nالوصف: {fault["description"]}'
+                    subject=f'🔧 تم إسناد بلاغ إليك - {fault["title"]}',
+                    body=f'تم إسناد البلاغ "{fault["title"]}" إليك.\n\nالوصف: {fault["description"]}{note_text}'
                 )
             
-            flash('✅ تم إسناد البلاغ بنجاح', 'success')
+            flash('✅ تم إسناد البلاغ للفني بنجاح', 'success')
         else:
-            flash('الرجاء اختيار فني', 'danger')
+            flash('الرجاء اختيار فني صالح', 'danger')
+            cursor.close()
+            conn.close()
+            return render_template('assign_fault.html', fault=fault, technicians=technicians)
         
         cursor.close()
         conn.close()
+        next_page = request.args.get('next')
+        if next_page == 'technician_support':
+            return redirect(url_for('technician_support'))
         return redirect(url_for('view_faults'))
     
     cursor.close()
@@ -1268,7 +1341,7 @@ def assign_fault(id):
 
 @app.route('/receive_fault/<int:id>', methods=['POST'])
 @login_required
-@role_required(['technician'])
+@role_required(['technician', 'admin', 'supervisor'])
 def receive_fault(id):
     conn = get_db_connection()
     if not conn:
@@ -1276,21 +1349,28 @@ def receive_fault(id):
         return redirect(url_for('technician_support'))
     
     cursor = conn.cursor()
-    cursor.execute(
-        "UPDATE faults SET status = 'in_progress', received_at = NOW() WHERE id = %s AND assigned_to = %s",
-        (id, session['user_id'])
-    )
+    # If admin/supervisor, they can receive for the assigned technician or auto-assign to themselves if not assigned
+    if session['user_role'] in ['admin', 'supervisor']:
+        cursor.execute(
+            "UPDATE faults SET status = 'in_progress', received_at = NOW() WHERE id = %s",
+            (id,)
+        )
+    else:
+        cursor.execute(
+            "UPDATE faults SET status = 'in_progress', received_at = NOW() WHERE id = %s AND assigned_to = %s",
+            (id, session['user_id'])
+        )
     conn.commit()
     cursor.close()
     conn.close()
     
     log_activity('استلام بلاغ', f'ID: {id}')
     flash('✅ تم استلام البلاغ بنجاح، جاري العمل عليه', 'success')
-    return redirect(url_for('technician_support'))
+    return redirect(request.referrer or url_for('technician_support'))
 
 @app.route('/start_fault/<int:id>', methods=['POST'])
 @login_required
-@role_required(['technician'])
+@role_required(['technician', 'admin', 'supervisor'])
 def start_fault(id):
     conn = get_db_connection()
     if not conn:
@@ -1298,35 +1378,40 @@ def start_fault(id):
         return redirect(url_for('technician_support'))
     
     cursor = conn.cursor()
-    cursor.execute(
-        "UPDATE faults SET status = 'in_progress', started_at = NOW() WHERE id = %s AND assigned_to = %s",
-        (id, session['user_id'])
-    )
+    if session['user_role'] in ['admin', 'supervisor']:
+        cursor.execute(
+            "UPDATE faults SET status = 'in_progress', started_at = NOW() WHERE id = %s",
+            (id,)
+        )
+    else:
+        cursor.execute(
+            "UPDATE faults SET status = 'in_progress', started_at = NOW() WHERE id = %s AND assigned_to = %s",
+            (id, session['user_id'])
+        )
     conn.commit()
     cursor.close()
     conn.close()
     
     log_activity('بدء حل البلاغ', f'ID: {id}')
-    flash('⏳ جاري حل المشكلة...', 'info')
-    return redirect(url_for('technician_support'))
+    flash('⏳ جاري العمل على حل المشكلة...', 'info')
+    return redirect(request.referrer or url_for('technician_support'))
 
 @app.route('/resolve_fault/<int:id>', methods=['GET', 'POST'])
 @login_required
-@role_required(['technician'])
+@role_required(['technician', 'admin', 'supervisor'])
 def resolve_fault(id):
     conn = get_db_connection()
     if not conn:
         flash('مشكلة في الاتصال بقاعدة البيانات', 'danger')
         return redirect(url_for('technician_support'))
     
-    # ===== جلب بيانات العطل أولاً =====
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM faults WHERE id = %s', (id,))
     fault = cursor.fetchone()
     
     try:
         cursor.fetchall()
-    except:
+    except Exception:
         pass
     cursor.close()
     
@@ -1336,12 +1421,19 @@ def resolve_fault(id):
         return redirect(url_for('technician_support'))
     
     if request.method == 'POST':
-        notes = request.form.get('technician_notes', '')
+        notes = request.form.get('technician_notes', '').strip()
         cursor = conn.cursor()
-        cursor.execute(
-            "UPDATE faults SET status = 'resolved', completed_at = NOW(), technician_notes = %s WHERE id = %s AND assigned_to = %s",
-            (notes, id, session['user_id'])
-        )
+        
+        if session['user_role'] in ['admin', 'supervisor']:
+            cursor.execute(
+                "UPDATE faults SET status = 'resolved', completed_at = NOW(), technician_notes = %s WHERE id = %s",
+                (notes, id)
+            )
+        else:
+            cursor.execute(
+                "UPDATE faults SET status = 'resolved', completed_at = NOW(), technician_notes = %s WHERE id = %s AND assigned_to = %s",
+                (notes, id, session['user_id'])
+            )
         conn.commit()
         
         # ===== إشعار عند حل العطل =====
@@ -1354,7 +1446,7 @@ def resolve_fault(id):
             
             try:
                 cursor2.fetchall()
-            except:
+            except Exception:
                 pass
             cursor2.close()
             conn2.close()
@@ -1370,7 +1462,7 @@ def resolve_fault(id):
         conn.close()
         
         log_activity('حل البلاغ', f'ID: {id}')
-        flash('✅ تم حل المشكلة بنجاح', 'success')
+        flash('✅ تم حل المشكلة بنجاح وتسجيل الملاحظات', 'success')
         return redirect(url_for('technician_support'))
     
     conn.close()
@@ -1907,7 +1999,10 @@ def page_not_found(e):
 def internal_error(e):
     import traceback
     error_details = traceback.format_exc()
-    print("🔥 500 ERROR OCCURRED:\n", error_details)
+    try:
+        print("500 ERROR OCCURRED:\n", error_details)
+    except Exception:
+        pass
     return render_template('500.html', error_details=error_details), 500
 
 @app.errorhandler(403)

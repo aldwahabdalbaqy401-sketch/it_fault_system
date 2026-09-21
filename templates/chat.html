@@ -1,74 +1,129 @@
 {% extends 'base.html' %}
 
-{% block title %}المحادثة{% endblock %}
+{% block title %}{{ 'Chat' if is_english else 'محادثة البلاغ' }} #{{ fault.id }}{% endblock %}
 
 {% block content %}
-<div class="chat-wrapper" dir="rtl" lang="ar">
-    <div class="chat-header">
-        <div>
-            <span class="chat-eyebrow"><i class="bi bi-chat-square-text"></i> قناة البلاغ</span>
-            <h2>محادثة البلاغ <span>#{{ fault.id }}</span></h2>
-            <p>{{ fault.title }}</p>
-        </div>
-        <a href="{{ url_for('fault_details', id=fault.id) }}" class="btn btn-secondary"><i class="bi bi-arrow-right"></i> رجوع</a>
-    </div>
-
-    <div class="chat-messages" id="chatMessages" aria-live="polite">
-        {% if not messages %}<div class="chat-empty"><i class="bi bi-chat-dots"></i><strong>لا توجد رسائل بعد</strong><span>ابدأ المحادثة مع الأطراف المرتبطة بهذا البلاغ.</span></div>{% endif %}
-        {% for msg in messages %}
-        <div class="message {% if msg.sender_id == session.user_id %}sent{% else %}received{% endif %}">
-            <div class="message-sender">{{ msg.sender_name }}</div>
-            <div class="message-text" dir="auto">
-                {% if msg.image %}
-                    <img src="{{ url_for('static', filename='attachments/' + msg.image) }}" 
-                         alt="صورة مرفقة" 
-                         style="max-width: 200px; max-height: 150px; border-radius: 8px; margin-top: 6px; cursor: pointer; border: 1px solid #e2e8f0;"
-                         onclick="window.open(this.src, '_blank')">
-                {% endif %}
-                <p style="margin: 4px 0 0 0;">{{ msg.message }}</p>
+<div class="container py-2" style="max-width: 900px;">
+    
+    <div class="chat-window-v2">
+        <!-- Chat Header -->
+        <div class="chat-header-v2">
+            <div class="chat-user-meta">
+                <div class="chat-avatar">
+                    <i class="bi bi-chat-text-fill"></i>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-warning text-dark fw-bold" dir="ltr">#{{ fault.id }}</span>
+                        <h6 class="mb-0 fw-bold text-white">{{ fault.title }}</h6>
+                    </div>
+                    <small class="text-white text-opacity-75">
+                        <i class="bi bi-person-circle me-1"></i> {{ 'Direct channel for this fault report' if is_english else 'قناة المحادثة المباشرة للبلاغ' }}
+                    </small>
+                </div>
             </div>
-            <div class="message-time">{{ msg.created_at.strftime('%H:%M') }}</div>
+            
+            <div>
+                <a href="{{ url_for('fault_details', id=fault.id) }}" class="btn btn-sm btn-outline-light rounded-pill px-3">
+                    <i class="bi bi-arrow-right me-1"></i> {{ 'Back to Fault' if is_english else 'تفاصيل البلاغ' }}
+                </a>
+            </div>
         </div>
-        {% endfor %}
+
+        <!-- Chat Messages Area -->
+        <div class="chat-messages-area" id="chatMessages" aria-live="polite">
+            {% if not messages %}
+                <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center text-muted p-4">
+                    <div class="rounded-circle bg-primary bg-opacity-10 p-3 mb-3 text-primary fs-2">
+                        <i class="bi bi-chat-dots-fill"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1">{{ 'No messages yet' if is_english else 'لا توجد رسائل سابقة' }}</h6>
+                    <p class="small text-muted mb-0">{{ 'Start the conversation with the technician or team.' if is_english else 'ابدأ المحادثة مع الفني أو مقدم البلاغ لمتابعة حالة الصيانة.' }}</p>
+                </div>
+            {% endif %}
+
+            {% for msg in messages %}
+                {% set is_me = (msg.sender_id == session.get('user_id')) %}
+                <div class="chat-bubble-wrap {% if is_me %}sent{% else %}received{% endif %}">
+                    <div class="chat-bubble {% if is_me %}sent{% else %}received{% endif %}">
+                        <div class="chat-sender-tag">
+                            <i class="bi bi-person-fill me-1"></i> {{ msg.sender_name }}
+                        </div>
+                        
+                        {% if msg.image %}
+                            <div class="my-2">
+                                <img src="{{ url_for('static', filename='attachments/' + msg.image) }}" 
+                                     alt="صورة مرفقة" 
+                                     class="rounded-3 shadow-sm img-fluid"
+                                     style="max-height: 220px; cursor: pointer; object-fit: cover;"
+                                     onclick="window.open(this.src, '_blank')">
+                            </div>
+                        {% endif %}
+
+                        <div class="text-break" dir="auto">{{ msg.message }}</div>
+                        
+                        <div class="chat-time-tag">
+                            <span>{{ msg.created_at.strftime('%H:%M') if msg.created_at else '' }}</span>
+                            {% if is_me %}<i class="bi bi-check2-all"></i>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Chat Input Footer -->
+        <div class="chat-footer-v2">
+            <form method="POST" action="{{ url_for('send_message', fault_id=fault.id) }}" enctype="multipart/form-data" id="chatMainForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="chat-form-grid mb-2">
+                    <!-- Recipient Selector -->
+                    <select name="receiver_id" required class="form-select form-select-sm" style="max-width: 260px; font-weight: 600;">
+                        <option value="">{{ 'Select Recipient...' if is_english else 'اختر المستلم...' }}</option>
+                        {% for chat_user in chat_users %}
+                            <option value="{{ chat_user.id }}" {% if loop.first and chat_users|length == 1 %}selected{% endif %}>
+                                {{ chat_user.full_name or chat_user.username }} ({{ chat_user.role }})
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    <!-- Text Message Input -->
+                    <input type="text" id="chatMessageInput" name="message" 
+                           placeholder="{{ 'Type your message here...' if is_english else 'اكتب رسالتك هنا...' }}" 
+                           class="chat-input-field" dir="auto" maxlength="2000" autocomplete="off">
+
+                    <!-- Image Attachment Button -->
+                    <label for="imageUpload" class="btn btn-secondary btn-icon m-0" title="{{ 'Attach Image' if is_english else 'إرفاق صورة' }}">
+                        <i class="bi bi-paperclip fs-5"></i>
+                        <input type="file" id="imageUpload" name="image" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                    </label>
+
+                    <!-- Send Button -->
+                    <button type="submit" class="btn btn-primary px-4 fw-bold">
+                        <i class="bi bi-send-fill me-1"></i> {{ 'Send' if is_english else 'إرسال' }}
+                    </button>
+                </div>
+
+                <!-- Attached Image Preview Pill -->
+                <div id="imagePreview" class="align-items-center gap-2 p-2 rounded-3 bg-light border mt-2" style="display: none;">
+                    <img id="previewImg" src="#" alt="معاينة" style="height: 48px; width: 48px; object-fit: cover; border-radius: 8px;">
+                    <span class="small fw-semibold text-muted flex-grow-1">{{ 'Image selected' if is_english else 'تم اختيار صورة للإرسال' }}</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeImage()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div class="chat-input">
-        <form method="POST" action="{{ url_for('send_message', fault_id=fault.id) }}" enctype="multipart/form-data" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            
-            <!-- ===== قائمة المستلمين (محدثة) ===== -->
-            <select name="receiver_id" required class="chat-recipient">
-                <option value="">اختر المستلم</option>
-                {% for chat_user in chat_users %}
-                    <option value="{{ chat_user.id }}">{{ chat_user.full_name or 'مستخدم' }} (@{{ chat_user.username }}) · {{ chat_user.role }}</option>
-                {% endfor %}
-            </select>
-            
-            <input type="text" id="chatMessageInput" name="message" placeholder="اكتب رسالتك..." class="chat-message-input" dir="auto" lang="ar" maxlength="2000">
-            
-            <!-- ===== رفع الصور ===== -->
-            <label for="imageUpload" class="chat-attach" title="إرفاق صورة">
-                <i class="bi bi-paperclip"></i> صورة
-                <input type="file" id="imageUpload" name="image" accept="image/*" style="display: none;" onchange="previewImage(this)">
-            </label>
-            
-            <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> إرسال</button>
-        </form>
-
-        <!-- ===== معاينة الصورة قبل الإرسال ===== -->
-        <div id="imagePreview" style="margin-top: 10px; display: none; align-items: center; gap: 10px;">
-            <img id="previewImg" src="#" alt="معاينة الصورة" style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 2px solid #e2e8f0;">
-            <button onclick="removeImage()" style="background: #ef4444; color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;">✕</button>
-        </div>
-    </div>
 </div>
 
 <script>
-function validateChatForm(form) {
+function validateChatForm() {
     const msg = document.getElementById('chatMessageInput').value.trim();
     const file = document.getElementById('imageUpload').files;
     if (!msg && (!file || file.length === 0)) {
-        alert(window.APP_LANGUAGE === 'en' ? 'Please enter a message or attach an image' : 'يرجى كتابة رسالة أو إرفاق صورة');
+        alert(window.APP_LANGUAGE === 'en' ? 'Please type a message or choose an image' : 'يرجى كتابة نص الرسالة أو اختيار صورة');
         return false;
     }
     return true;
@@ -92,11 +147,10 @@ function removeImage() {
     document.getElementById('imagePreview').style.display = 'none';
 }
 
-// ===== تمرير الشات للأسفل تلقائياً =====
 document.addEventListener('DOMContentLoaded', function() {
-    const chatForm = document.querySelector('.chat-input form');
+    const chatForm = document.getElementById('chatMainForm');
     if (chatForm) {
-        chatForm.onsubmit = function() { return validateChatForm(this); };
+        chatForm.onsubmit = validateChatForm;
     }
     const chatMessages = document.getElementById('chatMessages');
     if (chatMessages) {
@@ -104,91 +158,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-
-<style>
-.chat-wrapper { 
-    max-width: 800px; 
-    margin: auto; 
-}
-.chat-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; direction: rtl;
-}
-.chat-eyebrow { color: #2563eb; font-size: 12px; font-weight: 800; }
-.chat-header h2 { margin: 5px 0 2px; color: #172554; }
-.chat-header h2 span { color: #64748b; }
-.chat-header p { margin: 0; color: #64748b; }
-.chat-messages { 
-    height: 450px; 
-    overflow-y: auto; 
-    background: #f8fafc; 
-    padding: 15px; 
-    border-radius: 12px; 
-    border: 1px solid #e2e8f0;
-    direction: rtl;
-    scrollbar-color: #93c5fd #eff6ff;
-}
-.chat-empty { display: flex; height: 100%; align-items: center; justify-content: center; flex-direction: column; gap: 7px; color: #64748b; text-align: center; }
-.chat-empty i { color: #0f766e; font-size: 34px; }
-.chat-empty strong { color: #334155; }
-.message { 
-    margin-bottom: 12px; 
-    padding: 10px 14px; 
-    border-radius: 12px; 
-    max-width: 75%;
-    word-wrap: break-word;
-    overflow-wrap: anywhere;
-    unicode-bidi: plaintext;
-    line-height: 1.8;
-}
-.message.sent { 
-    background: #4a6cf7; 
-    color: white; 
-    margin-left: auto; 
-    text-align: right;
-}
-.message.received { 
-    background: white; 
-    border: 1px solid #e2e8f0; 
-    margin-right: auto; 
-}
-.message-sender { 
-    font-size: 12px; 
-    font-weight: 600; 
-    opacity: 0.7; 
-}
-.message-text img {
-    max-width: 200px;
-    max-height: 150px;
-    border-radius: 8px;
-    margin-top: 6px;
-    border: 1px solid #e2e8f0;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-.message-text img:hover {
-    transform: scale(1.02);
-}
-.message.sent .message-text img {
-    border-color: rgba(255, 255, 255, 0.3);
-}
-.message-text p {
-    margin: 4px 0 0 0;
-    white-space: pre-wrap;
-    unicode-bidi: plaintext;
-}
-.message-time { 
-    font-size: 11px; 
-    opacity: 0.6; 
-    margin-top: 4px; 
-}
-.chat-input { 
-    margin-top: 15px; 
-}
-.chat-recipient, .chat-message-input { padding: 11px 13px; border: 1px solid #cbd5e1; border-radius: 10px; font: inherit; font-family: var(--font-ui, var(--font-arabic)); direction: rtl; }
-.chat-recipient { flex: 1; min-width: 180px; background: #fff; }
-.chat-message-input { flex: 2; min-width: 180px; direction: auto; text-align: start; }
-.chat-recipient:focus, .chat-message-input:focus { outline: 0; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
-.chat-attach { cursor: pointer; background: #eff6ff; padding: 11px 15px; border-radius: 10px; display: flex; align-items: center; gap: 6px; border: 1px solid #bfdbfe; color: #1d4ed8; font-weight: 700; }
-.chat-input .btn { min-height: 44px; border-radius: 10px; font-weight: 700; }
-@media (max-width: 600px) { .chat-wrapper { padding: 0 8px; } .chat-header { align-items: flex-start; flex-direction: column; } .chat-messages { height: 55vh; padding: 10px; } .message { max-width: 90%; } .chat-input form > * { width: 100%; } }
-</style>
 {% endblock %}
