@@ -775,6 +775,63 @@ html.lang-en .dashboard-header-actions > * {
     }
 }
 
+/* ===== تحسينات إضافية لشاشات Moto 13 والشاشات المدمجة (320px - 380px) ===== */
+@media (max-width: 380px) {
+    .dashboard-page {
+        padding-left: 2px !important;
+        padding-right: 2px !important;
+        overflow-x: hidden;
+    }
+    .dashboard-header {
+        padding: 10px 10px;
+    }
+    .header-main-title {
+        font-size: 0.85rem !important;
+    }
+    .header-sub-title {
+        font-size: 0.58rem !important;
+    }
+    .dashboard-status,
+    .dashboard-role,
+    .dashboard-logout {
+        min-height: 22px;
+        padding: 1px 5px;
+        font-size: 0.55rem;
+    }
+    .dashboard-stat-card .card-body {
+        padding: 4px 2px !important;
+    }
+    .dashboard-stat-card .stat-icon-circle {
+        width: 17px;
+        height: 17px;
+        min-width: 17px;
+        font-size: 0.60rem;
+        border-radius: 4px;
+    }
+    .dashboard-stat-card .stat-count {
+        font-size: 0.88rem !important;
+    }
+    .dashboard-stat-card .stat-title {
+        font-size: 0.44rem !important;
+    }
+    .status-distribution-title,
+    .priority-distribution-title,
+    .department-distribution-title,
+    .quick-actions-title {
+        font-size: 0.60rem !important;
+    }
+    .department-list .list-group-item {
+        font-size: 0.50rem !important;
+    }
+    .quick-action-btn {
+        min-height: 34px !important;
+        font-size: 0.52rem !important;
+    }
+    .quick-action-btn i {
+        font-size: 0.72rem !important;
+    }
+}
+
 .hover-shadow:hover {
     transform: translateY(-5px);
     box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
