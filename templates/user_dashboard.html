@@ -541,21 +541,58 @@
 
 /* ===== التجاوب ===== */
 @media (max-width: 768px) {
-    .mission-card { grid-template-columns: 1fr; }
+    .user-dashboard-wrapper { padding: 12px 8px; }
+    .mission-card { grid-template-columns: 1fr; padding: 20px 16px; border-radius: 14px; }
     .mission-progress { width: 76px; height: 76px; }
     .dashboard-section-heading { align-items: flex-start; flex-direction: column; gap: 4px; }
     .user-header {
         flex-direction: column;
         align-items: flex-start;
+        padding: 16px;
+        margin-bottom: 16px;
+        border-radius: 14px;
     }
     .user-info-header {
         flex-wrap: wrap;
+        gap: 8px;
     }
     .mission-stats {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+    }
+    .mission-stats .stat-item {
+        padding: 8px 6px;
+        border-radius: 10px;
+    }
+    .mission-stats .stat-number {
+        font-size: 1.25rem;
+    }
+    .mission-stats .stat-label {
+        font-size: 11px;
+    }
+    .mission-stats .stat-item > i {
+        font-size: 16px;
     }
     .user-actions-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+    .action-card {
+        padding: 14px 12px;
+        border-radius: 10px;
+        gap: 10px;
+    }
+    .action-card .action-icon {
+        font-size: 1.25rem;
+    }
+    .action-info h3 {
+        font-size: 13.5px;
+        margin-bottom: 2px;
+    }
+    .action-info p {
+        font-size: 11px;
+        line-height: 1.3;
     }
     .guide-steps {
         grid-template-columns: 1fr;
@@ -563,24 +600,21 @@
 }
 
 @media (max-width: 480px) {
-    .mission-stats {
-        grid-template-columns: 1fr;
-    }
     .user-header {
-        padding: 16px 20px;
+        padding: 14px 16px;
     }
     .user-welcome { align-items: flex-start; }
-    .user-avatar { width: 44px; height: 44px; font-size: 20px; }
-    .user-welcome h1 { font-size: 20px; }
-    .user-info-header { flex-direction: column; align-items: flex-start; gap: 8px; }
-    .action-card {
-        padding: 16px 20px;
-    }
+    .user-avatar { width: 40px; height: 40px; font-size: 18px; border-radius: 10px; }
+    .user-welcome h1 { font-size: 18px; }
+    .user-info-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .mission-card h2 { font-size: 17px; }
+    .mission-card p { font-size: 13px; margin-bottom: 10px; }
+    .action-card .action-arrow { display: none; }
     .progress-summary-heading,
     .progress-summary-details {
         align-items: flex-start;
         flex-direction: column;
-        gap: 5px;
+        gap: 4px;
     }
 }
 </style>
