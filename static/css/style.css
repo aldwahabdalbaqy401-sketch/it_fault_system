@@ -797,9 +797,15 @@ a:hover {
    ============================================================ */
 
 /* الشاشات المتوسطة والأجهزة اللوحية (Tablets - max 991px) */
+/* ============================================================
+   ===== قواعد التجاوب الشاملة (Universal Responsive Design) =====
+   ============================================================ */
+
+/* شاشات الأجهزة اللوحية (Tablets - 768px to 991.98px) */
 @media (max-width: 991.98px) {
-    .container {
-        padding: 0 12px;
+    .container, .container-fluid {
+        padding-left: 16px;
+        padding-right: 16px;
     }
     
     .fault-stepper::before {
@@ -818,18 +824,78 @@ a:hover {
     }
 
     .chat-window-v2 {
-        height: calc(100vh - 140px);
+        height: calc(100vh - 150px);
+    }
+
+    .table-responsive {
+        border-radius: var(--radius);
+        -webkit-overflow-scrolling: touch;
     }
 }
 
-/* شاشات الهواتف الذكية (Mobile - max 767px) */
+/* شاشات الهواتف الذكية (Mobile - max 767.98px) */
 @media (max-width: 767.98px) {
+    html {
+        font-size: 15px;
+    }
+
     body {
-        font-size: 0.88rem;
-        padding-bottom: 78px !important; /* مساحة للشريط السفلي */
+        font-size: 0.90rem;
+        padding-bottom: 85px !important; /* مساحة آمنة للشريط السفلي */
         -webkit-tap-highlight-color: transparent;
     }
 
+    .main-content-area {
+        padding-bottom: 85px !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .container, .container-fluid {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .card {
+        border-radius: 14px;
+        margin-bottom: 14px;
+    }
+
+    .card-body {
+        padding: 16px 14px;
+    }
+
+    .card-header {
+        padding: 12px 14px;
+    }
+
+    /* أزرار لمس مريحة ومطابقة للمعايير */
+    .btn {
+        min-height: 42px;
+        padding: 8px 16px;
+        font-size: 0.88rem;
+        border-radius: 10px;
+    }
+
+    .btn-sm {
+        min-height: 36px;
+        padding: 6px 12px;
+        font-size: 0.82rem;
+    }
+
+    /* حقول النماذج على الهاتف */
+    .form-control, .form-select {
+        min-height: 46px;
+        font-size: 0.92rem;
+        border-radius: 10px;
+    }
+
+    .form-control-lg, .form-select-lg {
+        min-height: 50px;
+        font-size: 1rem;
+    }
+
+    /* خط زمني عمودي للأعطال */
     .fault-stepper {
         flex-direction: column;
         align-items: flex-start;
@@ -879,40 +945,108 @@ a:hover {
         font-size: 1.5rem;
     }
 
+    /* الشات على الهاتف */
     .chat-bubble-wrap {
-        max-width: 88%;
+        max-width: 90%;
+    }
+
+    .chat-bubble {
+        padding: 10px 14px;
+        font-size: 0.90rem;
     }
 
     .chat-form-grid {
-        flex-wrap: wrap;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
     }
 
     .chat-form-grid select {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .chat-input-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
         width: 100%;
     }
 
-    .btn {
-        padding: 7px 14px;
-        font-size: 0.82rem;
+    .chat-input-row .chat-input-field {
+        flex: 1;
+        min-height: 44px;
+    }
+
+    /* الجداول التفاعلية */
+    .table-responsive {
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        box-shadow: none;
+    }
+
+    .table th, .table td {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    /* النوافذ المنبثقة */
+    .modal-dialog {
+        margin: 10px;
+        max-width: calc(100% - 20px);
     }
 }
 
-/* شاشات الهواتف الصغيرة جداً (Small Mobile - max 480px) */
+/* شاشات الهواتف الصغيرة (Small Mobile - max 480px) */
 @media (max-width: 480px) {
-    .container {
-        padding: 0 8px;
+    html {
+        font-size: 14px;
     }
 
-    .navbar-brand img {
-        height: 42px !important;
+    .container, .container-fluid {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
     }
 
-    .navbar-brand span {
-        font-size: 14px !important;
+    .navbar-brand-text {
+        max-width: 160px;
+    }
+
+    .brand-uni-name {
+        font-size: 9px !important;
+    }
+
+    .brand-app-title {
+        font-size: 12px !important;
     }
 
     .card-body {
-        padding: 16px 12px;
+        padding: 14px 10px;
+    }
+
+    .btn {
+        padding: 6px 12px;
+        font-size: 0.84rem;
+    }
+}
+
+/* شاشات الهواتف المدمجة والضيقة جداً (320px - 380px) */
+@media (max-width: 380px) {
+    .brand-uni-name {
+        display: none !important;
+    }
+
+    .navbar-brand-text {
+        max-width: 130px;
+    }
+
+    .brand-app-title {
+        font-size: 11px !important;
+    }
+
+    .card-body {
+        padding: 12px 8px;
     }
 }
 

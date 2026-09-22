@@ -49,18 +49,18 @@
     </div>
     {% endif %}
 
-    <!-- Stats Cards (4 Horizontal Cards in 1 Row) -->
-    <div class="row g-1 g-sm-2 g-md-3 g-xl-4 mb-2 mb-md-3 dashboard-stats">
-        <div class="col-3">
+    <!-- Stats Cards (2x2 Grid on Mobile, 4-in-a-row on Desktop) -->
+    <div class="row g-2 g-md-3 g-xl-4 mb-3 dashboard-stats">
+        <div class="col-6 col-md-6 col-lg-3">
             <a href="{{ url_for('view_faults') }}" class="text-decoration-none">
-                <div class="card dashboard-stat-card stat-blue shadow-sm h-100 border-0 rounded-3 hover-shadow transition-all">
-                    <div class="card-body">
-                        <div class="stat-card-inner">
+                <div class="card dashboard-stat-card stat-blue shadow-sm h-100 border-0 rounded-4 hover-shadow transition-all">
+                    <div class="card-body p-3 p-md-4">
+                        <div class="stat-card-inner d-flex justify-content-between align-items-center">
                             <div class="stat-info">
                                 <h3 class="fw-bold mb-0 text-dark stat-count">{{ total_faults or 0 }}</h3>
-                                <p class="text-muted mb-0 stat-title">إجمالي الأعطال</p>
+                                <p class="text-muted mb-0 stat-title">{{ 'Total Faults' if is_english else 'إجمالي الأعطال' }}</p>
                             </div>
-                            <div class="rounded-circle bg-primary bg-opacity-10 stat-icon-circle">
+                            <div class="rounded-3 bg-primary bg-opacity-10 stat-icon-circle d-flex align-items-center justify-content-center">
                                 <i class="bi bi-ticket-detailed text-primary"></i>
                             </div>
                         </div>
@@ -68,16 +68,16 @@
                 </div>
             </a>
         </div>
-        <div class="col-3">
+        <div class="col-6 col-md-6 col-lg-3">
             <a href="{{ url_for('view_faults') }}?status=in_progress" class="text-decoration-none">
-                <div class="card dashboard-stat-card stat-yellow shadow-sm h-100 border-0 rounded-3 hover-shadow transition-all">
-                    <div class="card-body">
-                        <div class="stat-card-inner">
+                <div class="card dashboard-stat-card stat-yellow shadow-sm h-100 border-0 rounded-4 hover-shadow transition-all">
+                    <div class="card-body p-3 p-md-4">
+                        <div class="stat-card-inner d-flex justify-content-between align-items-center">
                             <div class="stat-info">
                                 <h3 class="fw-bold mb-0 text-dark stat-count">{{ pending_faults or 0 }}</h3>
-                                <p class="text-muted mb-0 stat-title">قيد المعالجة</p>
+                                <p class="text-muted mb-0 stat-title">{{ 'In Progress' if is_english else 'قيد المعالجة' }}</p>
                             </div>
-                            <div class="rounded-circle bg-warning bg-opacity-10 stat-icon-circle">
+                            <div class="rounded-3 bg-warning bg-opacity-10 stat-icon-circle d-flex align-items-center justify-content-center">
                                 <i class="bi bi-arrow-repeat text-warning"></i>
                             </div>
                         </div>
@@ -85,16 +85,16 @@
                 </div>
             </a>
         </div>
-        <div class="col-3">
+        <div class="col-6 col-md-6 col-lg-3">
             <a href="{{ url_for('view_faults') }}?status=resolved" class="text-decoration-none">
-                <div class="card dashboard-stat-card stat-green shadow-sm h-100 border-0 rounded-3 hover-shadow transition-all">
-                    <div class="card-body">
-                        <div class="stat-card-inner">
+                <div class="card dashboard-stat-card stat-green shadow-sm h-100 border-0 rounded-4 hover-shadow transition-all">
+                    <div class="card-body p-3 p-md-4">
+                        <div class="stat-card-inner d-flex justify-content-between align-items-center">
                             <div class="stat-info">
                                 <h3 class="fw-bold mb-0 text-dark stat-count">{{ resolved_faults or 0 }}</h3>
-                                <p class="text-muted mb-0 stat-title">تم حلها</p>
+                                <p class="text-muted mb-0 stat-title">{{ 'Resolved' if is_english else 'تم حلها' }}</p>
                             </div>
-                            <div class="rounded-circle bg-success bg-opacity-10 stat-icon-circle">
+                            <div class="rounded-3 bg-success bg-opacity-10 stat-icon-circle d-flex align-items-center justify-content-center">
                                 <i class="bi bi-check-circle text-success"></i>
                             </div>
                         </div>
@@ -102,16 +102,16 @@
                 </div>
             </a>
         </div>
-        <div class="col-3">
+        <div class="col-6 col-md-6 col-lg-3">
             <a href="{{ url_for('view_faults') }}?priority=critical" class="text-decoration-none">
-                <div class="card dashboard-stat-card stat-red shadow-sm h-100 border-0 rounded-3 hover-shadow transition-all">
-                    <div class="card-body">
-                        <div class="stat-card-inner">
+                <div class="card dashboard-stat-card stat-red shadow-sm h-100 border-0 rounded-4 hover-shadow transition-all">
+                    <div class="card-body p-3 p-md-4">
+                        <div class="stat-card-inner d-flex justify-content-between align-items-center">
                             <div class="stat-info">
                                 <h3 class="fw-bold mb-0 text-dark stat-count">{{ critical_faults or 0 }}</h3>
-                                <p class="text-muted mb-0 stat-title">حالات حرجة</p>
+                                <p class="text-muted mb-0 stat-title">{{ 'Critical Cases' if is_english else 'حالات حرجة' }}</p>
                             </div>
-                            <div class="rounded-circle bg-danger bg-opacity-10 stat-icon-circle">
+                            <div class="rounded-3 bg-danger bg-opacity-10 stat-icon-circle d-flex align-items-center justify-content-center">
                                 <i class="bi bi-exclamation-octagon text-danger"></i>
                             </div>
                         </div>
@@ -122,20 +122,20 @@
     </div>
 
 
-    <!-- Charts and Integration Row (Side-by-Side: 2 Columns) -->
-    <div class="row g-1 g-sm-2 g-md-4 mb-2 mb-md-3">
-        <div class="col-6">
-            <div class="card dashboard-card shadow-sm h-100 border-0">
-                <div class="card-body status-distribution-card">
-                    <div class="status-distribution-header">
-                        <span class="status-distribution-title">توزيع الأعطال حسب الحالة</span>
+    <!-- Charts and Integration Row (Responsive Stack on Mobile, Side-by-Side on Tablet/Desktop) -->
+    <div class="row g-3 g-md-4 mb-3">
+        <div class="col-12 col-lg-6">
+            <div class="card dashboard-card shadow-sm h-100 border-0 rounded-4">
+                <div class="card-body status-distribution-card p-3 p-md-4">
+                    <div class="status-distribution-header d-flex justify-content-between align-items-center mb-3">
+                        <span class="status-distribution-title fw-bold">{{ 'Faults by Status' if is_english else 'توزيع الأعطال حسب الحالة' }}</span>
                         <span class="status-distribution-icon"><i class="bi bi-lightning-charge"></i></span>
                     </div>
 
                     <a href="{{ url_for('view_faults') }}?status=new" class="text-decoration-none d-block status-progress-row">
                         <div class="status-progress-meta">
-                            <span class="status-progress-number">جديد</span>
-                            <span class="status-progress-label"><i class="bi bi-arrow-left small opacity-50 ms-1"></i>عرض</span>
+                            <span class="status-progress-number">{{ 'New' if is_english else 'جديد' }}</span>
+                            <span class="status-progress-label"><i class="bi bi-arrow-left small opacity-50 ms-1"></i>{{ 'View' if is_english else 'عرض' }}</span>
                         </div>
                         <div class="status-progress-track">
                             <span class="status-progress-fill status-new-fill" style="width: 35%;"></span>
@@ -144,8 +144,8 @@
 
                     <a href="{{ url_for('view_faults') }}?status=in_progress" class="text-decoration-none d-block status-progress-row">
                         <div class="status-progress-meta">
-                            <span class="status-progress-number">قيد المعالجة</span>
-                            <span class="status-progress-label"><i class="bi bi-arrow-left small opacity-50 ms-1"></i>عرض</span>
+                            <span class="status-progress-number">{{ 'In Progress' if is_english else 'قيد المعالجة' }}</span>
+                            <span class="status-progress-label"><i class="bi bi-arrow-left small opacity-50 ms-1"></i>{{ 'View' if is_english else 'عرض' }}</span>
                         </div>
                         <div class="status-progress-track">
                             <span class="status-progress-fill status-pending-fill" style="width: 45%;"></span>
@@ -154,8 +154,8 @@
 
                     <a href="{{ url_for('view_faults') }}?status=closed" class="text-decoration-none d-block status-progress-row last-row">
                         <div class="status-progress-meta">
-                            <span class="status-progress-number">مغلق</span>
-                            <span class="status-progress-label"><i class="bi bi-arrow-left small opacity-50 ms-1"></i>عرض</span>
+                            <span class="status-progress-number">{{ 'Closed' if is_english else 'مغلق' }}</span>
+                            <span class="status-progress-label"><i class="bi bi-arrow-left small opacity-50 ms-1"></i>{{ 'View' if is_english else 'عرض' }}</span>
                         </div>
                         <div class="status-progress-track">
                             <span class="status-progress-fill status-closed-fill" style="width: 20%;"></span>
@@ -165,32 +165,32 @@
             </div>
         </div>
 
-        <div class="col-6">
-            <div class="card dashboard-card shadow-sm h-100 border-0">
-                <div class="card-body department-distribution-card">
-                    <div class="department-distribution-header d-flex justify-content-between align-items-center mb-2">
-                        <span class="department-distribution-title fw-bold">توزيع الأعطال حسب القسم</span>
+        <div class="col-12 col-lg-6">
+            <div class="card dashboard-card shadow-sm h-100 border-0 rounded-4">
+                <div class="card-body department-distribution-card p-3 p-md-4">
+                    <div class="department-distribution-header d-flex justify-content-between align-items-center mb-3">
+                        <span class="department-distribution-title fw-bold">{{ 'Faults by Department' if is_english else 'توزيع الأعطال حسب القسم' }}</span>
                         <span class="department-distribution-icon text-primary"><i class="bi bi-diagram-3"></i></span>
                     </div>
                     <div class="list-group list-group-flush department-list">
-                        <a href="{{ url_for('view_faults') }}?fault_type=software" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0 py-1">
-                            <span><i class="bi bi-pc-display me-1 text-primary"></i> تقنية المعلومات</span>
+                        <a href="{{ url_for('view_faults') }}?fault_type=software" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0 py-2">
+                            <span><i class="bi bi-pc-display me-2 text-primary"></i> {{ 'Information Technology' if is_english else 'تقنية المعلومات' }}</span>
                             <i class="bi bi-chevron-left text-muted small"></i>
                         </a>
-                        <a href="{{ url_for('view_faults') }}?fault_type=network" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0 py-1">
-                            <span><i class="bi bi-globe me-1 text-info"></i> الشبكات</span>
+                        <a href="{{ url_for('view_faults') }}?fault_type=network" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0 py-2">
+                            <span><i class="bi bi-globe me-2 text-info"></i> {{ 'Networks' if is_english else 'الشبكات' }}</span>
                             <i class="bi bi-chevron-left text-muted small"></i>
                         </a>
-                        <a href="{{ url_for('view_faults') }}?fault_type=hardware" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0 py-1">
-                            <span><i class="bi bi-headset me-1 text-success"></i> الدعم الفني</span>
+                        <a href="{{ url_for('view_faults') }}?fault_type=hardware" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0 py-2">
+                            <span><i class="bi bi-headset me-2 text-success"></i> {{ 'Technical Support' if is_english else 'الدعم الفني' }}</span>
                             <i class="bi bi-chevron-left text-muted small"></i>
                         </a>
-                        <a href="{{ url_for('view_faults') }}?fault_type=other" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0 py-1">
-                            <span><i class="bi bi-gear-wide-connected me-1 text-warning"></i> التشغيل</span>
+                        <a href="{{ url_for('view_faults') }}?fault_type=other" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0 py-2">
+                            <span><i class="bi bi-gear-wide-connected me-2 text-warning"></i> {{ 'Operations' if is_english else 'التشغيل' }}</span>
                             <i class="bi bi-chevron-left text-muted small"></i>
                         </a>
-                        <a href="{{ url_for('view_faults') }}?fault_type=electrical" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0 py-1">
-                            <span><i class="bi bi-wrench-adjustable me-1 text-danger"></i> الصيانة</span>
+                        <a href="{{ url_for('view_faults') }}?fault_type=electrical" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0 py-2">
+                            <span><i class="bi bi-wrench-adjustable me-2 text-danger"></i> {{ 'Maintenance' if is_english else 'الصيانة' }}</span>
                             <i class="bi bi-chevron-left text-muted small"></i>
                         </a>
                     </div>
@@ -199,20 +199,20 @@
         </div>
     </div>
 
-    <!-- Priority and Actions Row (Side-by-Side: 2 Columns) -->
-    <div class="row g-1 g-sm-2 g-md-4 mb-2 mb-md-3">
-        <div class="col-6">
-            <div class="card dashboard-card shadow-sm h-100 border-0">
-                <div class="card-body priority-distribution-card">
-                    <div class="priority-distribution-header">
-                        <span class="priority-distribution-title">الأعطال حسب الأولوية</span>
+    <!-- Priority and Actions Row (Responsive Stack on Mobile, Side-by-Side on Tablet/Desktop) -->
+    <div class="row g-3 g-md-4 mb-3">
+        <div class="col-12 col-lg-6">
+            <div class="card dashboard-card shadow-sm h-100 border-0 rounded-4">
+                <div class="card-body priority-distribution-card p-3 p-md-4">
+                    <div class="priority-distribution-header d-flex justify-content-between align-items-center mb-3">
+                        <span class="priority-distribution-title fw-bold">{{ 'Faults by Priority' if is_english else 'الأعطال حسب الأولوية' }}</span>
                         <span class="priority-distribution-icon"><i class="bi bi-sort-up"></i></span>
                     </div>
 
                     <a href="{{ url_for('view_faults') }}?priority=critical" class="text-decoration-none d-block priority-progress-row">
                         <div class="priority-progress-meta">
-                            <span class="priority-progress-number">حرج</span>
-                            <span class="priority-progress-label text-danger"><i class="bi bi-arrow-left small opacity-50 ms-1"></i>عرض</span>
+                            <span class="priority-progress-number">{{ 'Critical' if is_english else 'حرج' }}</span>
+                            <span class="priority-progress-label text-danger"><i class="bi bi-arrow-left small opacity-50 ms-1"></i>{{ 'View' if is_english else 'عرض' }}</span>
                         </div>
                         <div class="priority-progress-track">
                             <span class="priority-progress-fill priority-critical-fill" style="width: 40%;"></span>
@@ -221,8 +221,8 @@
 
                     <a href="{{ url_for('view_faults') }}?priority=high" class="text-decoration-none d-block priority-progress-row">
                         <div class="priority-progress-meta">
-                            <span class="priority-progress-number">عالي</span>
-                            <span class="priority-progress-label text-warning"><i class="bi bi-arrow-left small opacity-50 ms-1"></i>عرض</span>
+                            <span class="priority-progress-number">{{ 'High' if is_english else 'عالي' }}</span>
+                            <span class="priority-progress-label text-warning"><i class="bi bi-arrow-left small opacity-50 ms-1"></i>{{ 'View' if is_english else 'عرض' }}</span>
                         </div>
                         <div class="priority-progress-track">
                             <span class="priority-progress-fill priority-high-fill" style="width: 35%;"></span>
@@ -231,8 +231,8 @@
 
                     <a href="{{ url_for('view_faults') }}?priority=medium" class="text-decoration-none d-block priority-progress-row last-row">
                         <div class="priority-progress-meta">
-                            <span class="priority-progress-number">متوسط</span>
-                            <span class="priority-progress-label text-success"><i class="bi bi-arrow-left small opacity-50 ms-1"></i>عرض</span>
+                            <span class="priority-progress-number">{{ 'Medium' if is_english else 'متوسط' }}</span>
+                            <span class="priority-progress-label text-success"><i class="bi bi-arrow-left small opacity-50 ms-1"></i>{{ 'View' if is_english else 'عرض' }}</span>
                         </div>
                         <div class="priority-progress-track">
                             <span class="priority-progress-fill priority-medium-fill" style="width: 25%;"></span>
@@ -242,45 +242,37 @@
             </div>
         </div>
 
-        <div class="col-6">
-            <div class="card dashboard-card quick-actions-card shadow-sm h-100 border-0 bg-light">
-                <div class="card-body">
-                    <div class="quick-actions-header d-flex justify-content-between align-items-center mb-2">
-                        <span class="quick-actions-title fw-bold"><i class="bi bi-lightning-charge text-warning me-1"></i> إجراءات سريعة</span>
+        <div class="col-12 col-lg-6">
+            <div class="card dashboard-card quick-actions-card shadow-sm h-100 border-0 rounded-4 bg-light">
+                <div class="card-body p-3 p-md-4">
+                    <div class="quick-actions-header d-flex justify-content-between align-items-center mb-3">
+                        <span class="quick-actions-title fw-bold"><i class="bi bi-lightning-charge text-warning me-1"></i> {{ 'Quick Actions' if is_english else 'إجراءات سريعة' }}</span>
                     </div>
-                    <div class="row g-1 g-md-2 quick-action-grid">
+                    <div class="row g-2 g-md-3 quick-action-grid">
                         <div class="col-6">
-                            <a href="{{ url_for('add_fault') }}" class="quick-action-btn action-light w-100 text-center shadow-sm rounded-2">
-                                <i class="bi bi-plus-circle"></i>
-                                <span>إضافة عطل</span>
-                            </a>
-                        </div>
-                        <div class="col-6">
-                            <a href="{{ url_for('view_faults') }}" class="quick-action-btn action-violet w-100 text-center shadow-sm rounded-2">
-                                <i class="bi bi-card-list"></i>
-                                <span>عرض الأعطال</span>
+                            <a href="{{ url_for('add_fault') }}" class="quick-action-btn action-light w-100 text-center shadow-sm rounded-3">
+                                <i class="bi bi-plus-circle fs-4 mb-1"></i>
+                                <span>{{ 'Add Fault' if is_english else 'إضافة عطل' }}</span>
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="{{ url_for('dashboard_stats') }}" class="quick-action-btn action-cyan w-100 text-center shadow-sm rounded-2">
-                                <i class="bi bi-bar-chart-fill"></i>
-                                <span>إحصائيات</span>
+                            <a href="{{ url_for('view_faults') }}" class="quick-action-btn action-violet w-100 text-center shadow-sm rounded-3">
+                                <i class="bi bi-card-list fs-4 mb-1"></i>
+                                <span>{{ 'View Faults' if is_english else 'عرض الأعطال' }}</span>
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="{{ url_for('technician_support') }}" class="quick-action-btn action-blue w-100 text-center shadow-sm rounded-2">
-                                <i class="bi bi-headset"></i>
-                                <span>دعم الفنيين</span>
+                            <a href="{{ url_for('dashboard_stats') }}" class="quick-action-btn action-cyan w-100 text-center shadow-sm rounded-3">
+                                <i class="bi bi-bar-chart-fill fs-4 mb-1"></i>
+                                <span>{{ 'Statistics' if is_english else 'إحصائيات' }}</span>
                             </a>
                         </div>
-                        {% if session.user_role == 'admin' %}
-                        <div class="col-12">
-                            <a href="{{ url_for('admin_users') }}" class="quick-action-btn action-red w-100 text-center shadow-sm rounded-2">
-                                <i class="bi bi-people-fill ms-1"></i>
-                                <span>{{ 'Users' if is_english else 'إدارة المستخدمين' }}</span>
+                        <div class="col-6">
+                            <a href="{{ url_for('admin_users') }}" class="quick-action-btn action-blue w-100 text-center shadow-sm rounded-3">
+                                <i class="bi bi-people-fill fs-4 mb-1"></i>
+                                <span>{{ 'Users' if is_english else 'المستخدمين' }}</span>
                             </a>
                         </div>
-                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -288,8 +280,8 @@
     </div>
 
     <!-- Footer Section -->
-    <footer class="mt-3 mt-md-4 text-center text-muted border-top pt-2 pt-md-3">
-        <p class="mb-0 small"><i class="bi bi-c-circle"></i> 2026 {{ APP_NAME }} | الإصدار 2.0</p>
+    <footer class="mt-4 text-center text-muted border-top pt-3">
+        <p class="mb-0 small"><i class="bi bi-c-circle"></i> 2026 {{ APP_NAME }} | {{ 'Version 2.0' if is_english else 'الإصدار 2.0' }}</p>
     </footer>
 
 </div>
@@ -310,534 +302,188 @@
 .dashboard-header h2 {
     color: #ffffff;
 }
-.dashboard-header p {
-    color: #dbeafe !important;
-}
-.dashboard-header > .col-md-8 {
-    padding-left: 300px;
-}
-.dashboard-header .badge {
-    background: rgba(255, 255, 255, 0.16) !important;
-    border: 1px solid rgba(255, 255, 255, 0.24);
-}
-.dashboard-header .btn-outline-danger {
-    color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.55);
-}
-.dashboard-header .btn-outline-danger:hover {
-    color: #172554;
-    background: #ffffff;
-}
 .dashboard-header-actions {
     display: flex;
-    direction: ltr;
-    justify-content: flex-end;
-    align-self: flex-start;
-    margin-top: 0;
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
-}
-.dashboard-header-actions > * {
-    direction: rtl;
-}
-.dashboard-header > .col-md-4 {
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-start;
-    position: absolute;
-    top: 24px;
-    left: 28px;
-    right: auto;
-    width: auto;
-    margin: 0 !important;
-}
-html.lang-en .dashboard-header > .col-md-8 {
-    padding-left: 12px;
-    padding-right: 300px;
-}
-html.lang-en .dashboard-header > .col-md-4 {
-    left: auto;
-    right: 28px;
-}
-html.lang-en .dashboard-header-actions {
-    direction: ltr;
-}
-html.lang-en .dashboard-header-actions > * {
-    direction: ltr;
 }
 .dashboard-status,
 .dashboard-role,
 .dashboard-logout {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    min-height: 40px;
-    padding: 9px 14px;
+    gap: 6px;
+    padding: 6px 14px;
     border-radius: 999px;
-    font-size: 0.86rem;
+    font-size: 0.82rem;
     font-weight: 700;
-    white-space: nowrap;
 }
-.dashboard-status { order: 3; }
-.dashboard-role { order: 2; }
-.dashboard-logout { order: 1; }
 .dashboard-status {
-    color: #dcfce7;
-    background: rgba(22, 163, 74, 0.26);
-    border: 1px solid rgba(187, 247, 208, 0.35);
-}
-.dashboard-status i {
-    color: #86efac;
-    font-size: 0.55rem;
+    background: rgba(16, 185, 129, 0.2);
+    color: #a7f3d0;
+    border: 1px solid rgba(16, 185, 129, 0.35);
 }
 .dashboard-role {
-    color: #dbeafe;
-    background: rgba(255, 255, 255, 0.14);
-    border: 1px solid rgba(219, 234, 254, 0.28);
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
 }
 .dashboard-logout {
-    color: #ffffff;
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.35);
     text-decoration: none;
-    background: rgba(220, 38, 38, 0.82);
-    border: 1px solid rgba(254, 202, 202, 0.35);
-    transition: transform 0.2s ease, background 0.2s ease;
+    transition: all 0.2s ease;
 }
 .dashboard-logout:hover {
+    background: rgba(239, 68, 68, 0.35);
     color: #ffffff;
-    background: #dc2626;
-    transform: translateY(-2px);
 }
+
+/* Stat Cards */
 .dashboard-stat-card {
-    position: relative;
-    overflow: hidden;
-    border-radius: 16px !important;
-    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.07) !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-top: 4px solid transparent !important;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
-.dashboard-stat-card::after {
-    content: "";
-    position: absolute;
-    left: -18px;
-    bottom: -28px;
-    width: 92px;
-    height: 92px;
-    border-radius: 50%;
-    opacity: 0.1;
-    pointer-events: none;
-}
-.dashboard-stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12) !important;
-}
-.dashboard-stat-card .card-body {
-    padding: 20px 22px;
-}
-.stat-card-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-}
-.dashboard-stat-card .stat-icon-circle {
-    width: 54px;
-    height: 54px;
-    min-width: 54px;
-    display: grid;
-    place-items: center;
-    padding: 0 !important;
-    font-size: 1.55rem;
-    border-radius: 14px;
+.dashboard-stat-card.stat-blue { border-top-color: #2563eb !important; }
+.dashboard-stat-card.stat-yellow { border-top-color: #f59e0b !important; }
+.dashboard-stat-card.stat-green { border-top-color: #10b981 !important; }
+.dashboard-stat-card.stat-red { border-top-color: #ef4444 !important; }
+
+.stat-icon-circle {
+    width: 44px;
+    height: 44px;
+    font-size: 1.3rem;
 }
 .dashboard-stat-card .stat-count {
-    font-size: 1.75rem;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
+    font-size: 1.65rem;
+    font-weight: 800;
 }
 .dashboard-stat-card .stat-title {
-    font-size: 0.92rem;
-    font-weight: 600;
+    font-size: 0.85rem;
+    font-weight: 700;
 }
-.stat-blue { border-top: 4px solid #2563eb !important; }
-.stat-yellow { border-top: 4px solid #f59e0b !important; }
-.stat-green { border-top: 4px solid #16a34a !important; }
-.stat-red { border-top: 4px solid #dc2626 !important; }
-.stat-blue::after { background: #2563eb; }
-.stat-yellow::after { background: #f59e0b; }
-.stat-green::after { background: #16a34a; }
-.stat-red::after { background: #dc2626; }
 
-.dashboard-card {
-    border-radius: 16px !important;
-    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06) !important;
-}
-.dashboard-card .card-body {
-    padding: 24px;
-}
-.dashboard-card .card-title {
-    color: #1e293b;
-}
-.status-distribution-card {
-    padding-top: 22px !important;
-}
-.status-distribution-header,
-.priority-distribution-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 20px;
-}
-.status-distribution-title,
-.priority-distribution-title {
-    font-size: 18px;
-    font-weight: 800;
-    color: #111827;
-}
-.status-distribution-icon,
-.priority-distribution-icon {
-    width: 28px;
-    height: 28px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
-    color: #ffffff;
-    font-size: 14px;
-    box-shadow: 0 8px 18px rgba(14, 165, 233, 0.22);
-}
+/* Progress bars */
 .status-progress-row,
 .priority-progress-row {
-    margin-bottom: 22px;
-}
-.status-progress-row.last-row,
-.priority-progress-row.last-row {
-    margin-bottom: 0;
+    margin-bottom: 16px;
 }
 .status-progress-meta,
 .priority-progress-meta {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 8px;
+    font-size: 0.90rem;
     font-weight: 700;
-    color: #111827;
-}
-.status-progress-number,
-.priority-progress-number {
-    font-size: 18px;
-    color: #111827;
-    min-width: 52px;
-    text-align: left;
-    font-weight: 800;
-}
-.status-progress-label,
-.priority-progress-label {
-    font-size: 16px;
-    flex: 1;
-    text-align: right;
-    color: #1f2937;
+    margin-bottom: 6px;
 }
 .status-progress-track,
 .priority-progress-track {
     width: 100%;
-    height: 12px;
-    background: #e5e7eb;
+    height: 10px;
+    background: #e2e8f0;
     border-radius: 999px;
     overflow: hidden;
-    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 .status-progress-fill,
 .priority-progress-fill {
-    display: block;
     height: 100%;
     border-radius: inherit;
+    transition: width 0.5s ease;
 }
-.status-new-fill {
-    background: linear-gradient(90deg, #2563eb, #60a5fa);
-}
-.status-pending-fill {
-    background: linear-gradient(90deg, #f59e0b, #fbbf24);
-}
-.status-closed-fill {
-    background: linear-gradient(90deg, #16a34a, #4ade80);
-}
-.priority-critical-fill {
-    background: linear-gradient(90deg, #ef4444, #f87171);
-}
-.priority-high-fill {
-    background: linear-gradient(90deg, #f59e0b, #fbbf24);
-}
-.priority-medium-fill {
-    background: linear-gradient(90deg, #22c55e, #4ade80);
-}
-.quick-actions-card {
-    background: #f8fafc !important;
-}
-.quick-action-grid {
-    margin-top: 4px;
-}
+.status-new-fill { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+.status-pending-fill { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.status-closed-fill { background: linear-gradient(90deg, #10b981, #34d399); }
+.priority-critical-fill { background: linear-gradient(90deg, #ef4444, #f87171); }
+.priority-high-fill { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.priority-medium-fill { background: linear-gradient(90deg, #10b981, #34d399); }
+
+/* Quick Action Buttons */
 .quick-action-btn {
-    min-height: 104px;
-    border: 0;
+    min-height: 80px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-decoration: none;
+    padding: 12px;
     color: #ffffff;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-    font-weight: 800;
-    letter-spacing: 0.01em;
-}
-.quick-action-btn i {
-    display: block;
-    margin-bottom: 4px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.92rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .quick-action-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 20px rgba(15, 23, 42, 0.14) !important;
-    filter: brightness(1.02);
+    transform: translateY(-2px);
     color: #ffffff;
 }
 .action-light {
-    background: linear-gradient(135deg, #eef2f7, #e5ebf3);
-    color: #1b2a4a;
-    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
 }
 .action-violet {
-    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
 }
 .action-cyan {
-    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+    background: linear-gradient(135deg, #0284c7, #0ea5e9);
 }
 .action-blue {
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
-}
-.action-red {
-    background: linear-gradient(135deg, #ef4444, #f87171);
-}
-.dashboard-page footer {
-    color: #64748b !important;
+    background: linear-gradient(135deg, #0d9488, #14b8a6);
 }
 
-/* ===== التجاوب للشاشات الصغيرة والمتوسطة (Mobile & Tablet: Samsung / Honor / etc.) ===== */
-@media (max-width: 767.98px) {
-    .dashboard-page {
-        padding-top: 0.35rem !important;
-        padding-left: 4px !important;
-        padding-right: 4px !important;
-    }
-    .dashboard-header {
-        padding: 12px 14px;
-        border-radius: 12px;
-    }
-    .header-main-title {
-        font-size: 0.92rem !important;
-        line-height: 1.25;
-    }
-    .header-sub-title {
-        font-size: 0.65rem !important;
-        line-height: 1.3;
-        margin-top: 2px;
-    }
-    .dashboard-header-actions {
-        justify-content: flex-start;
-        margin-top: 4px;
-        width: 100%;
-        gap: 4px;
-    }
-    .dashboard-status,
-    .dashboard-role,
-    .dashboard-logout {
-        min-height: 24px;
-        padding: 2px 7px;
-        font-size: 0.62rem;
-        border-radius: 999px;
-    }
-
-    /* كروت الإحصائيات الأربعة في صف واحد تماماً كالابتوب */
-    .dashboard-stat-card {
-        border-radius: 8px !important;
-        border-top-width: 3px !important;
-    }
-    .dashboard-stat-card::after {
-        display: none;
-    }
-    .dashboard-stat-card .card-body {
-        padding: 5px 4px !important;
-    }
-    .stat-card-inner {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        gap: 2px;
-    }
-    .dashboard-stat-card .stat-icon-circle {
-        width: 20px;
-        height: 20px;
-        min-width: 20px;
-        font-size: 0.70rem;
-        border-radius: 5px;
-    }
-    .dashboard-stat-card .stat-count {
-        font-size: 0.95rem !important;
-        line-height: 1;
-        margin-bottom: 1px !important;
-        font-weight: 800;
-    }
-    .dashboard-stat-card .stat-title {
-        font-size: 0.50rem !important;
-        font-weight: 700;
-        line-height: 1;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    /* كروت توزيع الحالات والأقسام (جنباً إلى جنب مثل اللابتوب) */
-    .dashboard-card {
-        border-radius: 10px !important;
-    }
-    .dashboard-card .card-body {
-        padding: 8px 8px !important;
-    }
-    .status-distribution-card,
-    .department-distribution-card,
-    .priority-distribution-card {
-        padding-top: 8px !important;
-    }
-    .status-distribution-title,
-    .priority-distribution-title,
-    .department-distribution-title,
-    .quick-actions-title {
-        font-size: 0.66rem !important;
-        margin-bottom: 6px !important;
-        font-weight: 800;
-    }
-    .status-distribution-icon,
-    .priority-distribution-icon,
-    .department-distribution-icon {
-        width: 16px;
-        height: 16px;
-        font-size: 8px;
-    }
-    .status-progress-row,
-    .priority-progress-row {
-        margin-bottom: 5px;
-    }
-    .status-progress-meta,
-    .priority-progress-meta {
-        font-size: 0.58rem !important;
-        margin-bottom: 2px;
-        font-weight: 700;
-    }
-    .status-progress-number,
-    .priority-progress-number {
-        font-size: 0.58rem !important;
-        min-width: 22px;
-    }
-    .status-progress-label,
-    .priority-progress-label {
-        font-size: 0.58rem !important;
-    }
-    .status-progress-track,
-    .priority-progress-track {
-        height: 4px;
-    }
-
-    /* قائمة الأقسام */
-    .department-list .list-group-item {
-        padding: 2px 0 !important;
-        font-size: 0.56rem !important;
-        background: transparent;
-    }
-    .department-list .list-group-item i {
-        font-size: 8px !important;
-    }
-    .department-list .badge {
-        padding: 1px 3px !important;
-        font-size: 7px !important;
-    }
-
-    /* أزرار الإجراءات السريعة المصغرة */
-    .quick-action-btn {
-        min-height: 38px !important;
-        padding: 2px 2px !important;
-        font-size: 0.58rem !important;
-        border-radius: 6px !important;
-    }
-    .quick-action-btn i {
-        font-size: 0.80rem !important;
-        margin-bottom: 0px !important;
-    }
-}
-
-/* ===== تحسينات إضافية لشاشات Moto 13 والشاشات المدمجة (320px - 380px) ===== */
-@media (max-width: 380px) {
-    .dashboard-page {
-        padding-left: 2px !important;
-        padding-right: 2px !important;
-        overflow-x: hidden;
-    }
-    .dashboard-header {
-        padding: 10px 10px;
-    }
-    .header-main-title {
-        font-size: 0.85rem !important;
-    }
-    .header-sub-title {
-        font-size: 0.58rem !important;
-    }
-    .dashboard-status,
-    .dashboard-role,
-    .dashboard-logout {
-        min-height: 22px;
-        padding: 1px 5px;
-        font-size: 0.55rem;
-    }
-    .dashboard-stat-card .card-body {
-        padding: 4px 2px !important;
-    }
-    .dashboard-stat-card .stat-icon-circle {
-        width: 17px;
-        height: 17px;
-        min-width: 17px;
-        font-size: 0.60rem;
-        border-radius: 4px;
-    }
-    .dashboard-stat-card .stat-count {
-        font-size: 0.88rem !important;
-    }
-    .dashboard-stat-card .stat-title {
-        font-size: 0.44rem !important;
-    }
-    .status-distribution-title,
-    .priority-distribution-title,
-    .department-distribution-title,
-    .quick-actions-title {
-        font-size: 0.60rem !important;
-    }
-    .department-list .list-group-item {
-        font-size: 0.50rem !important;
-    }
-    .quick-action-btn {
-        min-height: 34px !important;
-        font-size: 0.52rem !important;
-    }
-    .quick-action-btn i {
-        font-size: 0.72rem !important;
-    }
-}
-
+/* Hover effects */
 .hover-shadow:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.1) !important;
 }
 .transition-all {
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .dashboard-header {
+        padding: 16px 18px;
+        border-radius: 14px;
+    }
+    .header-main-title {
+        font-size: 1.15rem !important;
+    }
+    .header-sub-title {
+        font-size: 0.82rem !important;
+    }
+    .stat-icon-circle {
+        width: 36px;
+        height: 36px;
+        font-size: 1.1rem;
+    }
+    .dashboard-stat-card .stat-count {
+        font-size: 1.35rem;
+    }
+    .dashboard-stat-card .stat-title {
+        font-size: 0.78rem;
+    }
+    .quick-action-btn {
+        min-height: 70px;
+        font-size: 0.82rem;
+        padding: 8px 4px;
+    }
+    .quick-action-btn i {
+        font-size: 1.35rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-stat-card .card-body {
+        padding: 12px 10px !important;
+    }
+    .stat-icon-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+    .dashboard-stat-card .stat-count {
+        font-size: 1.25rem;
+    }
 }
 </style>
 

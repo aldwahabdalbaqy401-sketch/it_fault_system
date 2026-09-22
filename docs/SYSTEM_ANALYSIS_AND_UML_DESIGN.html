@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>وثيقة التحليل الفني والتصميم الهندسي الشامل ونمذجة UML - نظام تتبع الأعطال التقنية</title>
+    <!-- Google Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Mermaid.js for Dynamic UML Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --secondary: #6366f1;
+            --accent: #0ea5e9;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding: 0;
+        }
+
+        /* Hero Header */
+        .hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #312e81 100%);
+            color: white;
+            padding: 60px 30px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .hero h1 {
+            font-size: 2.6rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+        }
+
+        .badge-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(8px);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Container Layout */
+        .container {
+            max-width: 1280px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Table of Contents */
+        .toc-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        .toc-card h2 {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 12px;
+        }
+
+        .toc-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--light-bg);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .toc-link:hover {
+            background: #eff6ff;
+            color: var(--primary-light);
+            border-color: #bfdbfe;
+            transform: translateX(-4px);
+        }
+
+        /* Section Cards */
+        .section-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 45px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            border: 1px solid var(--border);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-bg);
+        }
+
+        .section-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin: 25px 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        p {
+            color: #334155;
+            margin-bottom: 16px;
+            font-size: 1.05rem;
+        }
+
+        /* Diagram Box */
+        .diagram-box {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 16px;
+            padding: 25px;
+            margin: 25px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            overflow-x: auto;
+            text-align: center;
+        }
+
+        .diagram-caption {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        /* Data Tables */
+        .table-responsive {
+            overflow-x: auto;
+            margin: 20px 0 30px 0;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+        }
+
+        th {
+            background: #f1f5f9;
+            color: var(--dark);
+            padding: 14px 18px;
+            font-weight: 700;
+            border-bottom: 2px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        td {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border);
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .tag-admin { background: #fee2e2; color: #991b1b; }
+        .tag-super { background: #fef3c7; color: #92400e; }
+        .tag-tech { background: #e0e7ff; color: #3730a3; }
+        .tag-user { background: #d1fae5; color: #065f46; }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-item {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-light);
+        }
+
+        .feature-item i {
+            color: var(--primary-light);
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .feature-item h4 {
+            font-size: 1.15rem;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        /* Print Styles */
+        @media print {
+            body { background: white; }
+            .hero { padding: 30px 10px; background: #1e3a8a; }
+            .section-card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; margin-bottom: 25px; padding: 20px; }
+            .toc-card { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hero Header -->
+    <header class="hero">
+        <h1><i class="fa-solid fa-laptop-medical me-2"></i> نظام إدارة وتتبع الأعطال التقنية</h1>
+        <p>وثيقة التحليل الفني والتصميم الهندسي الشامل والنمذجة القياسية UML</p>
+        <div class="badge-container">
+            <span class="badge"><i class="fa-brands fa-python"></i> Python Flask Framework</span>
+            <span class="badge"><i class="fa-solid fa-database"></i> PostgreSQL / Supabase</span>
+            <span class="badge"><i class="fa-solid fa-shield-halved"></i> Multi-Role RBAC & CSRF</span>
+            <span class="badge"><i class="fa-solid fa-diagram-project"></i> Complete UML 2.5 Architecture</span>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- Table of Contents -->
+        <nav class="toc-card">
+            <h2><i class="fa-solid fa-list-check"></i> فهرس محتويات وثيقة التحليل والتصميم</h2>
+            <div class="toc-grid">
+                <a href="#section-1" class="toc-link"><i class="fa-solid fa-book-open"></i> 1. نظرة عامة وأهداف المنظومة</a>
+                <a href="#section-2" class="toc-link"><i class="fa-solid fa-list-ol"></i> 2. تحليل المتطلبات (FR / NFR)</a>
+                <a href="#section-3" class="toc-link"><i class="fa-solid fa-users-gear"></i> 3. الممثلون ومصفوفة الصلاحيات (RBAC)</a>
+                <a href="#section-4" class="toc-link"><i class="fa-solid fa-diagram-project"></i> 4. حزمة مخططات UML الكاملة</a>
+                <a href="#section-5" class="toc-link"><i class="fa-solid fa-table"></i> 5. قاموس وتصميم قاعدة البيانات</a>
+                <a href="#section-6" class="toc-link"><i class="fa-solid fa-palette"></i> 6. تجربة المستخدم وتدفق الصفحات</a>
+                <a href="#section-7" class="toc-link"><i class="fa-solid fa-lock"></i> 7. التحصين وهيكلية الأمان السيبراني</a>
+                <a href="#section-8" class="toc-link"><i class="fa-solid fa-code"></i> 8. مسارات النظام والتنفيذ البرمجي</a>
+                <a href="#section-9" class="toc-link"><i class="fa-solid fa-vial-circle-check"></i> 9. خطة الاختبار وضمان الجودة</a>
+                <a href="#section-10" class="toc-link"><i class="fa-solid fa-server"></i> 10. دليل النشر والتشغيل</a>
+            </div>
+        </nav>
+
+        <!-- Section 1: Overview -->
+        <section id="section-1" class="section-card">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-compass"></i></div>
+                <h2 class="section-title">1. المقدمة ونظرة عامة على النظام</h2>
+            </div>
+            <p>
+                يمثل <strong>نظام إدارة وتتبع الأعطال التقنية</strong> حلاً مؤسسياً متكاملاً لأتمتة ورصد بلاغات الدعم الفني والصيانة للأجهزة، البرمجيات، الشبكات، والأنظمة داخل المؤسسات والجامعات. يوفر النظام بيئة عمل تشاركية تربط بين أربعة أطراف رئيسية (المستخدمين، الفنيين، المشرفين، ومديري النظام) لضمان حوكمة العمل وسرعة إنجاز المهام وفق معايير جودة الخدمة (SLA).
+            </p>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <i class="fa-solid fa-ticket"></i>
+                    <h4>التذاكر الذكية المتكاملة</h4>
+                    <p>تسجيل بلاغ العطل مع تحديد الموقع والأولوية وتصنيف العطل ورفع المرفقات والصور بسهولة.</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fa-solid fa-comments"></i>
+                    <h4>محادثة لحظية لكل تذكرة</h4>
+                    <p>غرفة دردشة مباشرة مرفقة بكل بلاغ لتبادل الإيضاحات والصور بين الفني والمستخدم والإدارة.</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fa-solid fa-bell"></i>
+                    <h4>تنبيهات فورية متعددة القنوات</h4>
+                    <p>إشعارات داخلية فورية وتنبيهات بريد إلكتروني آلية في كل مرحلة من مراحل البلاغ.</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <h4>تحليلات وتقارير احترافية</h4>
+                    <p>لوحات تحكم تفاعلية مع إمكانية التصدير إلى وثائق PDF رسمية وكشوفات Excel إحصائية.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Requirements -->
+        <section id="section-2" class="section-card">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-list-check"></i></div>
+                <h2 class="section-title">2. تحليل المتطلبات الوظيفية وغير الوظيفية</h2>
+            </div>
+            <h3><i class="fa-solid fa-circle-check text-primary"></i> 2.1 المتطلبات الوظيفية (Functional Requirements)</h3>
+            <ul style="padding-right: 25px; margin-bottom: 20px;">
+                <li><strong>إدارة الحسابات والمصادقة:</strong> التسجيل، تسجيل الدخول الآمن، استعادة كلمة المرور عبر كود OTP بريدي، وإدارة الملف الشخصي.</li>
+                <li><strong>دورة حياة بلاغات الصيانة:</strong> إنشاء البلاغ، مراجعته، تعيين الفني المختص، جدولة التاريخ، بدء المعالجة، تدوين تقرير الحل، وتقييم الجودة.</li>
+                <li><strong>نظام المحادثة والرسائل:</strong> إرسال واستقبال الرسائل والصور داخل التذكرة مع تتبع حالة القراءة.</li>
+                <li><strong>الإشعارات والبريد:</strong> تنبيه الأطراف المعنية لحظياً عند إضافة بلاغ، إسناده، حله، أو التقييم.</li>
+                <li><strong>التقارير والإحصائيات:</strong> استخراج جداول Excel المنسقة وتوليد ملفات PDF متقدمة عبر ReportLab.</li>
+            </ul>
+
+            <h3><i class="fa-solid fa-shield-halved text-primary"></i> 2.2 المتطلبات غير الوظيفية (Non-Functional Requirements)</h3>
+            <ul style="padding-right: 25px;">
+                <li><strong>الأمان والخصوصية:</strong> تشفير كلمات المرور باستخدام Bcrypt، تفعيل الحماية من CSRF، وتعقيم كافة استعلامات SQL.</li>
+                <li><strong>الأداء والاعتمادية:</strong> سرعة استجابة فائقة واستخدام قواعد بيانات سحابية موثوقة (PostgreSQL على Supabase).</li>
+                <li><strong>التوافقية والتدويل:</strong> دعم اللغتين العربية (RTL) والإنجليزية (LTR) مع توافق تام لكافة المتصفحات والأجهزة المحمولة.</li>
+            </ul>
+        </section>
+
+        <!-- Section 3: RBAC -->
+        <section id="section-3" class="section-card">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-user-shield"></i></div>
+                <h2 class="section-title">3. الممثلون ومصفوفة الصلاحيات (RBAC Matrix)</h2>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>العملية / الخاصية</th>
+                            <th>المستخدم العادي <span class="tag tag-user">User</span></th>
+                            <th>الفني التقني <span class="tag tag-tech">Technician</span></th>
+                            <th>المشرف <span class="tag tag-super">Supervisor</span></th>
+                            <th>مدير النظام <span class="tag tag-admin">Admin</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>تسجيل الدخول وفتح بلاغ جديد</td>
+                            <td>✅ متاح</td>
+                            <td>✅ متاح</td>
+                            <td>✅ متاح</td>
+                            <td>✅ متاح</td>
+                        </tr>
+                        <tr>
+                            <td>استعراض التذاكر</td>
+                            <td>بلاغاته فقط</td>
+                            <td>المسندة إليه فقط</td>
+                            <td>جميع البلاغات</td>
+                            <td>جميع البلاغات</td>
+                        </tr>
+                        <tr>
+                            <td>إسناد البلاغات للفنيين وتحديد الموعد</td>
+                            <td>❌ غير متاح</td>
+                            <td>❌ غير متاح</td>
+                            <td>✅ متاح</td>
+                            <td>✅ متاح</td>
+                        </tr>
+                        <tr>
+                            <td>بدء المعالجة وكتابة تقرير الحل</td>
+                            <td>❌ غير متاح</td>
+                            <td>✅ للمسندة إليه</td>
+                            <td>✅ متاح</td>
+                            <td>✅ متاح</td>
+                        </tr>
+                        <tr>
+                            <td>تقييم جودة الصيانة (1-5 نجوم)</td>
+                            <td>✅ صاحب البلاغ</td>
+                            <td>❌ غير متاح</td>
+                            <td>❌ غير متاح</td>
+                            <td>❌ غير متاح</td>
+                        </tr>
+                        <tr>
+                            <td>تصدير التقارير (Excel / PDF)</td>
+                            <td>❌ غير متاح</td>
+                            <td>❌ غير متاح</td>
+                            <td>✅ متاح</td>
+                            <td>✅ متاح</td>
+                        </tr>
+                        <tr>
+                            <td>إدارة حسابات وصلاحيات المستخدمين</td>
+                            <td>❌ غير متاح</td>
+                            <td>❌ غير متاح</td>
+                            <td>❌ غير متاح</td>
+                            <td>✅ متاح</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 4: Complete UML Suite -->
+        <section id="section-4" class="section-card">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-diagram-project"></i></div>
+                <h2 class="section-title">4. حزمة مخططات UML الكاملة (UML 2.5 Architecture)</h2>
+            </div>
+
+            <!-- 4.1 Use Case Diagram -->
+            <h3><i class="fa-solid fa-shapes"></i> 4.1 مخطط حالات الاستخدام العام (Use Case Diagram)</h3>
+            <div class="diagram-box">
+                <div class="mermaid">
+graph TD
+    User((المستخدم))
+    Tech((الفني))
+    Super((المشرف))
+    Admin((المدير))
+
+    subgraph "نظام إدارة وتتبع الأعطال التقنية"
+        UC1[تسجيل الدخول والمصادقة]
+        UC2[تقديم بلاغ عطل مع المرفقات]
+        UC3[متابعة مسار التذكرة والخط الزمني]
+        UC4[المحادثة اللحظية وتبادل الصور]
+        UC5[تقييم الخدمة 1-5 نجوم]
+        UC6[استعراض المهام وبدء المعالجة]
+        UC7[حل العطل وإضافة التقرير الفني]
+        UC8[إسناد العطل وجدولته لفني]
+        UC9[متابعة الإحصائيات والأداء]
+        UC10[تصدير التقارير PDF وإكسل]
+        UC11[إدارة المستخدمين والأدوار]
+        UC12[مراقبة سجل النشاطات والأمان]
+    end
+
+    User --> UC1
+    User --> UC2
+    User --> UC3
+    User --> UC4
+    User --> UC5
+
+    Tech --> UC1
+    Tech --> UC6
+    Tech --> UC7
+    Tech --> UC4
+
+    Super --> UC1
+    Super --> UC8
+    Super --> UC9
+    Super --> UC10
+    Super --> UC3
+    Super --> UC4
+
+    Admin --> UC1
+    Admin --> UC8
+    Admin --> UC9
+    Admin --> UC10
+    Admin --> UC11
+    Admin --> UC12
+                </div>
+                <div class="diagram-caption">الشكل 1: مخطط حالات الاستخدام يبين الصلاحيات والارتباطات بين كافة الممثلين والوظائف</div>
+            </div>
+
+            <!-- 4.2 Class Diagram -->
+            <h3><i class="fa-solid fa-sitemap"></i> 4.2 مخطط الأصناف وهندسة الفئات (Class Diagram)</h3>
+            <div class="diagram-box">
+                <div class="mermaid">
+classDiagram
+    class User {
+        +int id
+        +string username
+        +string password_hash
+        +string full_name
+        +string email
+        +string phone
+        +string department
+        +string user_type
+        +Role role
+        +datetime created_at
+        +verify_password(password) bool
+        +change_password(new_pass) bool
+        +update_profile(data) bool
+    }
+
+    class Fault {
+        +int id
+        +string title
+        +string description
+        +string fault_type
+        +string location
+        +Priority priority
+        +Status status
+        +string attachment
+        +int user_id
+        +int assigned_to
+        +datetime scheduled_date
+        +datetime received_at
+        +datetime started_at
+        +datetime completed_at
+        +string technician_notes
+        +int user_rating
+        +datetime created_at
+        +assign(tech_id, date) void
+        +start_work() void
+        +resolve(notes) void
+        +rate(stars) void
+    }
+
+    class ChatMessage {
+        +int id
+        +int fault_id
+        +int sender_id
+        +int receiver_id
+        +string message
+        +string image
+        +bool is_read
+        +datetime created_at
+        +mark_read() void
+    }
+
+    class Notification {
+        +int id
+        +int user_id
+        +int fault_id
+        +string message
+        +bool is_read
+        +datetime created_at
+        +mark_read() void
+    }
+
+    class ActivityLog {
+        +int id
+        +int user_id
+        +string username
+        +string action
+        +string details
+        +string ip_address
+        +datetime created_at
+    }
+
+    User "1" --> "0..*" Fault : submits
+    User "1" --> "0..*" Fault : works_on
+    Fault "1" --> "0..*" ChatMessage : holds
+    User "1" --> "0..*" ChatMessage : writes
+    Fault "1" --> "0..*" Notification : fires
+    User "1" --> "0..*" Notification : receives
+    User "1" --> "0..*" ActivityLog : logs
+                </div>
+                <div class="diagram-caption">الشكل 2: مخطط الفئات يوضح هيكلية الكائنات والخصائص والعمليات والعلاقات التشاركية</div>
+            </div>
+
+            <!-- 4.3 ERD Diagram -->
+            <h3><i class="fa-solid fa-database"></i> 4.3 مخطط العلاقات الكينونية لقاعدة البيانات (Entity Relationship Diagram)</h3>
+            <div class="diagram-box">
+                <div class="mermaid">
+erDiagram
+    USERS ||--o{ FAULTS : "submits"
+    USERS ||--o{ FAULTS : "assigned_to"
+    USERS ||--o{ CHAT_MESSAGES : "sends"
+    USERS ||--o{ NOTIFICATIONS : "receives"
+    USERS ||--o{ ACTIVITY_LOG : "triggers"
+    
+    FAULTS ||--o{ CHAT_MESSAGES : "contains"
+    FAULTS ||--o{ NOTIFICATIONS : "generates"
+
+    USERS {
+        int id PK
+        varchar username UK
+        varchar password
+        varchar full_name
+        varchar email UK
+        varchar phone
+        varchar department
+        varchar user_type
+        enum role
+        timestamp created_at
+    }
+
+    FAULTS {
+        int id PK
+        varchar title
+        text description
+        varchar fault_type
+        varchar location
+        enum priority
+        enum status
+        varchar attachment
+        int user_id FK
+        int assigned_to FK
+        timestamp scheduled_date
+        timestamp started_at
+        timestamp completed_at
+        text technician_notes
+        tinyint user_rating
+        timestamp created_at
+    }
+
+    CHAT_MESSAGES {
+        int id PK
+        int fault_id FK
+        int sender_id FK
+        int receiver_id FK
+        text message
+        varchar image
+        boolean is_read
+        timestamp created_at
+    }
+
+    NOTIFICATIONS {
+        int id PK
+        int user_id FK
+        int fault_id FK
+        text message
+        boolean is_read
+        timestamp created_at
+    }
+
+    ACTIVITY_LOG {
+        int id PK
+        int user_id FK
+        varchar username
+        varchar action
+        text details
+        varchar ip_address
+        timestamp created_at
+    }
+                </div>
+                <div class="diagram-caption">الشكل 3: مخطط الكينونات والعلاقات لقاعدة بيانات PostgreSQL</div>
+            </div>
+
+            <!-- 4.4 Sequence Diagrams -->
+            <h3><i class="fa-solid fa-arrow-down-up-across-line"></i> 4.4 مخطط التتابع: دورة المعالجة والإسناد (Sequence Diagram)</h3>
+            <div class="diagram-box">
+                <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Admin as المشرف / المدير
+    actor Tech as الفني المختص
+    actor User as صاحب البلاغ
+    participant App as خادم التطبيق (Flask)
+    participant DB as قاعدة البيانات (Postgres)
+    participant Mail as خادم البريد (Mail Server)
+
+    Admin->>App: إسناد التذكرة للفني + تحديد الموعد
+    App->>DB: UPDATE faults SET assigned_to = TechID, scheduled_date = Date
+    App->>DB: INSERT INTO notifications (للفني وللمستخدم)
+    App->>Mail: إرسال بريد إلكتروني للفني بالبلاغ المسند
+    
+    Tech->>App: تسجيل الدخول والضغط على "بدء المعالجة"
+    App->>DB: UPDATE faults SET status = 'in_progress', started_at = NOW()
+    App->>DB: INSERT INTO notifications (تم بدء العمل على العطل)
+
+    Tech->>App: تدوين تقرير الإصلاح وتغيير الحالة إلى "تم الحل"
+    App->>DB: UPDATE faults SET status = 'resolved', completed_at = NOW(), technician_notes = ...
+    App->>DB: INSERT INTO notifications (تم إصلاح العطل يرجى التقييم)
+    App->>Mail: إشعار صاحب البلاغ بريدياً باكتمال المعالجة
+
+    User->>App: تقييم جودة الخدمة (5 نجوم)
+    App->>DB: UPDATE faults SET user_rating = 5, status = 'closed'
+    App-->>User: إغلاق التذكرة بنجاح وعرض رسالة الشكر
+                </div>
+                <div class="diagram-caption">الشكل 4: مخطط التتابع الزمني لتوزيع وحل وتقييم بلاغ العطل</div>
+            </div>
+
+            <!-- 4.5 Activity Diagram -->
+            <h3><i class="fa-solid fa-route"></i> 4.5 مخطط النشاط: دورة حياة البلاغ الشاملة (Activity Diagram)</h3>
+            <div class="diagram-box">
+                <div class="mermaid">
+flowchart TD
+    Start([بدء البلاغ]) --> Submit[تقديم العطل والمرفقات]
+    Submit --> Review{مراجعة المشرف}
+    Review -->|مقبول| Assign[إسناد لفني مختص وجدولته]
+    Review -->|مرفوض| Reject[طلب توضيح أو إغلاق]
+    
+    Assign --> TechStart[الفني يبدأ المعالجة In Progress]
+    TechStart --> DoRepair[تنفيذ الصيانة وتجربة الجهاز]
+    
+    DoRepair --> TechResolve[تدوين تقرير الحل وتحديث الحالة Resolved]
+    TechResolve --> UserCheck{معاينة المستخدم للخدمة}
+    
+    UserCheck -->|المشكلة مستمرة| TechStart
+    UserCheck -->|تم حل المشكلة| Rate[تقييم الجودة 1-5 نجوم]
+    
+    Rate --> CloseTicket[إغلاق التذكرة نهائياً Closed]
+    CloseTicket --> End([نهاية الدورة المستندية والأرشفة])
+                </div>
+                <div class="diagram-caption">الشكل 5: مخطط النشاط وتدفق الأعمال لدورة حياة التذكرة</div>
+            </div>
+
+            <!-- 4.6 State Machine -->
+            <h3><i class="fa-solid fa-toggle-on"></i> 4.6 مخطط انتقال حالات العطل (State Transition Diagram)</h3>
+            <div class="diagram-box">
+                <div class="mermaid">
+stateDiagram-v2
+    [*] --> New : تقديم البلاغ من المستخدم
+    New --> InProgress : الفني يبدأ المعالجة
+    InProgress --> Resolved : الفني ينجز الإصلاح
+    Resolved --> InProgress : إعادة فتح البلاغ إذا تكرر العطل
+    Resolved --> Closed : تقييم المستخدم أو إغلاق الإدارة
+    Closed --> [*] : الأرشفة التامة
+                </div>
+                <div class="diagram-caption">الشكل 6: مخطط انتقال الحالات للتذكرة التقنية</div>
+            </div>
+
+            <!-- 4.7 Component Diagram -->
+            <h3><i class="fa-solid fa-cubes"></i> 4.7 مخطط المكونات والطبقات المعمارية (Component Diagram)</h3>
+            <div class="diagram-box">
+                <div class="mermaid">
+graph TB
+    subgraph "Presentation Layer (طبقة العرض)"
+        HTML["قوالب Jinja2 HTML5"]
+        CSS["نظام التنسيق المتجاوب CSS3"]
+        JS["محرك AJAX والدردشة والتنبيهات"]
+    end
+
+    subgraph "Application Layer (طبقة التطبيق والمنطق)"
+        Core["متحكم التطبيق المركزي (app.py)"]
+        AuthModule["وحدة المصادقة والحماية (auth.py & CSRF)"]
+        FaultModule["وحدة تتبع الأعطال والتذاكر"]
+        ChatModule["وحدة المحادثة اللحظية"]
+        ReportModule["محرك التقارير (PDF & Excel)"]
+        ActivityModule["مسجل الأنشطة والتدقيق"]
+    end
+
+    subgraph "Data & Cloud Layer (طبقة البيانات والسحابة)"
+        PostgresDB[("قاعدة بيانات Supabase PostgreSQL")]
+        FileStore[("مجلد التخزين الثابت (Attachments)")]
+        SMTP[("خدمة البريد الإلكتروني SMTP")]
+    end
+
+    HTML <--> JS
+    JS <-->|HTTP / JSON| Core
+    Core --> AuthModule
+    Core --> FaultModule
+    Core --> ChatModule
+    Core --> ReportModule
+    Core --> ActivityModule
+    
+    FaultModule --> PostgresDB
+    ChatModule --> PostgresDB
+    ChatModule --> FileStore
+    FaultModule --> FileStore
+    ReportModule --> PostgresDB
+    FaultModule --> SMTP
+                </div>
+                <div class="diagram-caption">الشكل 7: مخطط المكونات المعمارية ثلاثية الطبقات (3-Tier Architecture)</div>
+            </div>
+
+            <!-- 4.8 Deployment Diagram -->
+            <h3><i class="fa-solid fa-network-wired"></i> 4.8 مخطط النشر والتوزيع (Deployment Diagram)</h3>
+            <div class="diagram-box">
+                <div class="mermaid">
+graph TB
+    subgraph "أجهزة العملاء (Client Workstations)"
+        BrowserPC["متصفح الحاسوب (Chrome / Edge / Firefox)"]
+        BrowserMobile["متصفح الهاتف الذكي (Mobile Browser)"]
+    end
+
+    subgraph "خادم التطبيق والويب (Application Server)"
+        WSGIServer["خادم WSGI / Gunicorn"]
+        FlaskEnv["بيئة تشغيل Python 3.10+ مع Flask"]
+        StaticDir["الأصول الثابتة والمرفقات"]
+    end
+
+    subgraph "الخدمات السحابية الموزعة (Cloud Infrastructure)"
+        SupaPostgres[("Supabase Managed PostgreSQL DB")]
+        GoogleSMTP[("Google Workspace SMTP Relay")]
+    end
+
+    BrowserPC -->|HTTPS / TLS 1.3| WSGIServer
+    BrowserMobile -->|HTTPS / TLS 1.3| WSGIServer
+    WSGIServer --> FlaskEnv
+    FlaskEnv --> StaticDir
+    FlaskEnv -->|SSL Port 5432 Encrypted| SupaPostgres
+    FlaskEnv -->|TLS Port 587| GoogleSMTP
+                </div>
+                <div class="diagram-caption">الشكل 8: مخطط النشر وتوزيع الخوادم وقواعد البيانات السحابية</div>
+            </div>
+
+        </section>
+
+        <!-- Section 5: Database Dictionary -->
+        <section id="section-5" class="section-card">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-table-list"></i></div>
+                <h2 class="section-title">5. قاموس وتصميم جداول قاعدة البيانات</h2>
+            </div>
+            <h3><i class="fa-solid fa-table"></i> جدول الأعطال والتذاكر (faults Table)</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>اسم الحقل</th>
+                            <th>النوع</th>
+                            <th>القيود والخصائص</th>
+                            <th>الشرح والوظيفة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>id</code></td><td>SERIAL / INT</td><td>PRIMARY KEY, AUTO_INCREMENT</td><td>الرقم التعريفي المميز للتذكرة</td></tr>
+                        <tr><td><code>title</code></td><td>VARCHAR(200)</td><td>NOT NULL</td><td>عنوان العطل المختصر</td></tr>
+                        <tr><td><code>description</code></td><td>TEXT</td><td>NULLABLE</td><td>الشرح المفصل للمشكلة</td></tr>
+                        <tr><td><code>fault_type</code></td><td>VARCHAR(50)</td><td>INDEX</td><td>التصنيف (أجهزة، شبكات، برمجيات)</td></tr>
+                        <tr><td><code>location</code></td><td>VARCHAR(255)</td><td>NULLABLE</td><td>موقع العطل (المبنى، الطابق، الغرفة)</td></tr>
+                        <tr><td><code>priority</code></td><td>VARCHAR(20)</td><td>DEFAULT 'medium'</td><td>درجة الأهمية (low, medium, high, critical)</td></tr>
+                        <tr><td><code>status</code></td><td>VARCHAR(20)</td><td>DEFAULT 'new', INDEX</td><td>حالة البلاغ (new, in_progress, resolved, closed)</td></tr>
+                        <tr><td><code>user_id</code></td><td>INT</td><td>FOREIGN KEY -> users(id)</td><td>المستخدم مقدم البلاغ</td></tr>
+                        <tr><td><code>assigned_to</code></td><td>INT</td><td>FOREIGN KEY -> users(id)</td><td>الفني المسند إليه العطل</td></tr>
+                        <tr><td><code>user_rating</code></td><td>SMALLINT</td><td>CHECK (1-5)</td><td>تقييم جودة الخدمة من العميل</td></tr>
+                        <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>DEFAULT NOW()</td><td>تاريخ ووقت فتح البلاغ</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 6: UI Design -->
+        <section id="section-6" class="section-card">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-paint-roller"></i></div>
+                <h2 class="section-title">6. تصميم واجهات المستخدم وتدفق الصفحات</h2>
+            </div>
+            <p>
+                تم بناء النظام وفق أرقى معايير تصميم واجهات المستخدم (Modern Clean UI) معتمداً على الأسلوب الزجاجي الأنيق (Glassmorphism)، البطاقات المظللة، الخطوط الحديثة (Cairo)، والتفاعل السلس مع مختلف قياسات الشاشات (Responsive Layout).
+            </p>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <i class="fa-solid fa-desktop"></i>
+                    <h4>لوحات تحكم موجهة حسب الدور</h4>
+                    <p>واجهة مخصصة لكل دور (المستخدم يرى تذاكره وحالتها، الفني يرى مهامه اليومية، المشرف والمدير يريان الإحصائيات الشاملة ومؤشرات الإنجاز).</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fa-solid fa-language"></i>
+                    <h4>دعم ثنائي للغتين (AR / EN)</h4>
+                    <p>التبديل الفوري بين اللغة العربية مع محاذاة RTL واللغة الإنجليزية مع محاذاة LTR بنقرة زر واحدة.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 7: Security Architecture -->
+        <section id="section-7" class="section-card">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-shield-virus"></i></div>
+                <h2 class="section-title">7. التحصين وهيكلية الأمان السيبراني</h2>
+            </div>
+            <ul style="padding-right: 25px;">
+                <li><strong>تشفير Bcrypt:</strong> تشفير كلمات المرور باستخدام خوارزمية التجزئة التكيفية المقاومة لهجمات القوة الغاشمة.</li>
+                <li><strong>حماية CSRF الصارمة:</strong> تضمين توكن أمان مشفر ديناميكي في كافة النماذج عبر `Flask-WTF`.</li>
+                <li><strong>منع هجمات SQL Injection:</strong> تمرير كافة المدخلات باستخدام الاستعلامات البارامترية المعقمة في مكتبة `psycopg2`.</li>
+                <li><strong>حماية رفع الملفات:</strong> التحقق من الامتدادات المسموح بها واستخدام `secure_filename` وتحديد سقف الحجم بـ 16 ميجابايت.</li>
+                <li><strong>أمان الجلسات:</strong> تعيين ملفات تعريف الارتباط بخاصية `HttpOnly` و `SameSite=Lax` مع ترويسات منع الكاش `No-Cache`.</li>
+            </ul>
+        </section>
+
+        <!-- Section 8: API Endpoints -->
+        <section id="section-8" class="section-card">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-network-wired"></i></div>
+                <h2 class="section-title">8. مسارات النظام والتنفيذ البرمجي (Endpoints)</h2>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>المسار (Endpoint)</th>
+                            <th>النوع</th>
+                            <th>الصلاحية</th>
+                            <th>الوظيفة والبيانات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>/login</code></td><td>POST</td><td>الجميع</td><td>التحقق من بيانات الدخول وبدء الجلسة</td></tr>
+                        <tr><td><code>/add-fault</code></td><td>POST</td><td>مسجل دخول</td><td>إنشاء تذكرة عطل جديدة مع رفع المرفقات</td></tr>
+                        <tr><td><code>/assign-fault/&lt;id&gt;</code></td><td>POST</td><td>مشرف / مدير</td><td>إسناد التذكرة لفني وجدولتها زمنياً</td></tr>
+                        <tr><td><code>/resolve-fault/&lt;id&gt;</code></td><td>POST</td><td>فني / مدير</td><td>تسجيل حل المشكلة وتدوين التقرير الفني</td></tr>
+                        <tr><td><code>/chat/&lt;fault_id&gt;</code></td><td>GET/POST</td><td>أطراف البلاغ</td><td>إرسال واستقبال رسائل المحادثة والصور</td></tr>
+                        <tr><td><code>/export/pdf</code></td><td>GET</td><td>مشرف / مدير</td><td>توليد وتنزيل تقرير PDF احترافي</td></tr>
+                        <tr><td><code>/export/excel</code></td><td>GET</td><td>مشرف / مدير</td><td>تصدير كشف إحصائي إكسل للأعطال</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 9: QA & Testing -->
+        <section id="section-9" class="section-card">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-list-check"></i></div>
+                <h2 class="section-title">9. خطة الاختبار وضمان الجودة (QA Testing Suite)</h2>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>رقم الاختبار</th>
+                            <th>الوحدة المختبرة</th>
+                            <th>السيناريو والمدخلات</th>
+                            <th>النتيجة المتوقعة</th>
+                            <th>التقييم</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>TC-01</strong></td><td>المصادقة</td><td>تسجيل الدخول ببيانات معتمدة</td><td>نجاح الدخول والتوجيه للوحة المناسبة</td><td><span class="tag tag-user">ناجح ✅</span></td></tr>
+                        <tr><td><strong>TC-02</strong></td><td>إدارة التذاكر</td><td>إضافة عطل مع رفع صورة توضيحية</td><td>حفظ البلاغ وإشعار الإدارة فوراً</td><td><span class="tag tag-user">ناجح ✅</span></td></tr>
+                        <tr><td><strong>TC-03</strong></td><td>الأمان</td><td>محاولة رفع ملف تنفيذي خبيث (.exe)</td><td>حظر الرفع وإظهار رسالة رفض</td><td><span class="tag tag-user">ناجح ✅</span></td></tr>
+                        <tr><td><strong>TC-04</strong></td><td>الشات اللحظي</td><td>إرسال رسالة واستقبالها في الشات</td><td>وصول الرسالة وتحديث حالة القراءة</td><td><span class="tag tag-user">ناجح ✅</span></td></tr>
+                        <tr><td><strong>TC-05</strong></td><td>التقارير</td><td>تصدير تقرير الأعطال PDF وإكسل</td><td>توليد ملفات متكاملة ودقيقة 100%</td><td><span class="tag tag-user">ناجح ✅</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 10: Deployment & Operations -->
+        <section id="section-10" class="section-card">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-terminal"></i></div>
+                <h2 class="section-title">10. دليل التثبيت والتشغيل والنشر</h2>
+            </div>
+            <p><strong>بيانات الحسابات التجريبية الافتراضية:</strong></p>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <h4><i class="fa-solid fa-crown text-danger"></i> مدير النظام (Admin)</h4>
+                    <p>اسم المستخدم: <code>admin</code><br>كلمة المرور: <code>123456</code></p>
+                </div>
+                <div class="feature-item">
+                    <h4><i class="fa-solid fa-user-tie text-warning"></i> المشرف التقني (Supervisor)</h4>
+                    <p>اسم المستخدم: <code>supervisor1</code><br>كلمة المرور: <code>123456</code></p>
+                </div>
+                <div class="feature-item">
+                    <h4><i class="fa-solid fa-screwdriver-wrench text-primary"></i> الفني الأول (Technician)</h4>
+                    <p>اسم المستخدم: <code>tech1</code><br>كلمة المرور: <code>123456</code></p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 40px; background: #0f172a; color: #94a3b8; font-size: 0.95rem;">
+        <p>نظام إدارة وتتبع الأعطال التقنية &copy; 2026 - وثيقة التحليل والتصميم الهندسي ونمذجة UML الشاملة</p>
+    </footer>
+
+    <!-- Initialize Mermaid with Clean Styling -->
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            fontFamily: 'Cairo, sans-serif',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+    </script>
+</body>
+</html>

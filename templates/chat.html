@@ -78,30 +78,35 @@
                 
                 <div class="chat-form-grid mb-2">
                     <!-- Recipient Selector -->
-                    <select name="receiver_id" required class="form-select form-select-sm" style="max-width: 260px; font-weight: 600;">
-                        <option value="">{{ 'Select Recipient...' if is_english else 'اختر المستلم...' }}</option>
-                        {% for chat_user in chat_users %}
-                            <option value="{{ chat_user.id }}" {% if loop.first and chat_users|length == 1 %}selected{% endif %}>
-                                {{ chat_user.full_name or chat_user.username }} ({{ chat_user.role }})
-                            </option>
-                        {% endfor %}
-                    </select>
+                    <div class="chat-recipient-wrap w-100 mb-1 mb-md-0">
+                        <select name="receiver_id" required class="form-select form-select-sm w-100" style="font-weight: 600; min-height: 38px;">
+                            <option value="">{{ 'Select Recipient...' if is_english else 'اختر المستلم...' }}</option>
+                            {% for chat_user in chat_users %}
+                                <option value="{{ chat_user.id }}" {% if loop.first and chat_users|length == 1 %}selected{% endif %}>
+                                    {{ chat_user.full_name or chat_user.username }} ({{ chat_user.role }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                    <!-- Text Message Input -->
-                    <input type="text" id="chatMessageInput" name="message" 
-                           placeholder="{{ 'Type your message here...' if is_english else 'اكتب رسالتك هنا...' }}" 
-                           class="chat-input-field" dir="auto" maxlength="2000" autocomplete="off">
+                    <!-- Input Controls Row -->
+                    <div class="chat-input-row d-flex align-items-center gap-2 w-100">
+                        <!-- Text Message Input -->
+                        <input type="text" id="chatMessageInput" name="message" 
+                               placeholder="{{ 'Type your message here...' if is_english else 'اكتب رسالتك هنا...' }}" 
+                               class="form-control chat-input-field flex-grow-1" dir="auto" maxlength="2000" autocomplete="off">
 
-                    <!-- Image Attachment Button -->
-                    <label for="imageUpload" class="btn btn-secondary btn-icon m-0" title="{{ 'Attach Image' if is_english else 'إرفاق صورة' }}">
-                        <i class="bi bi-paperclip fs-5"></i>
-                        <input type="file" id="imageUpload" name="image" accept="image/*" style="display: none;" onchange="previewImage(this)">
-                    </label>
+                        <!-- Image Attachment Button -->
+                        <label for="imageUpload" class="btn btn-outline-secondary btn-icon m-0 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; flex-shrink: 0;" title="{{ 'Attach Image' if is_english else 'إرفاق صورة' }}">
+                            <i class="bi bi-paperclip fs-5"></i>
+                            <input type="file" id="imageUpload" name="image" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                        </label>
 
-                    <!-- Send Button -->
-                    <button type="submit" class="btn btn-primary px-4 fw-bold">
-                        <i class="bi bi-send-fill me-1"></i> {{ 'Send' if is_english else 'إرسال' }}
-                    </button>
+                        <!-- Send Button -->
+                        <button type="submit" class="btn btn-primary px-3 px-md-4 fw-bold d-flex align-items-center justify-content-center" style="min-height: 44px; flex-shrink: 0;">
+                            <i class="bi bi-send-fill me-1"></i> <span class="d-none d-sm-inline">{{ 'Send' if is_english else 'إرسال' }}</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Attached Image Preview Pill -->
