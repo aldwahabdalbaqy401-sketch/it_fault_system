@@ -329,8 +329,8 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+        username = (request.form.get('username') or '').strip()
+        password = request.form.get('password', '')
 
         if not username or not password:
             flash('يرجى ملء جميع الحقول', 'danger')
@@ -342,7 +342,12 @@ def login():
             return render_template('login.html')
 
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
+        cursor.execute(
+            '''SELECT * FROM users 
+               WHERE LOWER(TRIM(username)) = LOWER(%s) 
+                  OR (email IS NOT NULL AND LOWER(TRIM(email)) = LOWER(%s))''',
+            (username, username)
+        )
         user = cursor.fetchone()
         cursor.close()
         conn.close()
