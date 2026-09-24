@@ -1,8 +1,9 @@
 {
+  "id": "/",
   "name": "نظام إدارة وتتبع الأعطال التقنية",
   "short_name": "الأعطال التقنية",
   "description": "نظام مؤسسي متكامل لإدارة وتتبع بلاغات الصيانة والدعم الفني - جامعة النيل الأبيض",
-  "start_url": "/dashboard",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",

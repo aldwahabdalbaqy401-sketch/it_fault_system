@@ -442,6 +442,28 @@
             0%, 100% { transform: scale(1); opacity: 1; }
             50%       { transform: scale(1.35); opacity: 0.7; }
         }
+
+        /* PWA Mobile Floating Install Banner */
+        .pwa-mobile-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 16px;
+            right: 16px;
+            max-width: 480px;
+            margin: 0 auto;
+            background: rgba(15, 23, 42, 0.94);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 18px;
+            padding: 12px 16px;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+            z-index: 1090;
+            animation: slideUpBanner 0.4s ease-out;
+        }
+        @keyframes slideUpBanner {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -1009,6 +1031,56 @@
     </script>
     {% endif %}
 
+    <!-- PWA Mobile Floating Install Banner -->
+    <div id="pwaMobileInstallBanner" class="pwa-mobile-banner d-none">
+        <div class="d-flex align-items-center justify-content-between gap-2">
+            <div class="d-flex align-items-center gap-2">
+                <img src="{{ url_for('static', filename='icons/icon-192x192.png') }}" width="42" height="42" class="rounded-3 shadow-sm bg-white p-1" alt="App Icon">
+                <div>
+                    <strong class="d-block text-white small" style="line-height: 1.2;">{{ 'Install Fault System' if is_english else 'تثبيت نظام الأعطال' }}</strong>
+                    <span class="text-light text-opacity-75" style="font-size: 11px;">{{ 'Fast app on your home screen' if is_english else 'تطبيق سريع على شاشة هاتفك' }}</span>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm btn-warning rounded-pill px-3 py-1 fw-bold shadow-sm" id="btnInstallMobile">
+                    <i class="bi bi-download me-1"></i> {{ 'Install' if is_english else 'تثبيت الآن' }}
+                </button>
+                <button class="btn btn-sm btn-link text-white text-opacity-50 text-decoration-none p-1" onclick="dismissMobilePWA()" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- iOS Install Guide Modal -->
+    <div class="modal fade" id="iosInstallModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white border-0 py-3 px-4 rounded-top-4">
+                    <h5 class="modal-title fw-bold mb-0"><i class="bi bi-apple me-2"></i> {{ 'Install on iPhone / iPad' if is_english else 'تثبيت التطبيق على الآيفون' }}</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <img src="{{ url_for('static', filename='icons/icon-192x192.png') }}" width="64" height="64" class="rounded-3 shadow-sm mb-3" alt="Logo">
+                    <h6 class="fw-bold mb-3">{{ 'Follow these simple steps in Safari:' if is_english else 'اتبع الخطوات البسيطة التالية في متصفح Safari:' }}</h6>
+                    <div class="text-start bg-light p-3 rounded-3 small mb-3">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge bg-primary rounded-circle">1</span>
+                            <span>{{ 'Tap the Share button' if is_english else 'اضغط على زر المشاركة بالأسفل' }} <i class="bi bi-share text-primary fs-5"></i></span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary rounded-circle">2</span>
+                            <span>{{ 'Scroll down and tap "Add to Home Screen"' if is_english else 'مرر للأسفل واختر "إضافة إلى الصفحة الرئيسية"' }} <i class="bi bi-plus-square text-primary fs-5"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0 py-2 px-4 rounded-bottom-4">
+                    <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-dismiss="modal">{{ 'Got it' if is_english else 'حسناً، فهمت' }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- PWA Service Worker Registration & Install Prompt -->
     <script>
         // 1. تسجيل الـ Service Worker
@@ -1020,38 +1092,79 @@
             });
         }
 
-        // 2. معالجة وتفعيل زر تثبيت التطبيق
+        // 2. معالجة وتفعيل أزرار وشريط تثبيت التطبيق
         let deferredPrompt;
         const pwaInstallNav = document.getElementById('pwaInstallNav');
         const btnInstallApp = document.getElementById('btnInstallApp');
+        const pwaMobileBanner = document.getElementById('pwaMobileInstallBanner');
+        const btnInstallMobile = document.getElementById('btnInstallMobile');
+
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+        function showInstallUI() {
+            if (isStandalone) return;
+            if (sessionStorage.getItem('pwa_dismissed') === 'true') return;
+
+            if (pwaMobileBanner) {
+                pwaMobileBanner.classList.remove('d-none');
+            }
+            if (pwaInstallNav) {
+                pwaInstallNav.classList.remove('d-none');
+            }
+        }
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            if (pwaInstallNav) {
-                pwaInstallNav.classList.remove('d-none');
-            }
+            showInstallUI();
         });
 
-        if (btnInstallApp) {
-            btnInstallApp.addEventListener('click', async () => {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    console.log(`[PWA] Install prompt outcome: ${outcome}`);
-                    deferredPrompt = null;
-                    if (outcome === 'accepted' && pwaInstallNav) {
-                        pwaInstallNav.classList.add('d-none');
-                    }
+        // Trigger on iOS Safari
+        if (isIOS && !isStandalone) {
+            setTimeout(showInstallUI, 1500);
+        }
+
+        async function handleInstallAction() {
+            if (isIOS) {
+                const iosModal = new bootstrap.Modal(document.getElementById('iosInstallModal'));
+                iosModal.show();
+                return;
+            }
+
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`[PWA] Install prompt outcome: ${outcome}`);
+                deferredPrompt = null;
+                if (outcome === 'accepted') {
+                    if (pwaMobileBanner) pwaMobileBanner.classList.add('d-none');
+                    if (pwaInstallNav) pwaInstallNav.classList.add('d-none');
                 }
-            });
+            } else {
+                // Fallback for browsers that already offer native install menu
+                alert('{{ "To install, tap your browser menu (3 dots or share) and choose Add to Home screen" if is_english else "لتثبيت التطبيق، اضغط على خيارات المتصفح (النقاط الثلاث ⋮) واختر إضافة إلى الشاشة الرئيسية (تثبيت التطبيق)" }}');
+            }
+        }
+
+        if (btnInstallApp) {
+            btnInstallApp.addEventListener('click', handleInstallAction);
+        }
+        if (btnInstallMobile) {
+            btnInstallMobile.addEventListener('click', handleInstallAction);
+        }
+
+        function dismissMobilePWA() {
+            if (pwaMobileBanner) {
+                pwaMobileBanner.classList.add('d-none');
+                sessionStorage.setItem('pwa_dismissed', 'true');
+            }
         }
 
         window.addEventListener('appinstalled', () => {
             console.log('[PWA] App was successfully installed!');
-            if (pwaInstallNav) {
-                pwaInstallNav.classList.add('d-none');
-            }
+            if (pwaMobileBanner) pwaMobileBanner.classList.add('d-none');
+            if (pwaInstallNav) pwaInstallNav.classList.add('d-none');
         });
     </script>
 
