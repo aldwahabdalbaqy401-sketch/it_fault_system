@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'قاعدة المعرفة والحلول السريعة' if not is_english else 'Knowledge Base & Quick Solutions' }} - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Hero Header -->
+    <div class="p-4 p-md-5 mb-4 rounded-4 shadow-sm text-white position-relative overflow-hidden" 
+         style="background: linear-gradient(135deg, #0f3d70 0%, #1e293b 100%);">
+        <div class="position-relative z-2">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <span class="badge bg-warning text-dark fw-bold mb-2 px-3 py-2 rounded-pill">
+                        <i class="bi bi-lightbulb-fill me-1"></i> {{ 'الدعم الذاتي وحلول الأعطال' if not is_english else 'Self-Service & Help' }}
+                    </span>
+                    <h2 class="fw-bold mb-2">{{ 'قاعدة المعرفة والدعم التقني' if not is_english else 'Knowledge Base & IT Support' }}</h2>
+                    <p class="text-light opacity-75 mb-0" style="max-width: 650px;">
+                        {{ 'ابحث عن حلول سريعة للأعطال الشائعة (الطابعات، الشبكات، البريد الجامعي، النظام) لحل مشكلتك فوراً دون انتظار الفني.' if not is_english else 'Find instant solutions for common IT issues (Printers, Network, Email, System) before raising a ticket.' }}
+                    </p>
+                </div>
+                {% if session.get('user_role') in ['admin', 'supervisor'] %}
+                <div>
+                    <a href="{{ url_for('admin_add_kb') }}" class="btn btn-warning fw-bold px-4 py-2 rounded-3 shadow">
+                        <i class="bi bi-plus-circle me-1"></i> {{ 'إضافة مقال جديد' if not is_english else 'New Article' }}
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Search Bar -->
+            <div class="mt-4" style="max-width: 650px;">
+                <form action="{{ url_for('knowledge_base') }}" method="GET" class="position-relative">
+                    <input type="text" name="q" value="{{ query or '' }}" 
+                           class="form-control form-control-lg rounded-pill ps-5 pe-4 shadow-lg border-0" 
+                           placeholder="{{ 'ابحث بالكلمات المفتاحية (مثال: طابعة، انترنت، كلمة المرور، شاشة...)' if not is_english else 'Search articles (e.g., printer, wifi, email, password)...' }}">
+                    <button type="submit" class="btn position-absolute top-50 start-0 translate-middle-y ms-2 text-primary border-0 bg-transparent">
+                        <i class="bi bi-search fs-5"></i>
+                    </button>
+                    {% if query %}
+                    <a href="{{ url_for('knowledge_base') }}" class="position-absolute top-50 end-0 translate-middle-y me-3 text-secondary text-decoration-none">
+                        <i class="bi bi-x-circle-fill fs-5"></i>
+                    </a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Pills -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <a href="{{ url_for('knowledge_base') }}" 
+           class="btn rounded-pill px-3 py-2 fw-bold {{ 'btn-primary' if not active_category else 'btn-outline-secondary bg-white' }}">
+            <i class="bi bi-grid-fill me-1"></i> {{ 'جميع التصنيفات' if not is_english else 'All Categories' }}
+        </a>
+        <a href="{{ url_for('knowledge_base', category='أجهزة') }}" 
+           class="btn rounded-pill px-3 py-2 fw-bold {{ 'btn-primary' if active_category == 'أجهزة' else 'btn-outline-secondary bg-white' }}">
+            <i class="bi bi-display me-1"></i> {{ 'أجهزة ومعدات' if not is_english else 'Hardware' }}
+        </a>
+        <a href="{{ url_for('knowledge_base', category='شبكات') }}" 
+           class="btn rounded-pill px-3 py-2 fw-bold {{ 'btn-primary' if active_category == 'شبكات' else 'btn-outline-secondary bg-white' }}">
+            <i class="bi bi-wifi me-1"></i> {{ 'شبكات وإنترنت' if not is_english else 'Network & WiFi' }}
+        </a>
+        <a href="{{ url_for('knowledge_base', category='برمجيات') }}" 
+           class="btn rounded-pill px-3 py-2 fw-bold {{ 'btn-primary' if active_category == 'برمجيات' else 'btn-outline-secondary bg-white' }}">
+            <i class="bi bi-window-stack me-1"></i> {{ 'أنظمة وبرمجيات' if not is_english else 'Software & Systems' }}
+        </a>
+    </div>
+
+    <!-- Articles List -->
+    {% if articles and articles|length > 0 %}
+    <div class="row g-4">
+        {% for article in articles %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden d-flex flex-column hover-shadow transition-all">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-2 rounded-pill">
+                            <i class="bi bi-tag-fill me-1"></i> {{ article.category }}
+                        </span>
+                        <span class="text-muted small">
+                            <i class="bi bi-eye me-1"></i> {{ article.views_count }} {{ 'مشاهدة' if not is_english else 'views' }}
+                        </span>
+                    </div>
+                    <h5 class="fw-bold mb-3 text-dark text-decoration-none">
+                        {{ article.title }}
+                    </h5>
+                    <p class="text-muted small mb-4 flex-grow-1" style="line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                        {{ article.content }}
+                    </p>
+                    <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold" 
+                                data-bs-toggle="modal" data-bs-target="#kbModal{{ article.id }}"
+                                onclick="incrementViews({{ article.id }})">
+                            {{ 'قراءة الحل كاملاً' if not is_english else 'Read Full Guide' }} <i class="bi bi-arrow-left ms-1"></i>
+                        </button>
+                        {% if session.get('user_role') in ['admin', 'supervisor'] %}
+                        <div class="btn-group btn-group-sm">
+                            <a href="{{ url_for('admin_edit_kb', id=article.id) }}" class="btn btn-outline-secondary" title="تعديل">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form action="{{ url_for('admin_delete_kb', id=article.id) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا المقال؟');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-outline-danger" title="حذف">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Article Detail Modal -->
+        <div class="modal fade" id="kbModal{{ article.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content rounded-4 border-0 shadow-lg">
+                    <div class="modal-header bg-light border-0 py-3 px-4 rounded-top-4">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary px-3 py-2 rounded-pill">{{ article.category }}</span>
+                            <h5 class="modal-title fw-bold text-dark mb-0">{{ article.title }}</h5>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="article-content bg-light p-4 rounded-3 text-dark mb-4" style="white-space: pre-line; line-height: 1.8; font-size: 15px;">
+                            {{ article.content }}
+                        </div>
+                        {% if article.tags %}
+                        <div class="mb-3">
+                            <small class="text-muted fw-bold me-2"><i class="bi bi-tags"></i> {{ 'الكلمات المفتاحية:' if not is_english else 'Tags:' }}</small>
+                            {% for tag in article.tags.split(',') %}
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary me-1">{{ tag.strip() }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer bg-light border-0 py-3 px-4 rounded-bottom-4 d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-muted small">{{ 'هل كان هذا الحل مفيداً؟' if not is_english else 'Was this helpful?' }}</span>
+                            <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="markHelpful({{ article.id }}, this)">
+                                <i class="bi bi-hand-thumbs-up-fill me-1"></i> <span class="helpful-count">{{ article.helpful_count }}</span>
+                            </button>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('add_fault') }}" class="btn btn-primary btn-sm rounded-pill px-3">
+                                <i class="bi bi-ticket-detailed me-1"></i> {{ 'لم تُحل المشكلة؟ افتح بلاغاً' if not is_english else 'Still not resolved? Open ticket' }}
+                            </a>
+                            <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">
+                                {{ 'إغلاق' if not is_english else 'Close' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm rounded-4 text-center py-5">
+        <div class="card-body">
+            <i class="bi bi-journal-x display-3 text-muted mb-3 d-block"></i>
+            <h5 class="fw-bold text-dark mb-2">{{ 'لم يتم العثور على مقالات مطابقة' if not is_english else 'No matching articles found' }}</h5>
+            <p class="text-muted small mb-4">{{ 'يمكنك البحث بكلمات أخرى أو تقديم بلاغ صيانة مباشر لفريق الدعم الفني.' if not is_english else 'Try searching with different keywords or submit a direct maintenance request.' }}</p>
+            <a href="{{ url_for('add_fault') }}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold">
+                <i class="bi bi-plus-circle me-1"></i> {{ 'تقديم بلاغ صيانة' if not is_english else 'Submit a Fault' }}
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    function incrementViews(articleId) {
+        fetch(`/api/knowledge_base/view/${articleId}`, { method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token() }}' } });
+    }
+
+    function markHelpful(articleId, btn) {
+        fetch(`/api/knowledge_base/helpful/${articleId}`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token() }}' }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                btn.querySelector('.helpful-count').textContent = data.helpful_count;
+                btn.classList.remove('btn-outline-success');
+                btn.classList.add('btn-success');
+                btn.disabled = true;
+            }
+        });
+    }
+</script>
+{% endblock %}

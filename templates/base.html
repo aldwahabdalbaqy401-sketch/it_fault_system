@@ -7,6 +7,11 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="{{ APP_NAME }}">
+    <!-- PWA Manifest & App Icons -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{% block title %}{{ APP_NAME }}{% endblock %}</title>
     <!-- Bootstrap 5 layout direction -->
@@ -477,6 +482,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link fw-bold px-3" href="{{ url_for('knowledge_base') }}">
+                                <i class="bi bi-journal-bookmark-fill me-1"></i> {{ 'Knowledge Base' if is_english else 'قاعدة المعرفة' }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link fw-bold px-3" href="{{ url_for('dashboard_stats') }}">
                                 <i class="bi bi-bar-chart-line me-1"></i> {{ 'Statistics' if is_english else 'الإحصائيات' }}
                             </a>
@@ -492,6 +502,11 @@
                                 <i class="bi bi-list-check me-1"></i> {{ 'All Faults' if is_english else 'جميع البلاغات' }}
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold px-3" href="{{ url_for('knowledge_base') }}">
+                                <i class="bi bi-journal-bookmark-fill me-1"></i> {{ 'Knowledge Base' if is_english else 'قاعدة المعرفة' }}
+                            </a>
+                        </li>
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link fw-bold px-3" href="{{ url_for('user_dashboard') }}">
@@ -504,6 +519,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link fw-bold px-3" href="{{ url_for('knowledge_base') }}">
+                                <i class="bi bi-lightbulb-fill me-1"></i> {{ 'Solutions' if is_english else 'الحلول السريعة' }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link fw-bold px-3" href="{{ url_for('my_faults') }}">
                                 <i class="bi bi-clock-history me-1"></i> {{ 'My Reports' if is_english else 'سجل بلاغاتي' }}
                             </a>
@@ -512,6 +532,13 @@
                 </ul>
 
                 <ul class="navbar-nav ms-auto align-items-center">
+                    <!-- PWA Install Button -->
+                    <li class="nav-item me-2 d-none" id="pwaInstallNav">
+                        <button class="btn btn-sm btn-outline-light rounded-pill px-3 py-1 fw-bold d-flex align-items-center gap-1 shadow-sm" id="btnInstallApp" title="{{ 'Install App' if is_english else 'تثبيت التطبيق على جهازك' }}">
+                            <i class="bi bi-download text-warning"></i>
+                            <span class="small">{{ 'Install App' if is_english else 'تثبيت التطبيق' }}</span>
+                        </button>
+                    </li>
                     <!-- Chat Button (always visible) -->
                     <li class="nav-item me-2">
                         <a class="chat-nav-btn" href="{{ url_for('technician_support') if session.get('user_role') in ['admin','supervisor','technician'] else url_for('user_dashboard') }}" 
@@ -981,6 +1008,52 @@
         });
     </script>
     {% endif %}
+
+    <!-- PWA Service Worker Registration & Install Prompt -->
+    <script>
+        // 1. تسجيل الـ Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register("{{ url_for('static', filename='service-worker.js') }}")
+                    .then(reg => console.log('[PWA] Service Worker Registered Successfully! Scope:', reg.scope))
+                    .catch(err => console.log('[PWA] Service Worker Registration Failed:', err));
+            });
+        }
+
+        // 2. معالجة وتفعيل زر تثبيت التطبيق
+        let deferredPrompt;
+        const pwaInstallNav = document.getElementById('pwaInstallNav');
+        const btnInstallApp = document.getElementById('btnInstallApp');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (pwaInstallNav) {
+                pwaInstallNav.classList.remove('d-none');
+            }
+        });
+
+        if (btnInstallApp) {
+            btnInstallApp.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`[PWA] Install prompt outcome: ${outcome}`);
+                    deferredPrompt = null;
+                    if (outcome === 'accepted' && pwaInstallNav) {
+                        pwaInstallNav.classList.add('d-none');
+                    }
+                }
+            });
+        }
+
+        window.addEventListener('appinstalled', () => {
+            console.log('[PWA] App was successfully installed!');
+            if (pwaInstallNav) {
+                pwaInstallNav.classList.add('d-none');
+            }
+        });
+    </script>
 
 </body>
 </html>

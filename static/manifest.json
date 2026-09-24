@@ -1,0 +1,56 @@
+{
+  "name": "نظام إدارة وتتبع الأعطال التقنية",
+  "short_name": "الأعطال التقنية",
+  "description": "نظام مؤسسي متكامل لإدارة وتتبع بلاغات الصيانة والدعم الفني - جامعة النيل الأبيض",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f172a",
+  "theme_color": "#0f3d70",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    {
+      "src": "/static/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "تقديم بلاغ عطل",
+      "short_name": "بلاغ جديد",
+      "description": "فتح استمارة تسجيل بلاغ صيانة جديد فوراً",
+      "url": "/add_fault",
+      "icons": [{ "src": "/static/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "سجل البلاغات",
+      "short_name": "البلاغات",
+      "description": "استعراض ومتابعة حالة البلاغات",
+      "url": "/view_faults",
+      "icons": [{ "src": "/static/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "قاعدة المعرفة",
+      "short_name": "الحلول الذاتية",
+      "description": "استعراض مقالات الدعم والحلول السريعة",
+      "url": "/knowledge_base",
+      "icons": [{ "src": "/static/icons/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, send_file, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, session, send_file, send_from_directory, jsonify
 from flask_mail import Mail, Message
 import psycopg2
 import psycopg2.extras
@@ -116,6 +116,22 @@ def set_language(language):
         if parsed_referrer.netloc and parsed_referrer.netloc != request.host:
             referrer = None
     return redirect(referrer or url_for('login'))
+
+# ========== مسارات PWA وتطبيق الويب التقدمي ==========
+@app.route('/manifest.json')
+def pwa_manifest():
+    return send_from_directory('static', 'manifest.json', mimetype='application/manifest+json')
+
+@app.route('/service-worker.js')
+def pwa_service_worker():
+    response = send_from_directory('static', 'service-worker.js', mimetype='application/javascript')
+    response.headers['Service-Worker-Allowed'] = '/'
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    return response
+
+@app.route('/offline')
+def pwa_offline():
+    return render_template('offline.html')
 
 # ========== دالة الاتصال بقاعدة البيانات ==========
 last_db_error = ""
@@ -727,23 +743,35 @@ def add_fault():
         if conn:
             cursor = conn.cursor()
             
+            # ===== حساب مهلة اتفاقية مستوى الخدمة (SLA Due Date) تلقائياً =====
+            now = datetime.now()
+            if priority == 'critical':
+                sla_due_date = now + timedelta(hours=2)
+            elif priority == 'high':
+                sla_due_date = now + timedelta(hours=6)
+            elif priority == 'medium':
+                sla_due_date = now + timedelta(hours=24)
+            else:
+                sla_due_date = now + timedelta(hours=48)
+
             # ===== إضافة الموعد إذا كان موجوداً =====
             if scheduled_date:
                 cursor.execute(
                     '''INSERT INTO faults 
-                    (title, description, fault_type, location, priority, status, attachment, user_id, scheduled_date) 
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)''',
-                    (title, description, fault_type, location, priority, status, filename, session['user_id'], scheduled_date)
+                    (title, description, fault_type, location, priority, status, attachment, user_id, scheduled_date, sla_due_date) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id''',
+                    (title, description, fault_type, location, priority, status, filename, session['user_id'], scheduled_date, sla_due_date)
                 )
             else:
                 cursor.execute(
                     '''INSERT INTO faults 
-                    (title, description, fault_type, location, priority, status, attachment, user_id) 
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''',
-                    (title, description, fault_type, location, priority, status, filename, session['user_id'])
+                    (title, description, fault_type, location, priority, status, attachment, user_id, sla_due_date) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id''',
+                    (title, description, fault_type, location, priority, status, filename, session['user_id'], sla_due_date)
                 )
             
-            fault_id = cursor.lastrowid
+            inserted_row = cursor.fetchone()
+            fault_id = inserted_row['id'] if inserted_row and 'id' in inserted_row else cursor.lastrowid
             conn.commit()
             
             # ===== إضافة إشعارات =====
@@ -942,8 +970,24 @@ def fault_details(id):
         return redirect(url_for('view_faults'))
 
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM faults WHERE id = %s', (id,))
+    cursor.execute('''
+        SELECT f.*, 
+               u.full_name as user_full_name, u.email as user_email, u.phone as user_phone, u.department as user_dept,
+               t.full_name as assigned_technician_name, t.email as assigned_technician_email, t.phone as assigned_technician_phone
+        FROM faults f
+        LEFT JOIN users u ON f.user_id = u.id
+        LEFT JOIN users t ON f.assigned_to = t.id
+        WHERE f.id = %s
+    ''', (id,))
     fault = cursor.fetchone()
+
+    parts = []
+    try:
+        cursor.execute('SELECT * FROM fault_parts WHERE fault_id = %s ORDER BY id ASC', (id,))
+        parts = cursor.fetchall()
+    except Exception:
+        pass
+
     cursor.close()
     conn.close()
 
@@ -955,7 +999,170 @@ def fault_details(id):
         flash('غير مصرح لك بالوصول إلى هذا البلاغ', 'danger')
         return redirect(url_for('my_faults'))
 
-    return render_template('fault_details.html', fault=fault)
+    return render_template('fault_details.html', fault=fault, parts=parts, now=datetime.now())
+
+# ==========================================
+# ========== مسارات قاعدة المعرفة ==========
+# ==========================================
+
+@app.route('/knowledge_base')
+def knowledge_base():
+    q = request.args.get('q', '').strip()
+    category = request.args.get('category', '').strip()
+    
+    conn = get_db_connection()
+    articles = []
+    if conn:
+        cursor = conn.cursor()
+        query_sql = "SELECT * FROM knowledge_base WHERE 1=1"
+        params = []
+        
+        if category:
+            query_sql += " AND category = %s"
+            params.append(category)
+            
+        if q:
+            query_sql += " AND (title ILIKE %s OR content ILIKE %s OR tags ILIKE %s)"
+            search_param = f"%{q}%"
+            params.extend([search_param, search_param, search_param])
+            
+        query_sql += " ORDER BY id DESC"
+        cursor.execute(query_sql, tuple(params))
+        articles = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+    return render_template('knowledge_base.html', articles=articles, query=q, active_category=category)
+
+@app.route('/api/knowledge_base/view/<int:id>', methods=['POST'])
+def api_kb_view(id):
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE knowledge_base SET views_count = views_count + 1 WHERE id = %s", (id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({'success': True})
+    return jsonify({'success': False}), 500
+
+@app.route('/api/knowledge_base/helpful/<int:id>', methods=['POST'])
+def api_kb_helpful(id):
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE knowledge_base SET helpful_count = helpful_count + 1 WHERE id = %s RETURNING helpful_count", (id,))
+        row = cursor.fetchone()
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({'success': True, 'helpful_count': row['helpful_count'] if row else 1})
+    return jsonify({'success': False}), 500
+
+@app.route('/api/knowledge_base/suggest')
+def api_kb_suggest():
+    q = request.args.get('q', '').strip()
+    if not q or len(q) < 2:
+        return jsonify({'suggestions': []})
+        
+    conn = get_db_connection()
+    suggestions = []
+    if conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT id, title, category, content FROM knowledge_base WHERE title ILIKE %s OR tags ILIKE %s OR content ILIKE %s LIMIT 3",
+            (f"%{q}%", f"%{q}%", f"%{q}%")
+        )
+        suggestions = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+    return jsonify({'suggestions': suggestions})
+
+@app.route('/admin/knowledge_base/add', methods=['GET', 'POST'])
+@login_required
+@role_required(['admin', 'supervisor'])
+def admin_add_kb():
+    if request.method == 'POST':
+        title = request.form.get('title', '').strip()
+        category = request.form.get('category', '').strip()
+        content = request.form.get('content', '').strip()
+        tags = request.form.get('tags', '').strip()
+        
+        conn = get_db_connection()
+        if conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO knowledge_base (title, category, content, tags) VALUES (%s, %s, %s, %s)",
+                (title, category, content, tags)
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+            log_activity('إضافة مقال معرفي', f'العنوان: {title}')
+            flash('تمت إضافة المقال بنجاح إلى قاعدة المعرفة', 'success')
+            return redirect(url_for('knowledge_base'))
+        else:
+            flash('مشكلة في الاتصال بقاعدة البيانات', 'danger')
+            
+    return render_template('admin_kb_form.html', article=None)
+
+@app.route('/admin/knowledge_base/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+@role_required(['admin', 'supervisor'])
+def admin_edit_kb(id):
+    conn = get_db_connection()
+    if not conn:
+        flash('مشكلة في الاتصال بقاعدة البيانات', 'danger')
+        return redirect(url_for('knowledge_base'))
+        
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM knowledge_base WHERE id = %s", (id,))
+    article = cursor.fetchone()
+    
+    if not article:
+        cursor.close()
+        conn.close()
+        flash('المقال غير موجود', 'danger')
+        return redirect(url_for('knowledge_base'))
+        
+    if request.method == 'POST':
+        title = request.form.get('title', '').strip()
+        category = request.form.get('category', '').strip()
+        content = request.form.get('content', '').strip()
+        tags = request.form.get('tags', '').strip()
+        
+        cursor.execute(
+            "UPDATE knowledge_base SET title = %s, category = %s, content = %s, tags = %s, updated_at = NOW() WHERE id = %s",
+            (title, category, content, tags, id)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        log_activity('تعديل مقال معرفي', f'ID: {id}')
+        flash('تم تحديث المقال بنجاح', 'success')
+        return redirect(url_for('knowledge_base'))
+        
+    cursor.close()
+    conn.close()
+    return render_template('admin_kb_form.html', article=article)
+
+@app.route('/admin/knowledge_base/delete/<int:id>', methods=['POST'])
+@login_required
+@role_required(['admin', 'supervisor'])
+def admin_delete_kb(id):
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM knowledge_base WHERE id = %s", (id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        log_activity('حذف مقال معرفي', f'ID: {id}')
+        flash('تم حذف المقال بنجاح', 'success')
+    else:
+        flash('مشكلة في الاتصال بقاعدة البيانات', 'danger')
+    return redirect(url_for('knowledge_base'))
 
 @app.route('/dashboard_stats')
 @login_required
@@ -1448,6 +1655,32 @@ def resolve_fault(id):
                 "UPDATE faults SET status = 'resolved', completed_at = NOW(), technician_notes = %s WHERE id = %s AND assigned_to = %s",
                 (notes, id, session['user_id'])
             )
+
+        # ===== تسجيل قطع الغيار المستهلكة إن وجدت =====
+        part_name = request.form.get('part_name', '').strip()
+        if part_name:
+            try:
+                part_qty = int(request.form.get('part_qty', 1) or 1)
+            except Exception:
+                part_qty = 1
+            try:
+                part_cost = float(request.form.get('part_cost', 0) or 0)
+            except Exception:
+                part_cost = 0.0
+
+            total_cost = round(part_qty * part_cost, 2)
+            try:
+                cursor.execute(
+                    "INSERT INTO fault_parts (fault_id, part_name, quantity, unit_cost, total_cost) VALUES (%s, %s, %s, %s, %s)",
+                    (id, part_name, part_qty, part_cost, total_cost)
+                )
+                cursor.execute(
+                    "UPDATE faults SET spare_parts_cost = COALESCE(spare_parts_cost, 0) + %s WHERE id = %s",
+                    (total_cost, id)
+                )
+            except Exception as e:
+                print(f"Error saving spare parts: {e}")
+
         conn.commit()
         
         # ===== إشعار عند حل العطل =====

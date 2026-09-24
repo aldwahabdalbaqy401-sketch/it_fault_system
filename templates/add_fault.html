@@ -25,7 +25,17 @@
                     <!-- Title -->
                     <div class="col-12">
                         <label for="title" class="form-label fw-bold"><i class="bi bi-type me-1"></i> عنوان العطل <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control form-control-lg bg-light" id="title" name="title" placeholder="مثال: تعطل الشبكة الداخلية" required>
+                        <input type="text" class="form-control form-control-lg bg-light" id="title" name="title" placeholder="مثال: تعطل الشبكة الداخلية أو الطابعة" required autocomplete="off">
+                        <!-- Smart Knowledge Base Suggestions -->
+                        <div id="kbSuggestionsBox" class="mt-2 d-none">
+                            <div class="alert alert-info border-0 rounded-4 shadow-sm p-3 mb-0">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <span class="fw-bold small text-primary"><i class="bi bi-lightbulb-fill text-warning me-1"></i> هل قد يحل هذا المقال مشكلتك فوراً؟</span>
+                                    <button type="button" class="btn-close btn-close-sm" onclick="document.getElementById('kbSuggestionsBox').classList.add('d-none')"></button>
+                                </div>
+                                <div id="kbSuggestionsList" class="d-flex flex-column gap-2"></div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Description -->
@@ -304,6 +314,49 @@ document.addEventListener('DOMContentLoaded', function () {
         const savingText = window.APP_LANGUAGE === 'en' ? 'Saving...' : 'جارٍ الحفظ...';
         submitButton.innerHTML = `<span class="spinner-border spinner-border-sm ms-1" aria-hidden="true"></span> ${savingText}`;
     });
+    // Smart Knowledge Base Suggestion
+    const titleInput = document.getElementById('title');
+    const kbBox = document.getElementById('kbSuggestionsBox');
+    const kbList = document.getElementById('kbSuggestionsList');
+    let debounceTimer;
+
+    titleInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim();
+        if (query.length < 2) {
+            kbBox.classList.add('d-none');
+            return;
+        }
+
+        debounceTimer = setTimeout(() => {
+            fetch(`/api/knowledge_base/suggest?q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.suggestions && data.suggestions.length > 0) {
+                        let html = '';
+                        data.suggestions.forEach(item => {
+                            html += `
+                                <div class="p-2 bg-white rounded-3 border d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary small me-1">${item.category}</span>
+                                        <strong class="text-dark small">${item.title}</strong>
+                                    </div>
+                                    <a href="/knowledge_base" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1">
+                                        قراءة الحل <i class="bi bi-box-arrow-up-right ms-1"></i>
+                                    </a>
+                                </div>
+                            `;
+                        });
+                        kbList.innerHTML = html;
+                        kbBox.classList.remove('d-none');
+                    } else {
+                        kbBox.classList.add('d-none');
+                    }
+                })
+                .catch(() => kbBox.classList.add('d-none'));
+        }, 300);
+    });
+
     updateDescriptionCounter();
     updatePriorityHint();
 });

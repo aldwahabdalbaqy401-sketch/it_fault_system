@@ -29,6 +29,37 @@
         </div>
     </div>
 
+    <!-- ===== اتفاقية مستوى الخدمة (SLA Deadline & Live Status) ===== -->
+    {% if fault.sla_due_date %}
+    <div class="card border-0 mb-4 p-3 rounded-4 shadow-sm" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #f8fafc;">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle p-2 bg-primary bg-opacity-25 text-warning fs-4">
+                    <i class="bi bi-stopwatch-fill"></i>
+                </div>
+                <div>
+                    <span class="badge bg-warning text-dark fw-bold mb-1">{{ 'SLA Target' if is_english else 'اتفاقية مستوى الخدمة (SLA)' }}</span>
+                    <div class="fw-bold text-white small">
+                        {{ 'Target Resolution Time:' if is_english else 'الموعد الأقصى للحل المعتمد:' }} 
+                        <span class="text-warning" dir="ltr">{{ fault.sla_due_date }}</span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                {% if fault.status in ['resolved', 'closed'] %}
+                    <span class="badge bg-success bg-opacity-25 text-success border border-success px-3 py-2 fs-6 rounded-pill">
+                        <i class="bi bi-check-circle-fill me-1"></i> {{ 'Resolved within SLA target' if is_english else 'تم الحل ضمن المهلة المحددة' }}
+                    </span>
+                {% else %}
+                    <div id="slaTimerBadge" class="badge bg-primary bg-opacity-25 text-light border border-primary px-3 py-2 fs-6 rounded-pill" data-due="{{ fault.sla_due_date }}">
+                        <i class="bi bi-hourglass-split me-1"></i> <span id="slaCountdownText">{{ 'Calculating time...' if is_english else 'جاري حساب الوقت المتبقي...' }}</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- ===== 1. دورة حياة البلاغ (Interactive Lifecycle Stepper) ===== -->
     <div class="card border-0 mb-4 p-3 p-md-4 rounded-4 shadow-sm">
         <h6 class="fw-bold mb-3 d-flex align-items-center gap-2" style="color: var(--primary);">
@@ -148,6 +179,40 @@
                 </div>
                 {% endif %}
 
+                <!-- Spare Parts Section -->
+                {% if parts and parts|length > 0 %}
+                <div class="mt-4 pt-3 border-top">
+                    <h6 class="fw-bold mb-3 text-dark d-flex align-items-center justify-content-between">
+                        <span><i class="bi bi-cpu-fill text-primary me-1"></i> {{ 'Spare Parts Used' if is_english else 'قطع الغيار والمواد المستهلكة' }}</span>
+                        <span class="badge bg-success rounded-pill px-3">{{ 'Total Cost:' if is_english else 'إجمالي التكلفة:' }} {{ fault.spare_parts_cost or '0' }} SDG</span>
+                    </h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>{{ 'Part Name' if is_english else 'اسم القطعة' }}</th>
+                                    <th>{{ 'Qty' if is_english else 'الكمية' }}</th>
+                                    <th>{{ 'Unit Cost' if is_english else 'سعر الوحدة' }}</th>
+                                    <th>{{ 'Total' if is_english else 'الإجمالي' }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for part in parts %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td class="fw-bold">{{ part.part_name }}</td>
+                                    <td>{{ part.quantity }}</td>
+                                    <td>{{ part.unit_cost }}</td>
+                                    <td class="fw-bold text-success">{{ part.total_cost }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+
                 <!-- Rating Section (if closed) -->
                 {% if fault.status == 'closed' %}
                 <div class="mt-4 p-4 rounded-4 border-start border-4 border-warning bg-warning bg-opacity-10">
@@ -226,10 +291,11 @@
                         </form>
                         {% endif %}
 
-                        <button type="button" onclick="window.print()" class="btn btn-secondary rounded-3">
-                            <i class="bi bi-printer me-1"></i> {{ 'Print Ticket' if is_english else 'طباعة البلاغ' }}
-                        </button>
-                    </div>
+                <!-- Quick QR Code Tag Card -->
+                <div class="card border-0 rounded-4 shadow-sm p-4 text-center">
+                    <h6 class="fw-bold text-muted mb-3"><i class="bi bi-qr-code text-primary me-1"></i> {{ 'Ticket QR Code' if is_english else 'رمز الاستجابة السريعة (QR)' }}</h6>
+                    <div id="ticketQRCode" class="d-flex justify-content-center p-3 bg-light rounded-3 border mb-3"></div>
+                    <small class="text-muted d-block mb-3">{{ 'Scan with mobile camera to open this fault instantly.' if is_english else 'امسح الرمز بكاميرا الهاتف للوصول السريع لهذا البلاغ.' }}</small>
                 </div>
 
             </div>
@@ -238,4 +304,53 @@
     </div>
 
 </div>
+
+<!-- QR Code Library & SLA Live Script -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+    // 1. Generate QR Code
+    document.addEventListener('DOMContentLoaded', () => {
+        const qrContainer = document.getElementById('ticketQRCode');
+        if (qrContainer && typeof QRCode !== 'undefined') {
+            new QRCode(qrContainer, {
+                text: window.location.href,
+                width: 140,
+                height: 140,
+                colorDark: "#0f3d70",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+
+        // 2. SLA Countdown Logic
+        const slaBadge = document.getElementById('slaTimerBadge');
+        const slaText = document.getElementById('slaCountdownText');
+        if (slaBadge && slaText) {
+            const dueDateStr = slaBadge.getAttribute('data-due');
+            const dueDate = new Date(dueDateStr);
+
+            function updateSLACountdown() {
+                const now = new Date();
+                const diffMs = dueDate - now;
+
+                if (diffMs <= 0) {
+                    slaBadge.className = 'badge bg-danger bg-opacity-25 text-danger border border-danger px-3 py-2 fs-6 rounded-pill';
+                    slaText.innerHTML = '<i class="bi bi-exclamation-octagon-fill text-danger me-1"></i> {{ "SLA Target Exceeded / Breached" if is_english else "تجاوز المهلة المحددة (متأخر)" }}';
+                } else {
+                    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+                    const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                    const secs = Math.floor((diffMs % (1000 * 60)) / 1000);
+                    
+                    if (hours < 2) {
+                        slaBadge.className = 'badge bg-warning bg-opacity-25 text-warning border border-warning px-3 py-2 fs-6 rounded-pill';
+                    }
+                    slaText.innerHTML = `{{ "Remaining:" if is_english else "متبقي:" }} ${hours}h ${mins}m ${secs}s`;
+                }
+            }
+
+            updateSLACountdown();
+            setInterval(updateSLACountdown, 1000);
+        }
+    });
+</script>
 {% endblock %}

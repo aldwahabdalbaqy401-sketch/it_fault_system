@@ -75,9 +75,31 @@
                                 {{ 'Resolution Notes / Actions Taken' if is_english else 'ملاحظات الفني وتقرير الإصلاح' }}
                                 <span class="text-danger">*</span>
                             </label>
-                            <textarea id="technician_notes" name="technician_notes" rows="6" class="form-control rounded-3 p-3" placeholder="{{ 'Explain what was fixed, replaced parts (if any), or recommendations to prevent issue recurrence...' if is_english else 'اكتب تفاصيل ما قمت به لإصلاح العطل، القطع التي تم استبدالها (إن وجدت)، أو أي توصيات للمستخدم...' }}" required></textarea>
+                            <textarea id="technician_notes" name="technician_notes" rows="5" class="form-control rounded-3 p-3" placeholder="{{ 'Explain what was fixed, replaced parts (if any), or recommendations to prevent issue recurrence...' if is_english else 'اكتب تفاصيل ما قمت به لإصلاح العطل، القطع التي تم استبدالها (إن وجدت)، أو أي توصيات للمستخدم...' }}" required></textarea>
                             <div class="form-text text-muted mt-2">
                                 {{ 'These notes will be recorded in the fault history and will notify the reporter.' if is_english else 'سيتم حفظ هذه الملاحظات في سجل البلاغ وإشعار مقدم الطلب بنجاح الحل.' }}
+                            </div>
+                        </div>
+
+                        <!-- Optional Spare Parts Usage -->
+                        <div class="mb-4 p-3 bg-light rounded-3 border">
+                            <h6 class="fw-bold text-dark mb-2">
+                                <i class="bi bi-cpu text-primary me-1"></i>
+                                {{ 'Spare Parts Used (Optional)' if is_english else 'تسجيل قطع الغيار والمواد المستهلكة (اختياري)' }}
+                            </h6>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label small text-muted">{{ 'Part / Material Name' if is_english else 'اسم القطعة أو المادة' }}</label>
+                                    <input type="text" name="part_name" class="form-control rounded-3" placeholder="{{ 'e.g. Cat6 Network Cable, 8GB RAM, Cartridge' if is_english else 'مثال: كابل شبكة 5 متر، رامة 8GB، حبر طابعة...' }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small text-muted">{{ 'Quantity' if is_english else 'الكمية' }}</label>
+                                    <input type="number" name="part_qty" value="1" min="1" class="form-control rounded-3">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small text-muted">{{ 'Unit Cost (SDG)' if is_english else 'سعر الوحدة (SDG)' }}</label>
+                                    <input type="number" step="0.5" name="part_cost" value="0" min="0" class="form-control rounded-3">
+                                </div>
                             </div>
                         </div>
 
