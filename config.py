@@ -15,7 +15,9 @@ class Config:
     # ===== إعدادات CSRF (Flask-WTF) =====
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TRUSTED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0',
-                               'aldwahabdalbaqy.pythonanywhere.com']
+                               'aldwahabdalbaqy.pythonanywhere.com',
+                               'it-fault-system.onrender.com',
+                               '.onrender.com']
 
     # ===== إعدادات الجلسة والقوالب =====
     TEMPLATES_AUTO_RELOAD = True
