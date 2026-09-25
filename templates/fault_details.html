@@ -71,7 +71,7 @@
             <div class="stepper-step completed">
                 <div class="stepper-icon"><i class="bi bi-file-earmark-plus"></i></div>
                 <div class="stepper-label">{{ 'Reported' if is_english else 'تقديم البلاغ' }}</div>
-                <div class="stepper-time">{{ fault.created_at[:10] if fault.created_at else '' }}</div>
+                <div class="stepper-time">{{ (fault.created_at|string)[:10] if fault.created_at else '' }}</div>
             </div>
 
             <!-- Step 2: Assigned -->
@@ -92,7 +92,7 @@
             <div class="stepper-step {% if fault.status in ['resolved', 'closed'] %}completed{% if fault.status == 'resolved' %} active{% endif %}{% endif %}">
                 <div class="stepper-icon"><i class="bi bi-check-circle"></i></div>
                 <div class="stepper-label">{{ 'Resolved' if is_english else 'تم الحل' }}</div>
-                <div class="stepper-time">{% if fault.status in ['resolved', 'closed'] %}{{ fault.resolved_at or 'مكتمل' }}{% else %}-{% endif %}</div>
+                <div class="stepper-time">{% if fault.status in ['resolved', 'closed'] %}{{ (fault.resolved_at|string)[:10] if fault.resolved_at else ('Resolved' if is_english else 'مكتمل') }}{% else %}-{% endif %}</div>
             </div>
 
             <!-- Step 5: Closed / Rated -->
