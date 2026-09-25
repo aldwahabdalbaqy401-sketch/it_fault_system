@@ -62,23 +62,63 @@ def translate_text(arabic_text, english_text=None):
 def localize_data(value):
     if value is None or session.get('language', 'ar') != 'en':
         return value
-    translations = {
+    if not isinstance(value, str):
+        return value
+    phrase_map = {
         'أجهزة': 'Hardware', 'برمجيات': 'Software', 'شبكات': 'Network',
         'قواعد بيانات': 'Database', 'إنترنت': 'Internet', 'أمني': 'Security', 'أخرى': 'Other',
-        'كلية الطب': 'College of Medicine', 'كلية الهندسة': 'College of Engineering',
-        'كلية العلوم': 'College of Science', 'كلية الآداب': 'College of Arts',
-        'كلية الاقتصاد': 'College of Economics', 'كلية الحقوق': 'College of Law',
-        'كلية التربية': 'College of Education', 'كلية الزراعة': 'College of Agriculture',
-        'كلية الطب البيطري': 'College of Veterinary Medicine', 'كلية الصيدلة': 'College of Pharmacy',
-        'كلية التمريض': 'College of Nursing', 'كلية علوم الحاسوب': 'College of Computer Science',
-        'كلية الإعلام': 'College of Media', 'كلية الفنون': 'College of Arts and Design',
-        'كلية التعليم الصناعي': 'College of Industrial Education', 'كلية الدراسات العليا': 'Graduate Studies',
-        'عمادة القبول والتسجيل': 'Admissions and Registration', 'عمادة شؤون الطلاب': 'Student Affairs',
-        'الإدارة العامة': 'General Administration', 'شبكة': 'Network', 'كيبل': 'Cable',
-        'طابعة': 'Printer', 'حاسوب': 'Computer', 'إنترنت': 'Internet', 'اتصال': 'Connection',
-        'غير محدد': 'Not specified', '-': '-'
+        'كلية الطب البيطري': 'College of Veterinary Medicine',
+        'كلية علوم الحاسوب': 'College of Computer Science',
+        'كلية التعليم الصناعي': 'College of Industrial Education',
+        'كلية الدراسات العليا': 'Graduate Studies',
+        'عمادة القبول والتسجيل': 'Admissions & Registration',
+        'عمادة شؤون الطلاب': 'Student Affairs',
+        'الإدارة العامة': 'General Administration',
+        'كلية الطب': 'College of Medicine',
+        'كلية الهندسة': 'College of Engineering',
+        'كلية العلوم': 'College of Science',
+        'كلية الآداب': 'College of Arts',
+        'كلية الاقتصاد': 'College of Economics',
+        'كلية الحقوق': 'College of Law',
+        'كلية التربية': 'College of Education',
+        'كلية الزراعة': 'College of Agriculture',
+        'كلية الصيدلة': 'College of Pharmacy',
+        'كلية التمريض': 'College of Nursing',
+        'كلية الإعلام': 'College of Media',
+        'كلية الفنون': 'College of Arts and Design',
+        'مكتب عميد': 'Dean Office',
+        'مكتب العميد': 'Dean Office',
+        'مكتب': 'Office',
+        'قسم': 'Department of',
+        'لاب': 'Lab',
+        'معمل': 'Lab',
+        'قاعة': 'Hall',
+        'مدرج': 'Auditorium',
+        'مبنى': 'Building',
+        'طابق': 'Floor',
+        'الجهاز رقم': 'PC #',
+        'جهاز رقم': 'Device #',
+        'الجهاز': 'PC',
+        'جهاز': 'Device',
+        'رقم': '#',
+        'شبكة': 'Network',
+        'كيبل': 'Cable',
+        'طابعة': 'Printer',
+        'حاسوب': 'Computer',
+        'اتصال': 'Connection',
+        'غير محدد': 'Not specified',
+        'عطل في': 'Fault in',
+        'مشكلة في': 'Problem in',
+        'توقف': 'Down/Stopped',
+        'انقطاع': 'Outage'
     }
-    return translations.get(value, value)
+    if value in phrase_map:
+        return phrase_map[value]
+    result = value
+    for ar, en in phrase_map.items():
+        if ar in result:
+            result = result.replace(ar, en)
+    return result
 
 @app.context_processor
 def inject_app_name():

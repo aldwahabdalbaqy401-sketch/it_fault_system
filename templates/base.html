@@ -13,17 +13,26 @@
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script>
+        (function() {
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                document.documentElement.classList.add('dark-mode');
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', 'light');
+            }
+        })();
+    </script>
     <title>{% block title %}{{ APP_NAME }}{% endblock %}</title>
     <!-- Bootstrap 5 layout direction -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap{% if not is_english %}.rtl{% endif %}.min.css">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- Google Fonts Fast Preconnect -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Readex+Pro:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=37">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=38">
     
     <style>
         /* التعديلات البسيطة على التصميم والخطوط السريعة */
@@ -34,11 +43,117 @@
 
         body {
             font-family: var(--app-font-ar);
-            background-color: #f1f5f9;
+            background-color: var(--page-bg, #f1f5f9);
             line-height: 1.65;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             text-rendering: optimizeLegibility;
+            color: var(--text, #1e293b);
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+
+        /* Dark Mode High-Contrast Overrides */
+        html.dark-mode, body.dark-mode, [data-bs-theme="dark"] {
+            --page-bg: #090d16 !important;
+            --surface: #111827 !important;
+            --surface-muted: #172033 !important;
+            --surface-soft: #1f2d47 !important;
+            --surface-hover: #263859 !important;
+            --border: #1f293d !important;
+            --border-subtle: #192336 !important;
+            --text: #f8fafc !important;
+            --text-muted: #94a3b8 !important;
+            --text-light: #64748b !important;
+            background-color: #090d16 !important;
+            color: #f8fafc !important;
+        }
+
+        html.dark-mode .card, body.dark-mode .card,
+        html.dark-mode .bg-light, body.dark-mode .bg-light,
+        html.dark-mode .bg-white, body.dark-mode .bg-white,
+        html.dark-mode .modal-content, body.dark-mode .modal-content,
+        html.dark-mode .faults-filter-card, body.dark-mode .faults-filter-card,
+        html.dark-mode .faults-table-card, body.dark-mode .faults-table-card {
+            background-color: #111827 !important;
+            color: #f8fafc !important;
+            border-color: #1f293d !important;
+        }
+
+        html.dark-mode .table, body.dark-mode .table,
+        html.dark-mode .table > :not(caption) > * > *, body.dark-mode .table > :not(caption) > * > * {
+            background-color: #111827 !important;
+            color: #f8fafc !important;
+            border-color: #1f293d !important;
+        }
+
+        html.dark-mode .table-light, body.dark-mode .table-light,
+        html.dark-mode thead.table-light th, body.dark-mode thead.table-light th {
+            background-color: #0d131f !important;
+            color: #94a3b8 !important;
+            border-color: #1f293d !important;
+        }
+
+        html.dark-mode .table-hover tbody tr:hover, body.dark-mode .table-hover tbody tr:hover {
+            background-color: #172033 !important;
+            color: #f8fafc !important;
+        }
+
+        html.dark-mode .form-control, body.dark-mode .form-control,
+        html.dark-mode .form-select, body.dark-mode .form-select {
+            background-color: #090d16 !important;
+            color: #f8fafc !important;
+            border-color: #1f293d !important;
+        }
+
+        html.dark-mode .form-control:focus, body.dark-mode .form-control:focus,
+        html.dark-mode .form-select:focus, body.dark-mode .form-select:focus {
+            background-color: #0d131f !important;
+            color: #ffffff !important;
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25) !important;
+        }
+
+        html.dark-mode .form-control::placeholder, body.dark-mode .form-control::placeholder {
+            color: #64748b !important;
+        }
+
+        html.dark-mode .text-dark, body.dark-mode .text-dark {
+            color: #f8fafc !important;
+        }
+
+        html.dark-mode .text-muted, body.dark-mode .text-muted {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .text-secondary, body.dark-mode .text-secondary {
+            color: #cbd5e1 !important;
+        }
+
+        html.dark-mode .border, body.dark-mode .border,
+        html.dark-mode .border-bottom, body.dark-mode .border-bottom,
+        html.dark-mode .border-top, body.dark-mode .border-top {
+            border-color: #1f293d !important;
+        }
+
+        html.dark-mode .dropdown-menu, body.dark-mode .dropdown-menu {
+            background-color: #111827 !important;
+            border-color: #1f293d !important;
+            color: #f8fafc !important;
+        }
+
+        html.dark-mode .dropdown-item, body.dark-mode .dropdown-item {
+            color: #e2e8f0 !important;
+        }
+
+        html.dark-mode .dropdown-item:hover, body.dark-mode .dropdown-item:hover {
+            background-color: #1f2d47 !important;
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .badge.bg-light, body.dark-mode .badge.bg-light {
+            background-color: #1f2d47 !important;
+            color: #cbd5e1 !important;
+            border-color: #334155 !important;
         }
 
         h1, h2, h3, h4, h5, h6,
@@ -767,7 +882,11 @@
                 'عرض الأعطال': 'View Faults', 'قائمة الأعطال': 'Fault List', 'بلاغاتي': 'My Faults',
                 'إضافة بلاغ': 'Add Report', 'عرض البلاغات': 'View Reports', 'الإشعارات': 'Notifications',
                 'دعم الفنيين': 'Technician Support', 'الإحصائيات المتقدمة': 'Advanced Statistics',
-                'لوحة التحكم الرئيسية': 'Main Dashboard', 'نظام إدارة وتتبع الأعطال التقنية': 'Technical Fault Management and Tracking System',
+                'الإحصائيات': 'Statistics', 'قاعدة المعرفة': 'Knowledge Base',
+                'بوابتي': 'My Portal', 'تقديم بلاغ جديد': 'Report Fault', 'الحلول السريعة': 'Solutions',
+                'سجل بلاغاتي': 'My Reports', 'مهامي الفنية': 'My Tasks', 'جميع البلاغات': 'All Faults',
+                'المستخدمين': 'Users', 'البلاغات': 'Faults', 'إدارة المستخدمين': 'Users Management',
+                'لوحة التحكم الرئيسية': 'Main Dashboard', 'نظام إدارة وتتبع الأعطال التقنية': 'Technical Fault Management System',
                 'مرحباً بك': 'Welcome', 'إليك نظرة عامة على حالة النظام.': 'Here is an overview of the system status.',
                 'نشط': 'Active', 'مدير النظام': 'System Administrator', 'مواعيد صيانة قريبة': 'Upcoming maintenance appointments',
                 'خلال': 'In', 'يوم': 'day(s)', 'إجمالي الأعطال': 'Total faults', 'تم حلها': 'Resolved',
@@ -775,6 +894,7 @@
                 'الأعطال حسب الأولوية': 'Faults by priority', 'تقنية المعلومات': 'Information Technology', 'الشبكات': 'Networks',
                 'الدعم الفني': 'Technical Support', 'التشغيل': 'Operations', 'الصيانة': 'Maintenance',
                 'حرج': 'Critical', 'عالي': 'High', 'متوسط': 'Medium', 'منخفض': 'Low',
+                'حرجة': 'Critical', 'عالية': 'High', 'متوسطة': 'Medium', 'منخفضة': 'Low',
                 'إجراءات سريعة': 'Quick actions', 'إحصائيات متقدمة': 'Advanced statistics',
                 'مركز الدعم الفني': 'Technical Support Center', 'مركز البلاغات': 'Reports Center',
                 'مركز العمليات': 'Operations Center', 'مركز التحليل': 'Analysis Center',
@@ -784,18 +904,20 @@
                 'إرفاق ملف': 'Attach file', 'اختياري': 'Optional', 'الكل': 'All', 'تصفية': 'Filter',
                 'إعادة ضبط': 'Reset', 'بحث بالعنوان': 'Search by title', 'من تاريخ': 'From date', 'إلى تاريخ': 'To date',
                 'جديد': 'New', 'قيد المعالجة': 'In progress', 'تم الحل': 'Resolved', 'مغلق': 'Closed',
-                'منخفضة': 'Low', 'متوسطة': 'Medium', 'عالية': 'High', 'حرجة': 'Critical',
                 'غير محدد': 'Not specified', 'لا يوجد وصف': 'No description', 'إلغاء': 'Cancel', 'حفظ العطل': 'Save fault',
-                'حفظ': 'Save', 'رجوع': 'Back', 'تعديل': 'Edit', 'حذف': 'Delete', 'محادثة': 'Chat',
-                'تسجيل خروج': 'Sign out', 'خروج': 'Sign out', 'إرسال': 'Send', 'صورة': 'Image',
+                'حفظ': 'Save', 'رجوع': 'Back', 'تعديل': 'Edit', 'حذف': 'Delete', 'محادثة': 'Chat', 'إسناد': 'Assign', 'إغلاق': 'Close',
+                'تسجيل خروج': 'Sign out', 'تسجيل الخروج': 'Sign out', 'خروج': 'Sign out', 'إرسال': 'Send', 'صورة': 'Image',
                 'اسم المستخدم': 'Username', 'الاسم الكامل': 'Full name', 'البريد الإلكتروني': 'Email',
                 'كلمة المرور': 'Password', 'تأكيد كلمة المرور': 'Confirm password', 'الصلاحية': 'Role',
                 'نوع المستخدم': 'User type', 'مستخدم': 'User', 'فني': 'Technician', 'مشرف': 'Supervisor', 'أدمن': 'Admin',
                 'طالب': 'Student', 'موظف': 'Employee', 'عضو هيئة تدريس': 'Faculty member', 'إداري': 'Administrative',
                 'لا توجد بلاغات مسندة إليك حالياً': 'No faults are currently assigned to you',
                 'لا توجد رسائل بعد': 'No messages yet', 'اختر المستلم': 'Select recipient', 'اكتب رسالتك...': 'Write your message...',
-                'تفاصيل البلاغ': 'Report details', 'تاريخ الإضافة': 'Created date', 'آخر تحديث': 'Last updated',
+                'تفاصيل البلاغ': 'Fault details', 'تاريخ الإضافة': 'Created date', 'آخر تحديث': 'Last updated',
                 'قيم مستوى الخدمة': 'Rate the service', 'تم التقييم': 'Rated', 'الإجراءات': 'Actions',
+                'رقم البلاغ': 'Report #', 'التاريخ': 'Date', 'السابق': 'Previous', 'التالي': 'Next', 'صفحة': 'Page', 'من': 'of',
+                'تصدير PDF': 'Export PDF', 'تصدير Excel': 'Export Excel', 'لا توجد أعطال مسجلة': 'No faults recorded',
+                'جرب تعديل معايير البحث أو إضافة عطل جديد.': 'Try changing your search criteria or add a new fault.',
                 'إجمالي الأعطال': 'Total faults', 'إجمالي البلاغات': 'Total reports', 'بلاغات مكتملة': 'Completed reports',
                 'قيد المتابعة': 'Under follow-up', 'بلاغات حرجة': 'Critical reports', 'الإجراءات السريعة': 'Quick actions',
                 'نسبة الحل': 'Resolution rate', 'نسبة الإنجاز': 'Completion rate', 'دليل المستخدم': 'User guide',
@@ -806,11 +928,23 @@
                 'مقروء': 'Read', 'عرض كل الإشعارات': 'View all notifications',
                 'تم تفعيل الوضع الليلي': 'Dark mode enabled', 'تم تفعيل الوضع النهاري': 'Light mode enabled',
                 'الملف المختار:': 'Selected file:', 'جارٍ الحفظ...': 'Saving...',
+                'تثبيت التطبيق': 'Install App', 'تثبيت الآن': 'Install Now', 'تثبيت نظام الأعطال': 'Install Fault System',
+                'تطبيق سريع على شاشة هاتفك': 'Fast app on your home screen',
                 'أولوية منخفضة للطلبات غير العاجلة': 'Low priority for non-urgent requests',
                 'أولوية متوازنة للبلاغات العادية': 'Balanced priority for normal reports',
                 'أولوية عالية وتحتاج إلى متابعة قريبة': 'High priority and needs close follow-up',
                 'بلاغ حرج يحتاج إلى تدخل عاجل': 'Critical report requiring urgent intervention',
-                'عدد الأعطال': 'Number of faults', 'الرسائل الجديدة': 'New messages'
+                'عدد الأعطال': 'Number of faults', 'الرسائل الجديدة': 'New messages',
+                'كلية الهندسة': 'College of Engineering', 'كلية الحقوق': 'College of Law',
+                'كلية الطب': 'College of Medicine', 'كلية العلوم': 'College of Science',
+                'كلية الآداب': 'College of Arts', 'كلية الاقتصاد': 'College of Economics',
+                'كلية التربية': 'College of Education', 'كلية الزراعة': 'College of Agriculture',
+                'كلية الصيدلة': 'College of Pharmacy', 'كلية التمريض': 'College of Nursing',
+                'كلية علوم الحاسوب': 'College of Computer Science',
+                'عمادة شؤون الطلاب': 'Student Affairs', 'عمادة القبول والتسجيل': 'Admissions & Registration',
+                'الإدارة العامة': 'General Administration',
+                'قسم': 'Department of', 'مكتب': 'Office', 'عميد': 'Dean', 'لاب': 'Lab', 'معمل': 'Lab',
+                'الجهاز رقم': 'PC #', 'جهاز رقم': 'Device #', 'الجهاز': 'PC', 'جهاز': 'Device', 'رقم': '#'
             };
             const translationKeys = Object.keys(translations).sort((left, right) => right.length - left.length);
             const translate = value => {
@@ -875,37 +1009,37 @@
 
     <!-- Dark Mode Script -->
     <script>
-        (function () {
-            if (localStorage.getItem('darkMode') === 'enabled') {
-                document.documentElement.classList.add('dark-mode');
-            }
-        }());
-
         document.addEventListener('DOMContentLoaded', function() {
             const toggleBtn = document.getElementById('darkModeToggle');
             if (!toggleBtn) return;
             const icon = toggleBtn.querySelector('i');
             const body = document.body;
             
-            const darkMode = localStorage.getItem('darkMode');
-            if (darkMode === 'enabled') {
+            const isDark = localStorage.getItem('darkMode') === 'enabled';
+            if (isDark) {
                 body.classList.add('dark-mode');
                 document.documentElement.classList.add('dark-mode');
-                icon.classList.replace('bi-moon-fill', 'bi-sun-fill');
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+                if (icon) icon.classList.replace('bi-moon-fill', 'bi-sun-fill');
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', 'light');
             }
             
             toggleBtn.addEventListener('click', function() {
-                body.classList.toggle('dark-mode');
-                document.documentElement.classList.toggle('dark-mode');
-                if (body.classList.contains('dark-mode')) {
+                const willBeDark = !body.classList.contains('dark-mode');
+                body.classList.toggle('dark-mode', willBeDark);
+                document.documentElement.classList.toggle('dark-mode', willBeDark);
+                document.documentElement.setAttribute('data-bs-theme', willBeDark ? 'dark' : 'light');
+                
+                if (willBeDark) {
                     localStorage.setItem('darkMode', 'enabled');
-                    icon.classList.replace('bi-moon-fill', 'bi-sun-fill');
+                    if (icon) icon.classList.replace('bi-moon-fill', 'bi-sun-fill');
                     toggleBtn.title = window.APP_LANGUAGE === 'en' ? 'Switch to light mode' : 'تفعيل الوضع النهاري';
                     toggleBtn.setAttribute('aria-label', toggleBtn.title);
                     showToast(window.APP_LANGUAGE === 'en' ? 'Dark mode enabled' : 'تم تفعيل الوضع الليلي', 'info');
                 } else {
                     localStorage.setItem('darkMode', 'disabled');
-                    icon.classList.replace('bi-sun-fill', 'bi-moon-fill');
+                    if (icon) icon.classList.replace('bi-sun-fill', 'bi-moon-fill');
                     toggleBtn.title = window.APP_LANGUAGE === 'en' ? 'Toggle dark mode' : 'تبديل الوضع الليلي';
                     toggleBtn.setAttribute('aria-label', toggleBtn.title);
                     showToast(window.APP_LANGUAGE === 'en' ? 'Light mode enabled' : 'تم تفعيل الوضع النهاري', 'info');
