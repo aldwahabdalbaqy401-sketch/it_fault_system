@@ -388,6 +388,7 @@ def login():
                 session['username'] = user['username']
                 session['user_role'] = user['role']
                 session['full_name'] = user['full_name']
+                session['user_name'] = user['full_name'] or user['username']
                 session['email'] = user.get('email', '')
                 session['phone'] = user.get('phone', '')
                 session['department'] = user.get('department', '')

@@ -129,7 +129,7 @@
         .navbar {
             position: relative;
             z-index: 1050;
-            overflow: hidden !important;
+            overflow: visible !important;
             width: 100%;
             min-height: 76px;
             background: linear-gradient(135deg, #091a36 0%, #1e3a8a 52%, #2563eb 100%) !important;
@@ -578,29 +578,29 @@
                                 0
                             </span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-notif shadow-lg" aria-labelledby="notifDropdownToggle" id="notifList">
-                            <li><h6 class="dropdown-header d-flex justify-content-between align-items-center bg-light border-bottom py-2">
+                        <div class="dropdown-menu dropdown-menu-end dropdown-menu-notif shadow-lg" aria-labelledby="notifDropdownToggle" id="notifList">
+                            <div class="dropdown-header d-flex justify-content-between align-items-center bg-light border-bottom py-2">
                                 <span class="fw-bold text-dark"><i class="bi bi-bell-fill text-primary me-2"></i> {{ 'Notifications' if is_english else 'الإشعارات' }}</span>
-                                <button class="btn btn-sm btn-link text-decoration-none" onclick="markAllReadHeader()">{{ 'Read' if is_english else 'مقروء' }}</button>
-                            </h6></li>
-                            <div id="notifItemsContainer">
-                                <li><a class="dropdown-item text-center text-muted small py-3" href="#">{{ 'Loading...' if is_english else 'جاري التحميل...' }}</a></li>
+                                <button type="button" class="btn btn-sm btn-link text-decoration-none" onclick="markAllReadHeader()">{{ 'Read' if is_english else 'مقروء' }}</button>
                             </div>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-center text-primary" href="{{ url_for('notifications') }}">{{ 'View all notifications' if is_english else 'عرض كل الإشعارات' }}</a></li>
-                        </ul>
+                            <div id="notifItemsContainer">
+                                <div class="dropdown-item text-center text-muted small py-3">{{ 'Loading...' if is_english else 'جاري التحميل...' }}</div>
+                            </div>
+                            <div class="dropdown-divider m-0"></div>
+                            <a class="dropdown-item text-center text-primary py-2 fw-bold" href="{{ url_for('notifications') }}">{{ 'View all notifications' if is_english else 'عرض كل الإشعارات' }}</a>
+                        </div>
                     </li>
                     <!-- User Profile / Logout Dropdown -->
                     <li class="nav-item dropdown me-2">
                         <a class="nav-link dropdown-toggle text-white d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="rounded-circle bg-white text-primary d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: bold;">
-                                {{ session.get('user_name', 'U')[:1] | upper }}
+                                {{ (session.get('full_name') or session.get('username') or 'U')[:1] | upper }}
                             </div>
-                            <span class="d-none d-lg-inline">{{ session.get('user_name') }}</span>
+                            <span class="d-none d-lg-inline">{{ session.get('full_name') or session.get('username') }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow">
                             <li class="px-3 py-2 border-bottom">
-                                <div class="fw-bold">{{ session.get('user_name') }}</div>
+                                <div class="fw-bold">{{ session.get('full_name') or session.get('username') }}</div>
                                 <small class="badge bg-primary text-white">{{ session.get('user_role') }}</small>
                             </li>
                             <li><a class="dropdown-item text-danger d-flex align-items-center gap-2" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> {{ 'Sign out' if is_english else 'تسجيل الخروج' }}</a></li>
@@ -964,24 +964,22 @@
                             const targetHref = notif.fault_id ? `/fault_details/${notif.fault_id}` : '/notifications';
                             const faultBadge = notif.fault_id ? `<span class="badge bg-light text-dark border"><i class="bi bi-hash"></i>${notif.fault_id}</span>` : '';
                             html += `
-                                <li>
-                                    <div class="notif-item-wrapper">
-                                        <button class="notif-delete-btn" onclick="deleteNotification(event, ${notif.id})" title="إزالة الإشعار" aria-label="إزالة الإشعار">&times;</button>
-                                        <a href="${targetHref}" class="notif-item text-start ${isUnread}">
-                                            <div class="fw-bold mb-1">${notif.message}</div>
-                                            <div class="small text-muted d-flex justify-content-between align-items-center mt-2">
-                                                ${faultBadge}
-                                                <span dir="ltr"><i class="bi bi-clock me-1"></i>${notif.created_at || ''}</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                </li>
+                                <div class="notif-item-wrapper">
+                                    <button type="button" class="notif-delete-btn" onclick="deleteNotification(event, ${notif.id})" title="{{ 'Remove notification' if is_english else 'إزالة الإشعار' }}" aria-label="{{ 'Remove notification' if is_english else 'إزالة الإشعار' }}">&times;</button>
+                                    <a href="${targetHref}" class="notif-item text-start ${isUnread}">
+                                        <div class="fw-bold mb-1">${notif.message}</div>
+                                        <div class="small text-muted d-flex justify-content-between align-items-center mt-2">
+                                            ${faultBadge}
+                                            <span dir="ltr"><i class="bi bi-clock me-1"></i>${notif.created_at || ''}</span>
+                                        </div>
+                                    </a>
+                                </div>
                             `;
                         });
                         container.innerHTML = html;
                     } else {
                         badge.style.display = 'none';
-                        container.innerHTML = `<li><div class="dropdown-item text-center text-muted small py-3"><i class="bi bi-bell-slash fs-4 d-block mb-2"></i> لا توجد إشعارات</div></li>`;
+                        container.innerHTML = `<div class="dropdown-item text-center text-muted small py-3"><i class="bi bi-bell-slash fs-4 d-block mb-2"></i> {{ 'No notifications' if is_english else 'لا توجد إشعارات' }}</div>`;
                     }
                 })
                 .catch(err => console.error('Error fetching notifications:', err));
